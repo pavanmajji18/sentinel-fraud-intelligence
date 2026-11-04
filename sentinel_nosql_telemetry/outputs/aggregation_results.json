@@ -1,0 +1,338 @@
+{
+  "pipeline_1_mcc_exposure": {
+    "description": "Fraud rate (%) and financial exposure per merchant_category",
+    "stages_defined": 3,
+    "results": [
+      {
+        "total_txns": 554,
+        "fraud_txns": 10,
+        "total_amount_paise": 232384189,
+        "merchant_category": "gaming",
+        "total_amount_inr": 2323841.89,
+        "avg_amount_inr": 4194.66,
+        "fraud_amount_inr": 468415.33,
+        "fraud_rate_pct": 1.81
+      },
+      {
+        "total_txns": 396,
+        "fraud_txns": 7,
+        "total_amount_paise": 201301643,
+        "merchant_category": "gift_cards",
+        "total_amount_inr": 2013016.43,
+        "avg_amount_inr": 5083.37,
+        "fraud_amount_inr": 180574.51,
+        "fraud_rate_pct": 1.77
+      },
+      {
+        "total_txns": 798,
+        "fraud_txns": 10,
+        "total_amount_paise": 878889192,
+        "merchant_category": "electronics",
+        "total_amount_inr": 8788891.92,
+        "avg_amount_inr": 11013.65,
+        "fraud_amount_inr": 162583.09,
+        "fraud_rate_pct": 1.25
+      },
+      {
+        "total_txns": 812,
+        "fraud_txns": 0,
+        "total_amount_paise": 983302796,
+        "merchant_category": "quick_commerce",
+        "total_amount_inr": 9833027.96,
+        "avg_amount_inr": 12109.64,
+        "fraud_amount_inr": 0.0,
+        "fraud_rate_pct": 0.0
+      },
+      {
+        "total_txns": 304,
+        "fraud_txns": 0,
+        "total_amount_paise": 472066490,
+        "merchant_category": "other",
+        "total_amount_inr": 4720664.9,
+        "avg_amount_inr": 15528.5,
+        "fraud_amount_inr": 0.0,
+        "fraud_rate_pct": 0.0
+      },
+      {
+        "total_txns": 1071,
+        "fraud_txns": 0,
+        "total_amount_paise": 223433091,
+        "merchant_category": "grocery",
+        "total_amount_inr": 2234330.91,
+        "avg_amount_inr": 2086.21,
+        "fraud_amount_inr": 0.0,
+        "fraud_rate_pct": 0.0
+      },
+      {
+        "total_txns": 687,
+        "fraud_txns": 0,
+        "total_amount_paise": 143454447,
+        "merchant_category": "food",
+        "total_amount_inr": 1434544.47,
+        "avg_amount_inr": 2088.13,
+        "fraud_amount_inr": 0.0,
+        "fraud_rate_pct": 0.0
+      },
+      {
+        "total_txns": 381,
+        "fraud_txns": 0,
+        "total_amount_paise": 96427602,
+        "merchant_category": "healthcare",
+        "total_amount_inr": 964276.02,
+        "avg_amount_inr": 2530.91,
+        "fraud_amount_inr": 0.0,
+        "fraud_rate_pct": 0.0
+      },
+      {
+        "total_txns": 223,
+        "fraud_txns": 0,
+        "total_amount_paise": 64404047,
+        "merchant_category": "education",
+        "total_amount_inr": 644040.47,
+        "avg_amount_inr": 2888.07,
+        "fraud_amount_inr": 0.0,
+        "fraud_rate_pct": 0.0
+      },
+      {
+        "total_txns": 274,
+        "fraud_txns": 0,
+        "total_amount_paise": 62432531,
+        "merchant_category": "travel",
+        "total_amount_inr": 624325.31,
+        "avg_amount_inr": 2278.56,
+        "fraud_amount_inr": 0.0,
+        "fraud_rate_pct": 0.0
+      }
+    ]
+  },
+  "pipeline_2a_personal_24h_velocity": {
+    "description": "Top 10 accounts by 24-hour spend velocity (per-customer rolling 24h peak window)",
+    "window_definition": "[customer_peak_window_end - 24h, customer_peak_window_end]",
+    "results": [
+      {
+        "txns_in_24h": 9,
+        "total_spend_24h_paise": 800940216,
+        "fraud_txns_in_24h": 0,
+        "window_start_utc": "2024-10-20 11:33:57.458000+00:00",
+        "window_end_utc": "2024-10-20 11:42:39.591000+00:00",
+        "channels_used": [
+          "UPI"
+        ],
+        "customer_id": "C_9b3aee21759c3763",
+        "total_spend_24h_inr": 8009402.16,
+        "max_single_txn_inr": 7995933.05
+      },
+      {
+        "txns_in_24h": 2,
+        "total_spend_24h_paise": 578271761,
+        "fraud_txns_in_24h": 0,
+        "window_start_utc": "2024-11-05 17:32:19.313000+00:00",
+        "window_end_utc": "2024-11-05 17:33:54.900000+00:00",
+        "channels_used": [
+          "card"
+        ],
+        "customer_id": "C_ec0917ec69fef0e2",
+        "total_spend_24h_inr": 5782717.61,
+        "max_single_txn_inr": 5780139.65
+      },
+      {
+        "txns_in_24h": 3,
+        "total_spend_24h_paise": 406239725,
+        "fraud_txns_in_24h": 0,
+        "window_start_utc": "2024-10-05 05:55:22.055000+00:00",
+        "window_end_utc": "2024-10-05 05:57:28.721000+00:00",
+        "channels_used": [
+          "UPI"
+        ],
+        "customer_id": "C_d7627b94e4877d99",
+        "total_spend_24h_inr": 4062397.25,
+        "max_single_txn_inr": 4060489.61
+      },
+      {
+        "txns_in_24h": 8,
+        "total_spend_24h_paise": 31380274,
+        "fraud_txns_in_24h": 0,
+        "window_start_utc": "2024-10-16 03:32:24.762000+00:00",
+        "window_end_utc": "2024-10-17 00:40:04.376000+00:00",
+        "channels_used": [
+          "UPI",
+          "card"
+        ],
+        "customer_id": "C_1f99ce6bdd6ab058",
+        "total_spend_24h_inr": 313802.74,
+        "max_single_txn_inr": 274058.54
+      },
+      {
+        "txns_in_24h": 9,
+        "total_spend_24h_paise": 24190080,
+        "fraud_txns_in_24h": 0,
+        "window_start_utc": "2024-10-22 12:47:26.198000+00:00",
+        "window_end_utc": "2024-10-22 12:56:38.370000+00:00",
+        "channels_used": [
+          "UPI"
+        ],
+        "customer_id": "C_4c80552c1bd9fbca",
+        "total_spend_24h_inr": 241900.8,
+        "max_single_txn_inr": 178538.14
+      },
+      {
+        "txns_in_24h": 8,
+        "total_spend_24h_paise": 23027745,
+        "fraud_txns_in_24h": 1,
+        "window_start_utc": "2024-10-21 00:59:54.342000+00:00",
+        "window_end_utc": "2024-10-21 01:05:59.019000+00:00",
+        "channels_used": [
+          "UPI"
+        ],
+        "customer_id": "C_20d02d4ebc5df27b",
+        "total_spend_24h_inr": 230277.45,
+        "max_single_txn_inr": 174209.21
+      },
+      {
+        "txns_in_24h": 6,
+        "total_spend_24h_paise": 17832230,
+        "fraud_txns_in_24h": 0,
+        "window_start_utc": "2024-10-25 23:05:32.631000+00:00",
+        "window_end_utc": "2024-10-25 23:12:37.994000+00:00",
+        "channels_used": [
+          "card"
+        ],
+        "customer_id": "C_1aa451e90647f952",
+        "total_spend_24h_inr": 178322.3,
+        "max_single_txn_inr": 138850.61
+      },
+      {
+        "txns_in_24h": 9,
+        "total_spend_24h_paise": 16699584,
+        "fraud_txns_in_24h": 0,
+        "window_start_utc": "2024-10-04 06:44:02.591000+00:00",
+        "window_end_utc": "2024-10-04 06:55:30.491000+00:00",
+        "channels_used": [
+          "UPI"
+        ],
+        "customer_id": "C_10ac8ffb32236498",
+        "total_spend_24h_inr": 166995.84,
+        "max_single_txn_inr": 81644.17
+      },
+      {
+        "txns_in_24h": 7,
+        "total_spend_24h_paise": 15257471,
+        "fraud_txns_in_24h": 0,
+        "window_start_utc": "2024-10-28 21:47:54.203000+00:00",
+        "window_end_utc": "2024-10-28 21:57:24.234000+00:00",
+        "channels_used": [
+          "card"
+        ],
+        "customer_id": "C_4107507e8652aca9",
+        "total_spend_24h_inr": 152574.71,
+        "max_single_txn_inr": 73326.17
+      },
+      {
+        "txns_in_24h": 7,
+        "total_spend_24h_paise": 14391512,
+        "fraud_txns_in_24h": 1,
+        "window_start_utc": "2024-11-26 18:38:31.981000+00:00",
+        "window_end_utc": "2024-11-26 18:43:31.646000+00:00",
+        "channels_used": [
+          "UPI"
+        ],
+        "customer_id": "C_52094f023f449fb3",
+        "total_spend_24h_inr": 143915.12,
+        "max_single_txn_inr": 130570.45
+      }
+    ]
+  },
+  "pipeline_2b_global_24h_velocity": {
+    "description": "Top 10 accounts by 24-hour spend velocity (global dataset trailing 24h window)",
+    "global_window_start_utc": "2026-01-30T04:36:47.526000+00:00",
+    "global_window_end_utc": "2026-01-31 04:36:47.526000+00:00",
+    "results": [
+      {
+        "txns_in_global_24h": 1,
+        "total_spend_24h_paise": 324560,
+        "fraud_txns_in_24h": 0,
+        "latest_txn_utc": "2026-01-31 04:36:47.526000+00:00",
+        "customer_id": "C_fc2e7b5b12031d4a",
+        "total_spend_24h_inr": 3245.6
+      }
+    ]
+  },
+  "pipeline_3_reason_code_precision": {
+    "description": "Risk signal precision and volume attribution across R01-R08 via unwind",
+    "stages_defined": 5,
+    "results": [
+      {
+        "trigger_count": 184,
+        "fraud_hits": 19,
+        "reason_code": "R05_AMOUNT_SPIKE",
+        "genuine_hits": 165,
+        "exposed_volume_inr": 21501923.74,
+        "fraud_volume_inr": 586915.79,
+        "precision_pct": 10.33
+      },
+      {
+        "trigger_count": 474,
+        "fraud_hits": 24,
+        "reason_code": "R04_FAILED_ATTEMPTS",
+        "genuine_hits": 450,
+        "exposed_volume_inr": 4062318.15,
+        "fraud_volume_inr": 635317.09,
+        "precision_pct": 5.06
+      },
+      {
+        "trigger_count": 741,
+        "fraud_hits": 22,
+        "reason_code": "R07_VELOCITY",
+        "genuine_hits": 719,
+        "exposed_volume_inr": 4532727.98,
+        "fraud_volume_inr": 624176.86,
+        "precision_pct": 2.97
+      },
+      {
+        "trigger_count": 729,
+        "fraud_hits": 19,
+        "reason_code": "R03_ODD_HOUR",
+        "genuine_hits": 710,
+        "exposed_volume_inr": 3606249.2,
+        "fraud_volume_inr": 405580.11,
+        "precision_pct": 2.61
+      },
+      {
+        "trigger_count": 1598,
+        "fraud_hits": 25,
+        "reason_code": "R08_HIGH_RISK_MCC",
+        "genuine_hits": 1573,
+        "exposed_volume_inr": 12529121.05,
+        "fraud_volume_inr": 661062.58,
+        "precision_pct": 1.56
+      },
+      {
+        "trigger_count": 4397,
+        "fraud_hits": 20,
+        "reason_code": "R02_GEO_MISMATCH",
+        "genuine_hits": 4377,
+        "exposed_volume_inr": 30169802.91,
+        "fraud_volume_inr": 437032.27,
+        "precision_pct": 0.45
+      },
+      {
+        "trigger_count": 1717,
+        "fraud_hits": 0,
+        "reason_code": "R01_NEW_DEVICE",
+        "genuine_hits": 1717,
+        "exposed_volume_inr": 4031571.5,
+        "fraud_volume_inr": 0.0,
+        "precision_pct": 0.0
+      },
+      {
+        "trigger_count": 22,
+        "fraud_hits": 0,
+        "reason_code": "R06_NEW_ACCOUNT",
+        "genuine_hits": 22,
+        "exposed_volume_inr": 76422.36,
+        "fraud_volume_inr": 0.0,
+        "precision_pct": 0.0
+      }
+    ]
+  }
+}

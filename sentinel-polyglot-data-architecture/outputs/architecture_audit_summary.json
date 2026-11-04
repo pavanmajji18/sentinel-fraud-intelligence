@@ -1,0 +1,54 @@
+{
+  "loader_tier": "Tier 3 (Deterministic Schema-Compliant Synthetic Telemetry: 5,500 txns, seed=42)",
+  "privacy_audit": {
+    "compliance_standard": "DPDP Act 2023 & PCI-DSS v4.0 Data Minimization",
+    "forbidden_pii_columns_checked": 12,
+    "redacted_columns": [],
+    "tokenized_customer_ids_verified": 500,
+    "tokenized_merchant_ids_verified": 120,
+    "tokenized_device_ids_verified": 900,
+    "all_records_synthetic_verified": true
+  },
+  "tables_verified": 18,
+  "temporal_leakage_audit": {
+    "pre_validation_rows": 4878,
+    "mature_rows_at_boundary": 3368,
+    "purged_immature_rows_60d_window": 1510
+  },
+  "worked_example_TX_0000842910": {
+    "amount_inr": 48500.0,
+    "amount_paise": 4850000,
+    "FE_01_amount_to_avg_ratio": 9.7,
+    "FE_02_is_new_device": true,
+    "FE_03_customer_merchant_distance_km": 1739.8,
+    "FE_03_is_new_city": false,
+    "FE_04_hour_of_day_ist": 2,
+    "FE_04_is_night": true,
+    "FE_05_failed_transactions_24h": 3,
+    "FE_05_has_recent_failures": true,
+    "FE_06_account_age_days": 15,
+    "FE_06_is_new_account": true,
+    "FE_07_txn_count_last_1h": 4,
+    "FE_07_txn_amount_last_24h_paise": 2150000,
+    "FE_08_mcc_target_encoded_rate": 0.01205,
+    "FE_09_distinct_customers_per_device_7d": 4,
+    "FE_10_combined_risk_flags": 5,
+    "reason_codes_fired": [
+      "R01_NEW_DEVICE",
+      "R02_GEO_MISMATCH",
+      "R03_ODD_HOUR",
+      "R04_FAILED_ATTEMPTS",
+      "R05_AMOUNT_SPIKE",
+      "R06_NEW_ACCOUNT",
+      "R07_VELOCITY",
+      "R08_HIGH_RISK_MCC"
+    ]
+  },
+  "polyglot_latency_budget_ms": 62,
+  "data_quality_audit": {
+    "missing_customer_location_rate": 0.0298,
+    "missing_device_rate": 0.0107,
+    "null_telemetry_false_positive_codes": 0
+  },
+  "all_gates_passed": true
+}

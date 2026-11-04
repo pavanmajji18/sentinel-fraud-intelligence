@@ -1,0 +1,16 @@
+merchant_id,merchant_name,merchant_category,shared_device_txns,distinct_shared_devices,distinct_shared_customers,confirmed_fraud_txns,fraud_rate_pct,shared_device_volume_inr
+M_b15c5e4c19a34cc6,Merchant_Electronics_028,electronics,76,44,60,48,63.16,2046665.84
+M_91fd430abec5a213,Merchant_Electronics_021,electronics,74,36,63,54,72.97,2201725.89
+M_284df6b5c8a360ae,Merchant_Travel_032,travel,68,41,60,42,61.76,1826968.38
+M_f4caa346bafafd3e,Merchant_Travel_033,travel,65,41,55,40,61.54,1456717.53
+M_fbc56865d6f27b2d,Merchant_Travel_020,travel,62,28,54,43,69.35,1756328.1
+M_e9c05049527a28f5,Merchant_Travel_015,travel,61,34,55,47,77.05,1710563.22
+M_eaddf6ba969de66d,Merchant_Travel_034,travel,61,34,53,42,68.85,1681837.61
+M_18bae063a825a759,Merchant_Travel_013,travel,61,33,53,41,67.21,1460875.62
+M_a009f012be7c0d67,Merchant_Gaming_001,gaming,59,40,50,40,67.8,1392204.47
+M_fec01df425aaf906,Merchant_Gaming_027,gaming,47,28,44,35,74.47,1350699.84
+M_a3fd80b0dec1bff6,Merchant_Quick_Commerce_017,quick_commerce,40,37,39,1,2.5,81741.48
+M_3bbf5d4ee058700d,Merchant_Gaming_058,gaming,38,37,36,2,5.26,101972.09
+M_2b2d02a05bea2b05,Merchant_Utilities_065,utilities,37,36,33,0,0.0,106861.06
+M_45d51fa5f94852d0,Merchant_Electronics_082,electronics,36,34,35,9,25.0,82831.79
+M_13ff090d22b843cf,Merchant_Gaming_057,gaming,36,34,35,5,13.89,85764.45

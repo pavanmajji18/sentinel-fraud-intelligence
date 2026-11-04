@@ -1,0 +1,35 @@
+# ============================================================================
+# Project SENTINEL — Hardened DPDP Act 2023 & PCI-DSS v4.0 .gitignore
+# ============================================================================
+.env
+.env.*
+!.env.example
+
+# Cryptographic keys & certificates
+*.pem
+*.ppk
+*.key
+*.crt
+*.p12
+
+# Raw telemetry & binary dumps (Never commit raw payment data)
+sentinel_data/
+data/
+*.parquet
+*.npz
+*.dump
+*.bson
+*.sqlite
+*.db
+
+# Python & virtual environments
+__pycache__/
+*.py[cod]
+*.py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.DS_Store

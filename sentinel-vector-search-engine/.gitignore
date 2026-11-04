@@ -1,0 +1,27 @@
+# Secrets & Environment Variables (DPDP Act 2023 & PCI-DSS v4.0 Hardened)
+.env
+.env.*
+!.env.example
+*.pem
+*.ppk
+*.key
+*.crt
+
+# Raw Data & Dumps (Never stage raw telemetry or binary dumps)
+sentinel_data/
+data/
+*.parquet
+*.npz
+*.dump
+*.bson
+
+# Python Bytecode & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.DS_Store

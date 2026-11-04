@@ -1,0 +1,40 @@
+name: Sentinel Fraud Intelligence CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  audit-and-verify:
+    name: Subsystem Quality & Syntax Audit
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install Common Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas pytest fastapi httpx uvicorn pydantic
+
+      - name: Audit Subsystems Code Quality & Artifacts
+        run: |
+          python verify_all_subsystems.py --audit
+
+      - name: Run FastAPI RAG Assistant Unit Tests
+        run: |
+          cd sentinel_rag_investigator
+          pytest tests/ -v
+

@@ -1,0 +1,33 @@
+# Environment & Secrets (DPDP Act 2023 & PCI-DSS v4.0 Guardrail)
+.env
+.env.*
+!.env.example
+*.pem
+*.ppk
+*.key
+*.crt
+
+# Raw Telemetry & Local Data Dumps
+sentinel_data/
+data/
+*.parquet
+*.npz
+*.dump
+*.bson
+
+# Neo4j Volume Artifacts
+neo4j_data/
+neo4j_logs/
+neo4j_import/
+neo4j_plugins/
+
+# Python Bytecode & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.DS_Store

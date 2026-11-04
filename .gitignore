@@ -1,0 +1,96 @@
+# ==============================================================================
+# Project SENTINEL — Root GitIgnore (DPDP Act 2023 & PCI-DSS v4.0 Hardened)
+# Prevents accidental commit of secrets, database credentials, raw telemetry,
+# local database volumes, and virtual environment directories.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Environment Variables & Secret Credentials (CRITICAL SECURITY RULE)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+*.env
+!.env.example
+*.pem
+*.ppk
+*.key
+*.crt
+*.p12
+secrets/
+credentials.json
+*_credential.json
+service_account.json
+
+# ------------------------------------------------------------------------------
+# 2. Virtual Environments & Python Packages
+# ------------------------------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+**/venv/
+**/.venv/
+**/env/
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+
+# ------------------------------------------------------------------------------
+# 3. Python Bytecode, Caches & Testing
+# ------------------------------------------------------------------------------
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+**/.pytest_cache/
+.mypy_cache/
+**/.mypy_cache/
+.ruff_cache/
+**/.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ------------------------------------------------------------------------------
+# 4. Raw Telemetry Dumps & Ephemeral Local Databases
+# ------------------------------------------------------------------------------
+sentinel_data/
+**/sentinel_data/
+data/
+**/data/
+*.parquet
+*.npz
+*.dump
+*.bson
+*.sqlite
+*.sqlite3
+*.db
+
+# ------------------------------------------------------------------------------
+# 5. Local Database Container Volumes & State
+# ------------------------------------------------------------------------------
+neo4j_data/
+neo4j_logs/
+neo4j_import/
+neo4j_plugins/
+sentinel_mongodb_data/
+qdrant_storage/
+**/qdrant_storage/
+
+# ------------------------------------------------------------------------------
+# 6. IDEs, OS & Editor Artifacts
+# ------------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+

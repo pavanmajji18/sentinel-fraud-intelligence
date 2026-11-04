@@ -1,0 +1,30 @@
+{
+  "privacy_audit": {
+    "compliance_standard": "DPDP Act 2023 & PCI-DSS v4.0 Data Minimization",
+    "forbidden_pii_columns_checked": 12,
+    "redacted_columns": [],
+    "tokenized_customer_ids_verified": 500,
+    "tokenized_merchant_ids_verified": 120,
+    "tokenized_device_ids_verified": 900,
+    "all_records_synthetic_verified": true
+  },
+  "service_metrics": {
+    "total_explain_requests": 10,
+    "grounding_pass_rate": 1.0,
+    "schema_compliance_rate": 1.0,
+    "template_fallback_invocations": 0,
+    "latency_p50_ms": 2.92,
+    "latency_p95_ms": 6.72,
+    "latency_p99_ms": 7.37,
+    "sla_p99_target_ms": 250.0,
+    "sla_compliant": true
+  },
+  "gates": {
+    "Gate 1 (DPDP Act 2023 & PCI-DSS v4.0 Zero-PII Gate)": true,
+    "Gate 2 (Qdrant 3072-d Policy Corpus >= 200 Docs Indexed)": true,
+    "Gate 3 (10 Validation Explanations: 5 Fraud + 5 Genuine)": true,
+    "Gate 4 (100% JSON Schema & Factual Grounding Compliance)": true,
+    "Gate 5 (10-Query Policy Retrieval Benchmark Hit@5 >= 90%)": true,
+    "Gate 6 (Real-Time p99 Scoring & RAG Latency <= 250 ms)": true
+  }
+}

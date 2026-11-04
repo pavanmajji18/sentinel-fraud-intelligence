@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  sentinel-mongodb:
+    image: mongo:7.0
+    container_name: sentinel-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: sentinel_fraud_db
+    volumes:
+      - sentinel_mongodb_data:/data/db
+    command: ["mongod", "--wiredTigerCacheSizeGB", "1.5", "--bind_ip_all"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sentinel_mongodb_data:

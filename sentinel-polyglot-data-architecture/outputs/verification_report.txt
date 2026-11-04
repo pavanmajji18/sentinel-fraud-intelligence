@@ -1,0 +1,33 @@
+========================================================================================
+PROJECT SENTINEL — POLYGLOT DATA ARCHITECTURE & TEMPORAL LEAKAGE VERIFIER
+========================================================================================
+
+[STAGE 1] Loading Sanitized Payment Telemetry & Enforcing Privacy Guardrails...
+  Active Loader Tier : Tier 3 (Deterministic Schema-Compliant Synthetic Telemetry: 5,500 txns, seed=42)
+  Compliance Standard: DPDP Act 2023 & PCI-DSS v4.0 Data Minimization
+  [PASS] Gate 1: DPDP Act 2023 & PCI-DSS v4.0 Zero-PII & Tokenization Verified.
+
+[STAGE 2] Auditing All 18 `sentinel_demo` Tables (Grain, PK, FK & Volumes)...
+  Verified 18/18 table schemas across 4 functional domains.
+  [PASS] Gate 2: Complete 18-Table Grain, PK, and FK Catalog Verified.
+
+[STAGE 3] Verifying 60-Day `label_available_at` Maturation & Temporal Leakage Guardrails...
+  Pre-Validation Rows: 4,878 | Mature at T_val: 3,368 | Purged Immature (60d window): 1,510
+  [PASS] Gate 3: 60-Day Maturation Window & Look-Ahead Leakage Filter Verified.
+
+[STAGE 4] Verifying Worked Numerical Derivation (FE-01..FE-10 & R01..R08 on TX_0000842910)...
+  FE-01=9.7, FE-03=1739.8km, FE-04=02:15 IST, FE-08=0.01205, FE-10=5
+  Reason Codes Fired (8/8): ['R01_NEW_DEVICE', 'R02_GEO_MISMATCH', 'R03_ODD_HOUR', 'R04_FAILED_ATTEMPTS', 'R05_AMOUNT_SPIKE', 'R06_NEW_ACCOUNT', 'R07_VELOCITY', 'R08_HIGH_RISK_MCC']
+  [PASS] Gate 4: FE-01..FE-10 & R01..R08 Exact Numerical Parity Verified.
+
+[STAGE 5] Auditing 4-Database Polyglot Storage Mapping & Latency Budget...
+  Combined 4-Store Retrieval Budget: 62 ms (well within p50 <= 80 ms, p99 <= 250 ms SLA)
+  [PASS] Gate 5: Polyglot 4-Database Architecture & Latency Budget Verified.
+
+[STAGE 6] Verifying Null-Safety Guardrails on Missing GPS (~3.01%) & Missing Device (~0.89%)...
+  Observed Missing Location Rate: 2.98% | Observed Missing Device Rate: 1.07%
+  [PASS] Gate 6: Data-Quality Null Guards (GPS, Device ID, Class Imbalance) Verified.
+
+========================================================================================
+ALL 6 SENTINEL ARCHITECTURE, PRIVACY, LEAKAGE & MATH GATES PASSED SUCCESSFULLY.
+========================================================================================
