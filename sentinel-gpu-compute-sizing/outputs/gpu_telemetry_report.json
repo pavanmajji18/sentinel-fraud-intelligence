@@ -1,0 +1,80 @@
+{
+  "timestamp_utc": "2026-11-04T17:51:13.376716+00:00",
+  "host_platform": "Windows-11-10.0.26300-SP0",
+  "privacy_governance_audit": {
+    "compliance_standard": "DPDP Act 2023 & PCI-DSS v4.0 Data Minimization",
+    "forbidden_pii_columns_checked": 12,
+    "redacted_columns": [],
+    "tokenized_customer_ids_verified": 2500,
+    "tokenized_merchant_ids_verified": 200,
+    "tokenized_device_ids_verified": 10120,
+    "all_records_synthetic_verified": true
+  },
+  "gpu_telemetry": {
+    "execution_mode": "LIVE_HARDWARE_GPU",
+    "gpu_index": 0,
+    "gpu_name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "driver_version": "566.07",
+    "vram_total_mib": 4096.0,
+    "vram_used_mib": 1084.0,
+    "vram_free_mib": 2881.0,
+    "gpu_utilization_pct": 15.0,
+    "temperature_c": 55.0,
+    "power_draw_w": 6.28,
+    "power_limit_w": 300.0,
+    "raw_nvidia_smi_table": "Wed Nov  4 23:21:08 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 566.07                 Driver Version: 566.07         CUDA Version: 12.7     |\n|-----------------------------------------+------------------------+----------------------+\n| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  NVIDIA GeForce RTX 3050 ...  WDDM  |   00000000:01:00.0  On |                  N/A |\n| N/A   55C    P8              6W /   35W |    1084MiB /   4096MiB |      4%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n                                                                                         \n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|    0   N/A  N/A      1976    C+G   ...Desktop\\frontend\\Docker Desktop.exe      N/A      |\n|    0   N/A  N/A      6100    C+G   ...on\\156.0.4314.58\\msedgewebview2.exe      N/A      |\n|    0   N/A  N/A      7192    C+G   ...383.0_x64__dt26b99r8h8gj\\RtkUWP.exe      N/A      |\n|    0   N/A  N/A      7252    C+G   ...2txyewy\\StartMenuExperienceHost.exe      N/A      |\n|    0   N/A  N/A      7600    C+G   ...CBS_cw5n1h2txyewy\\TextInputHost.exe      N/A      |\n|    0   N/A  N/A      8236    C+G   ...crosoft\\Edge\\Application\\msedge.exe      N/A      |\n|    0   N/A  N/A     10220    C+G   ...64__cv1g1gvanyjgm\\WhatsApp.Root.exe      N/A      |\n|    0   N/A  N/A     10756    C+G   ...cw5n1h2txyewy\\CrossDeviceResume.exe      N/A      |\n|    0   N/A  N/A     12448    C+G   ...nt.CBS_cw5n1h2txyewy\\SearchHost.exe      N/A      |\n|    0   N/A  N/A     13592    C+G   ...siveControlPanel\\SystemSettings.exe      N/A      |\n|    0   N/A  N/A     14556    C+G   ...on\\156.0.4314.58\\msedgewebview2.exe      N/A      |\n|    0   N/A  N/A     16392    C+G   ...s\\System32\\ApplicationFrameHost.exe      N/A      |\n|    0   N/A  N/A     17084    C+G   ...on\\156.0.4314.58\\msedgewebview2.exe      N/A      |\n|    0   N/A  N/A     17752    C+G   ...5n1h2txyewy\\ShellExperienceHost.exe      N/A      |\n|    0   N/A  N/A     23116    C+G   ...Programs\\Microsoft VS Code\\Code.exe      N/A      |\n|    0   N/A  N/A     24084    C+G   ...049_x64__8wekyb3d8bbwe\\ms-teams.exe      N/A      |\n|    0   N/A  N/A     24448    C+G   ...oogle\\Chrome\\Application\\chrome.exe      N/A      |\n|    0   N/A  N/A     26600    C+G   ...x64__qmba6cd70vzyy\\ArmouryCrate.exe      N/A      |\n|    0   N/A  N/A     27440    C+G   ...Antigravity IDE\\Antigravity IDE.exe      N/A      |\n|    0   N/A  N/A     28568    C+G   ...t.LockApp_cw5n1h2txyewy\\LockApp.exe      N/A      |\n|    0   N/A  N/A     29944    C+G   ...oogle\\Chrome\\Application\\chrome.exe      N/A      |\n|    0   N/A  N/A     30216    C+G   ...\\Copilot\\Application\\copilotapp.exe      N/A      |\n|    0   N/A  N/A     31496    C+G   C:\\Windows\\explorer.exe                     N/A      |\n|    0   N/A  N/A     35928    C+G   ...undocked_copilot\\copilotapphost.exe      N/A      |\n|    0   N/A  N/A     38980    C+G   C:\\Windows\\System32\\ShellHost.exe           N/A      |\n|    0   N/A  N/A     39776    C+G   ...ekyb3d8bbwe\\PhoneExperienceHost.exe      N/A      |\n+-----------------------------------------------------------------------------------------+\n"
+  },
+  "gemm_benchmark": {
+    "backend": "PyTorch 2.12.1+cpu (CPU, torch.float32)",
+    "matrix_shape": "2048x2048",
+    "iterations": 8,
+    "flops_formula": "2 * M * N * K per GEMM",
+    "flops_per_matmul": 17179869184,
+    "total_flops_executed": 137438953472,
+    "elapsed_seconds": 0.5557,
+    "measured_host_gflops": 247.33,
+    "measured_host_tflops": 0.2473,
+    "rtx_a6000_fp16_effective_tflops_at_42pct_mfu": 65.02,
+    "rtx_a6000_expected_wall_time_ms": 2.114,
+    "output_tensor_checksum": 45.32275
+  },
+  "mini_lora_benchmark": {
+    "layer_dimension_d_model": 3584,
+    "lora_rank_r": 16,
+    "lora_alpha": 32,
+    "batch_tokens": 512,
+    "frozen_base_parameters": 12845056,
+    "trainable_lora_parameters": 114688,
+    "trainable_parameter_pct": 0.885,
+    "parameter_reduction_factor": 112.0,
+    "frozen_w0_has_zero_grad": true,
+    "loss_value": 2.427875,
+    "grad_norm_lora_A": 0.0,
+    "grad_norm_lora_B": 0.01156,
+    "step_latency_ms": 158.95,
+    "full_finetune_layer_flops": 39460012032,
+    "lora_finetune_layer_flops": 26658996224,
+    "lora_compute_savings_pct": 32.44
+  },
+  "http_server_verification": {
+    "bound_host": "127.0.0.1",
+    "bound_port": 8080,
+    "health_http_status": 200,
+    "health_response": {
+      "status": "ok",
+      "service": "sentinel-gpu-telemetry-server"
+    },
+    "telemetry_http_status": 200,
+    "telemetry_verified_keys": [
+      "timestamp_utc",
+      "host_platform",
+      "privacy_governance_audit",
+      "gpu_telemetry",
+      "gemm_benchmark",
+      "mini_lora_benchmark"
+    ],
+    "dashboard_http_status": 200,
+    "dashboard_html_bytes": 5937,
+    "clean_shutdown": true
+  }
+}

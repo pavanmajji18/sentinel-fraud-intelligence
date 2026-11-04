@@ -1,0 +1,49 @@
+# ============================================================================
+# Project SENTINEL — Hardened Security & Data Governance .gitignore
+# Enforces DPDP Act 2023 & PCI-DSS v4.0 Zero-Secret / Zero-Raw-Dump Hygiene
+# ============================================================================
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.ppk
+*.key
+*.crt
+secrets/
+credentials.json
+
+# Raw Telemetry Dumps & Binary Stores (DPDP Act 2023 / PCI-DSS v4.0)
+sentinel_data/
+data/
+*.parquet
+*.npz
+*.dump
+*.bson
+*.sqlite
+*.db
+
+# Whitelist committed sample verification artifacts
+!**/outputs/*.csv
+!**/outputs/*.json
+!**/outputs/*.md
+!**/outputs/*.txt
+!**/outputs/*.png
+
+# Python Bytecode & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE & OS Artifacts
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

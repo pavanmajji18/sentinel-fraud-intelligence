@@ -57,7 +57,7 @@ htmlcov/
 .tox/
 
 # ------------------------------------------------------------------------------
-# 4. Raw Telemetry Dumps & Ephemeral Local Databases
+# 4. Raw Telemetry Dumps & Ephemeral Local Databases (DPDP Act 2023 / PCI-DSS v4.0)
 # ------------------------------------------------------------------------------
 sentinel_data/
 **/sentinel_data/
@@ -70,6 +70,13 @@ data/
 *.sqlite
 *.sqlite3
 *.db
+
+# Whitelist committed sample verification artifacts
+!**/outputs/*.csv
+!**/outputs/*.json
+!**/outputs/*.md
+!**/outputs/*.txt
+!**/outputs/*.png
 
 # ------------------------------------------------------------------------------
 # 5. Local Database Container Volumes & State

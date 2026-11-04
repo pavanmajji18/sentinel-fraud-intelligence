@@ -9,7 +9,7 @@ services:
       - "7474:7474"   # Neo4j Browser HTTP UI
       - "7687:7687"   # Bolt Binary Protocol
     environment:
-      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-SentinelGraph@2026!}
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-neo4j_local_dev_only}
       - NEO4J_PLUGINS=["apoc"]
       - NEO4J_dbms_security_procedures_unrestricted=apoc.*
       - NEO4J_dbms_security_procedures_allowlist=apoc.*

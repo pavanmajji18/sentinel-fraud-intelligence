@@ -1,0 +1,102 @@
+{
+  "query_id": "Q11_FILTERED",
+  "query_text": "In a SIM-swap and UPI PIN brute-force attack (CASE-2025-ATO-02 / R04_FAILED_ATTEMPTS) with 4 consecutive declined attempts and an 8.4x gaming spike under RBI zero-liability rules, what are the exact SOC runbook Step 1 credential lockout and Step 2 spike interception steps?",
+  "filter_applied": "document_type == 'playbooks'",
+  "unfiltered_latency_ms": 6.006,
+  "filtered_latency_ms": 1.763,
+  "all_filtered_hits_match_playbooks": true,
+  "unfiltered_top_3": [
+    {
+      "rank": 1,
+      "point_id": 434,
+      "cosine_score": 0.8213,
+      "chunk_id": "DOC_CASE_037_CH_01",
+      "doc_id": "DOC_CASE_037",
+      "document_type": "case_narratives",
+      "source": "forensic_case_narrative_037.md",
+      "title": "Forensic Case Narrative: SIM-Swap & PIN Brute-Force Account Takeover on High-Value Gaming Merchant \u2014 Case File #037 (DOC_CASE_037)",
+      "chunk_index": 1,
+      "word_count": 80,
+      "reason_code": "R04_FAILED_ATTEMPTS",
+      "regulatory_ref": "CASE-2025-ATO-02-037",
+      "excerpt": "[DOC_CASE_037 | case_narratives | CASE-2025-ATO-02-037 | R04_FAILED_ATTEMPTS] 'gaming'`, `R08_HIGH_RISK_MCC`), equivalent to `8.42x` the customer's Rs. 7,600 90-day average (`R05_AMOUNT_SPIKE`). Because the transaction f..."
+    },
+    {
+      "rank": 2,
+      "point_id": 394,
+      "cosine_score": 0.8212,
+      "chunk_id": "DOC_CASE_017_CH_01",
+      "doc_id": "DOC_CASE_017",
+      "document_type": "case_narratives",
+      "source": "forensic_case_narrative_017.md",
+      "title": "Forensic Case Narrative: SIM-Swap & PIN Brute-Force Account Takeover on High-Value Gaming Merchant \u2014 Case File #017 (DOC_CASE_017)",
+      "chunk_index": 1,
+      "word_count": 80,
+      "reason_code": "R04_FAILED_ATTEMPTS",
+      "regulatory_ref": "CASE-2025-ATO-02-017",
+      "excerpt": "[DOC_CASE_017 | case_narratives | CASE-2025-ATO-02-017 | R04_FAILED_ATTEMPTS] 'gaming'`, `R08_HIGH_RISK_MCC`), equivalent to `8.42x` the customer's Rs. 7,600 90-day average (`R05_AMOUNT_SPIKE`). Because the transaction f..."
+    },
+    {
+      "rank": 3,
+      "point_id": 384,
+      "cosine_score": 0.8212,
+      "chunk_id": "DOC_CASE_012_CH_01",
+      "doc_id": "DOC_CASE_012",
+      "document_type": "case_narratives",
+      "source": "forensic_case_narrative_012.md",
+      "title": "Forensic Case Narrative: SIM-Swap & PIN Brute-Force Account Takeover on High-Value Gaming Merchant \u2014 Case File #012 (DOC_CASE_012)",
+      "chunk_index": 1,
+      "word_count": 80,
+      "reason_code": "R04_FAILED_ATTEMPTS",
+      "regulatory_ref": "CASE-2025-ATO-02-012",
+      "excerpt": "[DOC_CASE_012 | case_narratives | CASE-2025-ATO-02-012 | R04_FAILED_ATTEMPTS] 'gaming'`, `R08_HIGH_RISK_MCC`), equivalent to `8.42x` the customer's Rs. 7,600 90-day average (`R05_AMOUNT_SPIKE`). Because the transaction f..."
+    }
+  ],
+  "filtered_top_3": [
+    {
+      "rank": 1,
+      "point_id": 346,
+      "cosine_score": 0.7937,
+      "chunk_id": "DOC_PB_038_CH_01",
+      "doc_id": "DOC_PB_038",
+      "document_type": "playbooks",
+      "source": "investigator_playbook_pb-brute-103_038.md",
+      "title": "SOC Investigator Playbook: Rapid Failed PIN/OTP Brute-Force Retries Followed by High-Value Spike \u2014 SOP Runbook #38 (DOC_PB_038)",
+      "chunk_index": 1,
+      "word_count": 72,
+      "reason_code": "R04_FAILED_ATTEMPTS",
+      "regulatory_ref": "PB-BRUTE-103-R38",
+      "excerpt": "[DOC_PB_038 | playbooks | PB-BRUTE-103-R38 | R04_FAILED_ATTEMPTS] 24 hours of 3+ failed attempts must be hard-blocked (`decision = 'BLOCK'`). Step 3 (Multi-Account Correlation Audit): If brute-force retries span >= 10 cu..."
+    },
+    {
+      "rank": 2,
+      "point_id": 296,
+      "cosine_score": 0.7932,
+      "chunk_id": "DOC_PB_013_CH_01",
+      "doc_id": "DOC_PB_013",
+      "document_type": "playbooks",
+      "source": "investigator_playbook_pb-brute-103_013.md",
+      "title": "SOC Investigator Playbook: Rapid Failed PIN/OTP Brute-Force Retries Followed by High-Value Spike \u2014 SOP Runbook #13 (DOC_PB_013)",
+      "chunk_index": 1,
+      "word_count": 72,
+      "reason_code": "R04_FAILED_ATTEMPTS",
+      "regulatory_ref": "PB-BRUTE-103-R13",
+      "excerpt": "[DOC_PB_013 | playbooks | PB-BRUTE-103-R13 | R04_FAILED_ATTEMPTS] 24 hours of 3+ failed attempts must be hard-blocked (`decision = 'BLOCK'`). Step 3 (Multi-Account Correlation Audit): If brute-force retries span >= 10 cu..."
+    },
+    {
+      "rank": 3,
+      "point_id": 316,
+      "cosine_score": 0.793,
+      "chunk_id": "DOC_PB_023_CH_01",
+      "doc_id": "DOC_PB_023",
+      "document_type": "playbooks",
+      "source": "investigator_playbook_pb-brute-103_023.md",
+      "title": "SOC Investigator Playbook: Rapid Failed PIN/OTP Brute-Force Retries Followed by High-Value Spike \u2014 SOP Runbook #23 (DOC_PB_023)",
+      "chunk_index": 1,
+      "word_count": 72,
+      "reason_code": "R04_FAILED_ATTEMPTS",
+      "regulatory_ref": "PB-BRUTE-103-R23",
+      "excerpt": "[DOC_PB_023 | playbooks | PB-BRUTE-103-R23 | R04_FAILED_ATTEMPTS] 24 hours of 3+ failed attempts must be hard-blocked (`decision = 'BLOCK'`). Step 3 (Multi-Account Correlation Audit): If brute-force retries span >= 10 cu..."
+    }
+  ]
+}

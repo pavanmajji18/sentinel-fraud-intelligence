@@ -1,0 +1,1176 @@
+{
+  "service": "sentinel-investigator-assistant-rag",
+  "validation_split": "validation",
+  "num_fraud_transactions": 5,
+  "num_genuine_transactions": 5,
+  "fraud_transaction_ids": [
+    "TX_0000004270",
+    "TX_0000004344",
+    "TX_0000004901",
+    "TX_0000004905",
+    "TX_0000004204"
+  ],
+  "genuine_transaction_ids": [
+    "TX_0000004132",
+    "TX_0000004133",
+    "TX_0000004143",
+    "TX_0000004145",
+    "TX_0000004147"
+  ],
+  "grounding_pass_rate": 1.0,
+  "schema_compliance_rate": 1.0,
+  "latency_p50_ms": 1.29,
+  "latency_p95_ms": 2.75,
+  "latency_p99_ms": 2.77,
+  "explanations": [
+    {
+      "transaction_id": "TX_0000004270",
+      "customer_id": "C_6fd885b57de814df",
+      "merchant_id": "M_e9c05049527a28f5",
+      "device_id": "D_5ca245340c743a27",
+      "amount_paise": 5417734,
+      "transaction_amount": 54177.34,
+      "payment_channel": "UPI",
+      "merchant_category": "travel",
+      "split": "validation",
+      "ground_truth_fraud_label": 1,
+      "fraud_probability": 0.99,
+      "risk_level": "CRITICAL",
+      "recommended_action": "BLOCK",
+      "reason_codes_fired": [
+        "R01_NEW_DEVICE",
+        "R02_GEO_MISMATCH",
+        "R03_ODD_HOUR",
+        "R04_FAILED_ATTEMPTS",
+        "R05_AMOUNT_SPIKE",
+        "R08_HIGH_RISK_MCC"
+      ],
+      "risk_summary": "Authorization TX_0000004270 by customer C_6fd885b57de814df at Merchant_Travel_015 (M_e9c05049527a28f5, MCC=travel) for Rs. 54177.34 (5417734 paise) via UPI scored fraud_probability=0.9900 (CRITICAL) -> BLOCK. Triggered signals [R01_NEW_DEVICE, R02_GEO_MISMATCH, R03_ODD_HOUR, R04_FAILED_ATTEMPTS, R05_AMOUNT_SPIKE, R08_HIGH_RISK_MCC]: amount_to_avg_ratio=7.51x, distance=1306.74 km, hour_of_day=03:00 IST, failed_transactions_24h=5, txn_count_last_1h=0, txn_amount_last_24h_paise=220299, account_age=741d. Neo4j 2-hop topology on device D_5ca245340c743a27 detected a shared-device ring (distinct_customers_per_device_7d=2, two_hop_fraud_exposure_count=87). Grounded in policy citations [DOC_PLAYBOOK_R08_008, DOC_PLAYBOOK_R05_005, DOC_PLAYBOOK_R04_004].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_PLAYBOOK_R08_008",
+          "document_type": "playbooks",
+          "title": "SOP-R08: High-Risk Liquid Merchant Categories (Gaming, Crypto, Gift Cards)",
+          "topic": "R08_HIGH_RISK_MCC",
+          "chunk_number": 1,
+          "relevance_score": 0.9946,
+          "excerpt": "Standard Operating Procedure SOP-R08 covers R08_HIGH_RISK_MCC triggers when merchant_category belongs to the high-liquidity set: electronics, gaming, travel, gift_cards, or crypto. These five categories exhibit elevated base fraud rates (captured via smoothed Bayesian target enco"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R05_005",
+          "document_type": "playbooks",
+          "title": "SOP-R05: 5x Historical Spend Spike & Integer Paise Verification Playbook",
+          "topic": "R05_AMOUNT_SPIKE",
+          "chunk_number": 1,
+          "relevance_score": 0.634,
+          "excerpt": "Standard Operating Procedure SOP-R05 governs R05_AMOUNT_SPIKE where amount_to_avg_ratio >= 5.0 relative to the customer's trailing 90-day mean transaction value (average_transaction_value). All monetary aggregations must preserve the exact integer paise invariant (amount_paise =="
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R04_004",
+          "document_type": "playbooks",
+          "title": "SOP-R04: Consecutive Authentication Failures & PIN Retry Lockout Playbook",
+          "topic": "R04_FAILED_ATTEMPTS",
+          "chunk_number": 1,
+          "relevance_score": 0.9846,
+          "excerpt": "Standard Operating Procedure SOP-R04 defines investigator response when R04_FAILED_ATTEMPTS triggers due to has_recent_failures == True (failed_transactions >= 3 within the trailing 24-hour window). Three or more AUTH_DECLINED payment outcomes preceding a successful or high-value"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R03_003",
+          "document_type": "playbooks",
+          "title": "SOP-R03: Nocturnal IST Window (00:00-04:59 IST) Fraud Triage Playbook",
+          "topic": "R03_ODD_HOUR",
+          "chunk_number": 1,
+          "relevance_score": 0.7083,
+          "excerpt": "Standard Operating Procedure SOP-R03 governs R03_ODD_HOUR risk signals where is_night is True because the authorization timestamp falls between 00:00 and 04:59 Indian Standard Time (IST, UTC+05:30). All UTC transaction_time records must be converted to IST (+05:30 offset) prior t"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R02_002",
+          "document_type": "playbooks",
+          "title": "SOP-R02: Geodesic Distance Anomaly (>500 km) & Missing Location Playbook",
+          "topic": "R02_GEO_MISMATCH",
+          "chunk_number": 1,
+          "relevance_score": 0.9723,
+          "excerpt": "Standard Operating Procedure SOP-R02 addresses R02_GEO_MISMATCH triggers where is_new_city is True or customer_merchant_distance_km exceeds 500.0 km via the Haversine great-circle formula. When a payer transacts from an unseen city or at a geodesic distance > 500 km from the merc"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_6fd885b57de814df",
+        "device_id": "D_5ca245340c743a27",
+        "merchant_id": "M_e9c05049527a28f5",
+        "distinct_customers_per_device_7d": 2,
+        "shared_device_ring_detected": false,
+        "peer_customer_ids_on_device": [
+          "C_11b45814a2b37f34",
+          "C_1616a5fe1bf18238",
+          "C_18d569863e242b87",
+          "C_32abf437241e8590",
+          "C_3d033f5b754b6932"
+        ],
+        "two_hop_fraud_exposure_count": 87,
+        "two_hop_fraud_transaction_ids": [
+          "TX_0000000282",
+          "TX_0000000841",
+          "TX_0000001365",
+          "TX_0000001542",
+          "TX_0000001715"
+        ],
+        "merchants_paid_by_device_count": 30,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 7.507,
+        "is_new_device": true,
+        "customer_merchant_distance_km": 1306.74,
+        "is_new_city": true,
+        "hour_of_day": 3,
+        "is_night": true,
+        "has_recent_failures": true,
+        "is_new_account": false,
+        "txn_count_last_1h": 0,
+        "txn_amount_last_24h_paise": 220299,
+        "distinct_customers_per_device_7d": 2,
+        "combined_risk_flags": 4
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 2.71
+    },
+    {
+      "transaction_id": "TX_0000004344",
+      "customer_id": "C_89aec26619606cb4",
+      "merchant_id": "M_fa83d8e21b47ce09",
+      "device_id": "D_4719e96e57524728",
+      "amount_paise": 4748245,
+      "transaction_amount": 47482.45,
+      "payment_channel": "net_banking",
+      "merchant_category": "electronics",
+      "split": "validation",
+      "ground_truth_fraud_label": 1,
+      "fraud_probability": 0.99,
+      "risk_level": "CRITICAL",
+      "recommended_action": "BLOCK",
+      "reason_codes_fired": [
+        "R02_GEO_MISMATCH",
+        "R03_ODD_HOUR",
+        "R04_FAILED_ATTEMPTS",
+        "R05_AMOUNT_SPIKE",
+        "R07_VELOCITY",
+        "R08_HIGH_RISK_MCC"
+      ],
+      "risk_summary": "Authorization TX_0000004344 by customer C_89aec26619606cb4 at Merchant_Electronics_117 (M_fa83d8e21b47ce09, MCC=electronics) for Rs. 47482.45 (4748245 paise) via net_banking scored fraud_probability=0.9900 (CRITICAL) -> BLOCK. Triggered signals [R02_GEO_MISMATCH, R03_ODD_HOUR, R04_FAILED_ATTEMPTS, R05_AMOUNT_SPIKE, R07_VELOCITY, R08_HIGH_RISK_MCC]: amount_to_avg_ratio=5.62x, distance=9.04 km, hour_of_day=01:00 IST, failed_transactions_24h=4, txn_count_last_1h=4, txn_amount_last_24h_paise=6506037, account_age=998d. Neo4j 2-hop topology on device D_4719e96e57524728 detected a shared-device ring (distinct_customers_per_device_7d=1, two_hop_fraud_exposure_count=133). Grounded in policy citations [DOC_PLAYBOOK_R08_008, DOC_PLAYBOOK_R07_007, DOC_PLAYBOOK_R05_005].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_PLAYBOOK_R08_008",
+          "document_type": "playbooks",
+          "title": "SOP-R08: High-Risk Liquid Merchant Categories (Gaming, Crypto, Gift Cards)",
+          "topic": "R08_HIGH_RISK_MCC",
+          "chunk_number": 1,
+          "relevance_score": 0.9946,
+          "excerpt": "Standard Operating Procedure SOP-R08 covers R08_HIGH_RISK_MCC triggers when merchant_category belongs to the high-liquidity set: electronics, gaming, travel, gift_cards, or crypto. These five categories exhibit elevated base fraud rates (captured via smoothed Bayesian target enco"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R07_007",
+          "document_type": "playbooks",
+          "title": "SOP-R07: 1-Hour Authorization Burst Velocity (>=4 Attempts) Playbook",
+          "topic": "R07_VELOCITY",
+          "chunk_number": 1,
+          "relevance_score": 0.9773,
+          "excerpt": "Standard Operating Procedure SOP-R07 governs R07_VELOCITY where txn_count_last_1h >= 4 strictly prior attempts within [t - 1h, t). High-frequency bursts of 4 or more transactions within 60 minutes are characteristic of scripted wallet draining and split-ticket structuring designe"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R05_005",
+          "document_type": "playbooks",
+          "title": "SOP-R05: 5x Historical Spend Spike & Integer Paise Verification Playbook",
+          "topic": "R05_AMOUNT_SPIKE",
+          "chunk_number": 1,
+          "relevance_score": 0.634,
+          "excerpt": "Standard Operating Procedure SOP-R05 governs R05_AMOUNT_SPIKE where amount_to_avg_ratio >= 5.0 relative to the customer's trailing 90-day mean transaction value (average_transaction_value). All monetary aggregations must preserve the exact integer paise invariant (amount_paise =="
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R04_004",
+          "document_type": "playbooks",
+          "title": "SOP-R04: Consecutive Authentication Failures & PIN Retry Lockout Playbook",
+          "topic": "R04_FAILED_ATTEMPTS",
+          "chunk_number": 1,
+          "relevance_score": 0.9846,
+          "excerpt": "Standard Operating Procedure SOP-R04 defines investigator response when R04_FAILED_ATTEMPTS triggers due to has_recent_failures == True (failed_transactions >= 3 within the trailing 24-hour window). Three or more AUTH_DECLINED payment outcomes preceding a successful or high-value"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R03_003",
+          "document_type": "playbooks",
+          "title": "SOP-R03: Nocturnal IST Window (00:00-04:59 IST) Fraud Triage Playbook",
+          "topic": "R03_ODD_HOUR",
+          "chunk_number": 1,
+          "relevance_score": 0.7083,
+          "excerpt": "Standard Operating Procedure SOP-R03 governs R03_ODD_HOUR risk signals where is_night is True because the authorization timestamp falls between 00:00 and 04:59 Indian Standard Time (IST, UTC+05:30). All UTC transaction_time records must be converted to IST (+05:30 offset) prior t"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_89aec26619606cb4",
+        "device_id": "D_4719e96e57524728",
+        "merchant_id": "M_fa83d8e21b47ce09",
+        "distinct_customers_per_device_7d": 1,
+        "shared_device_ring_detected": false,
+        "peer_customer_ids_on_device": [
+          "C_093196fa0afaa586",
+          "C_27c7e9189409bb1a",
+          "C_2cf15b7a1fa7ef78",
+          "C_30b0709f0ebbecbf",
+          "C_32691cd772617751"
+        ],
+        "two_hop_fraud_exposure_count": 133,
+        "two_hop_fraud_transaction_ids": [
+          "TX_0000000142",
+          "TX_0000000525",
+          "TX_0000000565",
+          "TX_0000000703",
+          "TX_0000000982"
+        ],
+        "merchants_paid_by_device_count": 39,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 5.6245,
+        "is_new_device": false,
+        "customer_merchant_distance_km": 9.04,
+        "is_new_city": true,
+        "hour_of_day": 1,
+        "is_night": true,
+        "has_recent_failures": true,
+        "is_new_account": false,
+        "txn_count_last_1h": 4,
+        "txn_amount_last_24h_paise": 6506037,
+        "distinct_customers_per_device_7d": 1,
+        "combined_risk_flags": 3
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 2.43
+    },
+    {
+      "transaction_id": "TX_0000004901",
+      "customer_id": "C_7dcdd3e88195a3cf",
+      "merchant_id": "M_fa83d8e21b47ce09",
+      "device_id": "D_b64f832752bf8208",
+      "amount_paise": 4827144,
+      "transaction_amount": 48271.44,
+      "payment_channel": "UPI",
+      "merchant_category": "electronics",
+      "split": "validation",
+      "ground_truth_fraud_label": 1,
+      "fraud_probability": 0.99,
+      "risk_level": "CRITICAL",
+      "recommended_action": "BLOCK",
+      "reason_codes_fired": [
+        "R01_NEW_DEVICE",
+        "R02_GEO_MISMATCH",
+        "R03_ODD_HOUR",
+        "R04_FAILED_ATTEMPTS",
+        "R05_AMOUNT_SPIKE",
+        "R08_HIGH_RISK_MCC"
+      ],
+      "risk_summary": "Authorization TX_0000004901 by customer C_7dcdd3e88195a3cf at Merchant_Electronics_117 (M_fa83d8e21b47ce09, MCC=electronics) for Rs. 48271.44 (4827144 paise) via UPI scored fraud_probability=0.9900 (CRITICAL) -> BLOCK. Triggered signals [R01_NEW_DEVICE, R02_GEO_MISMATCH, R03_ODD_HOUR, R04_FAILED_ATTEMPTS, R05_AMOUNT_SPIKE, R08_HIGH_RISK_MCC]: amount_to_avg_ratio=5.12x, distance=1742.34 km, hour_of_day=03:00 IST, failed_transactions_24h=3, txn_count_last_1h=1, txn_amount_last_24h_paise=2962627, account_age=775d. Neo4j 2-hop topology on device D_b64f832752bf8208 detected a shared-device ring (distinct_customers_per_device_7d=3, two_hop_fraud_exposure_count=110). Grounded in policy citations [DOC_PLAYBOOK_R08_008, DOC_PLAYBOOK_R05_005, DOC_PLAYBOOK_R04_004].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_PLAYBOOK_R08_008",
+          "document_type": "playbooks",
+          "title": "SOP-R08: High-Risk Liquid Merchant Categories (Gaming, Crypto, Gift Cards)",
+          "topic": "R08_HIGH_RISK_MCC",
+          "chunk_number": 1,
+          "relevance_score": 0.9946,
+          "excerpt": "Standard Operating Procedure SOP-R08 covers R08_HIGH_RISK_MCC triggers when merchant_category belongs to the high-liquidity set: electronics, gaming, travel, gift_cards, or crypto. These five categories exhibit elevated base fraud rates (captured via smoothed Bayesian target enco"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R05_005",
+          "document_type": "playbooks",
+          "title": "SOP-R05: 5x Historical Spend Spike & Integer Paise Verification Playbook",
+          "topic": "R05_AMOUNT_SPIKE",
+          "chunk_number": 1,
+          "relevance_score": 0.634,
+          "excerpt": "Standard Operating Procedure SOP-R05 governs R05_AMOUNT_SPIKE where amount_to_avg_ratio >= 5.0 relative to the customer's trailing 90-day mean transaction value (average_transaction_value). All monetary aggregations must preserve the exact integer paise invariant (amount_paise =="
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R04_004",
+          "document_type": "playbooks",
+          "title": "SOP-R04: Consecutive Authentication Failures & PIN Retry Lockout Playbook",
+          "topic": "R04_FAILED_ATTEMPTS",
+          "chunk_number": 1,
+          "relevance_score": 0.9846,
+          "excerpt": "Standard Operating Procedure SOP-R04 defines investigator response when R04_FAILED_ATTEMPTS triggers due to has_recent_failures == True (failed_transactions >= 3 within the trailing 24-hour window). Three or more AUTH_DECLINED payment outcomes preceding a successful or high-value"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R03_003",
+          "document_type": "playbooks",
+          "title": "SOP-R03: Nocturnal IST Window (00:00-04:59 IST) Fraud Triage Playbook",
+          "topic": "R03_ODD_HOUR",
+          "chunk_number": 1,
+          "relevance_score": 0.7083,
+          "excerpt": "Standard Operating Procedure SOP-R03 governs R03_ODD_HOUR risk signals where is_night is True because the authorization timestamp falls between 00:00 and 04:59 Indian Standard Time (IST, UTC+05:30). All UTC transaction_time records must be converted to IST (+05:30 offset) prior t"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R02_002",
+          "document_type": "playbooks",
+          "title": "SOP-R02: Geodesic Distance Anomaly (>500 km) & Missing Location Playbook",
+          "topic": "R02_GEO_MISMATCH",
+          "chunk_number": 1,
+          "relevance_score": 0.9723,
+          "excerpt": "Standard Operating Procedure SOP-R02 addresses R02_GEO_MISMATCH triggers where is_new_city is True or customer_merchant_distance_km exceeds 500.0 km via the Haversine great-circle formula. When a payer transacts from an unseen city or at a geodesic distance > 500 km from the merc"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_7dcdd3e88195a3cf",
+        "device_id": "D_b64f832752bf8208",
+        "merchant_id": "M_fa83d8e21b47ce09",
+        "distinct_customers_per_device_7d": 3,
+        "shared_device_ring_detected": true,
+        "peer_customer_ids_on_device": [
+          "C_0600c71aac8a08a4",
+          "C_11b45814a2b37f34",
+          "C_32691cd772617751",
+          "C_32bcb7477087ff42",
+          "C_41e7cc4543d3929c"
+        ],
+        "two_hop_fraud_exposure_count": 110,
+        "two_hop_fraud_transaction_ids": [
+          "TX_0000000665",
+          "TX_0000001050",
+          "TX_0000001820",
+          "TX_0000001855",
+          "TX_0000001964"
+        ],
+        "merchants_paid_by_device_count": 34,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 5.1168,
+        "is_new_device": true,
+        "customer_merchant_distance_km": 1742.34,
+        "is_new_city": true,
+        "hour_of_day": 3,
+        "is_night": true,
+        "has_recent_failures": true,
+        "is_new_account": false,
+        "txn_count_last_1h": 1,
+        "txn_amount_last_24h_paise": 2962627,
+        "distinct_customers_per_device_7d": 3,
+        "combined_risk_flags": 4
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 2.62
+    },
+    {
+      "transaction_id": "TX_0000004905",
+      "customer_id": "C_7dcdd3e88195a3cf",
+      "merchant_id": "M_fe918a6090bd2131",
+      "device_id": "D_bfb3a6e2f72f29b3",
+      "amount_paise": 6350722,
+      "transaction_amount": 63507.22,
+      "payment_channel": "card",
+      "merchant_category": "travel",
+      "split": "validation",
+      "ground_truth_fraud_label": 1,
+      "fraud_probability": 0.99,
+      "risk_level": "CRITICAL",
+      "recommended_action": "BLOCK",
+      "reason_codes_fired": [
+        "R01_NEW_DEVICE",
+        "R02_GEO_MISMATCH",
+        "R03_ODD_HOUR",
+        "R04_FAILED_ATTEMPTS",
+        "R07_VELOCITY",
+        "R08_HIGH_RISK_MCC"
+      ],
+      "risk_summary": "Authorization TX_0000004905 by customer C_7dcdd3e88195a3cf at Merchant_Travel_071 (M_fe918a6090bd2131, MCC=travel) for Rs. 63507.22 (6350722 paise) via card scored fraud_probability=0.9900 (CRITICAL) -> BLOCK. Triggered signals [R01_NEW_DEVICE, R02_GEO_MISMATCH, R03_ODD_HOUR, R04_FAILED_ATTEMPTS, R07_VELOCITY, R08_HIGH_RISK_MCC]: amount_to_avg_ratio=1.91x, distance=852.30 km, hour_of_day=03:00 IST, failed_transactions_24h=6, txn_count_last_1h=5, txn_amount_last_24h_paise=28097921, account_age=775d. Neo4j 2-hop topology on device D_bfb3a6e2f72f29b3 detected a shared-device ring (distinct_customers_per_device_7d=1, two_hop_fraud_exposure_count=127). Grounded in policy citations [DOC_PLAYBOOK_R08_008, DOC_PLAYBOOK_R07_007, DOC_PLAYBOOK_R04_004].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_PLAYBOOK_R08_008",
+          "document_type": "playbooks",
+          "title": "SOP-R08: High-Risk Liquid Merchant Categories (Gaming, Crypto, Gift Cards)",
+          "topic": "R08_HIGH_RISK_MCC",
+          "chunk_number": 1,
+          "relevance_score": 0.9946,
+          "excerpt": "Standard Operating Procedure SOP-R08 covers R08_HIGH_RISK_MCC triggers when merchant_category belongs to the high-liquidity set: electronics, gaming, travel, gift_cards, or crypto. These five categories exhibit elevated base fraud rates (captured via smoothed Bayesian target enco"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R07_007",
+          "document_type": "playbooks",
+          "title": "SOP-R07: 1-Hour Authorization Burst Velocity (>=4 Attempts) Playbook",
+          "topic": "R07_VELOCITY",
+          "chunk_number": 1,
+          "relevance_score": 0.9773,
+          "excerpt": "Standard Operating Procedure SOP-R07 governs R07_VELOCITY where txn_count_last_1h >= 4 strictly prior attempts within [t - 1h, t). High-frequency bursts of 4 or more transactions within 60 minutes are characteristic of scripted wallet draining and split-ticket structuring designe"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R04_004",
+          "document_type": "playbooks",
+          "title": "SOP-R04: Consecutive Authentication Failures & PIN Retry Lockout Playbook",
+          "topic": "R04_FAILED_ATTEMPTS",
+          "chunk_number": 1,
+          "relevance_score": 0.9846,
+          "excerpt": "Standard Operating Procedure SOP-R04 defines investigator response when R04_FAILED_ATTEMPTS triggers due to has_recent_failures == True (failed_transactions >= 3 within the trailing 24-hour window). Three or more AUTH_DECLINED payment outcomes preceding a successful or high-value"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R03_003",
+          "document_type": "playbooks",
+          "title": "SOP-R03: Nocturnal IST Window (00:00-04:59 IST) Fraud Triage Playbook",
+          "topic": "R03_ODD_HOUR",
+          "chunk_number": 1,
+          "relevance_score": 0.7083,
+          "excerpt": "Standard Operating Procedure SOP-R03 governs R03_ODD_HOUR risk signals where is_night is True because the authorization timestamp falls between 00:00 and 04:59 Indian Standard Time (IST, UTC+05:30). All UTC transaction_time records must be converted to IST (+05:30 offset) prior t"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R02_002",
+          "document_type": "playbooks",
+          "title": "SOP-R02: Geodesic Distance Anomaly (>500 km) & Missing Location Playbook",
+          "topic": "R02_GEO_MISMATCH",
+          "chunk_number": 1,
+          "relevance_score": 0.9723,
+          "excerpt": "Standard Operating Procedure SOP-R02 addresses R02_GEO_MISMATCH triggers where is_new_city is True or customer_merchant_distance_km exceeds 500.0 km via the Haversine great-circle formula. When a payer transacts from an unseen city or at a geodesic distance > 500 km from the merc"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_7dcdd3e88195a3cf",
+        "device_id": "D_bfb3a6e2f72f29b3",
+        "merchant_id": "M_fe918a6090bd2131",
+        "distinct_customers_per_device_7d": 1,
+        "shared_device_ring_detected": false,
+        "peer_customer_ids_on_device": [
+          "C_08fc8ae9fedc2f40",
+          "C_189a98a1e2f9cb1c",
+          "C_32bcb7477087ff42",
+          "C_3490e97bea550367",
+          "C_4a7c761b4f12d8e4"
+        ],
+        "two_hop_fraud_exposure_count": 127,
+        "two_hop_fraud_transaction_ids": [
+          "TX_0000000105",
+          "TX_0000000140",
+          "TX_0000000210",
+          "TX_0000000560",
+          "TX_0000000563"
+        ],
+        "merchants_paid_by_device_count": 34,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 1.9146,
+        "is_new_device": true,
+        "customer_merchant_distance_km": 852.3,
+        "is_new_city": true,
+        "hour_of_day": 3,
+        "is_night": true,
+        "has_recent_failures": true,
+        "is_new_account": false,
+        "txn_count_last_1h": 5,
+        "txn_amount_last_24h_paise": 28097921,
+        "distinct_customers_per_device_7d": 1,
+        "combined_risk_flags": 4
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 2.78
+    },
+    {
+      "transaction_id": "TX_0000004204",
+      "customer_id": "C_be52159abe85f42a",
+      "merchant_id": "M_7d62bc16fb09bc72",
+      "device_id": "D_b64f832752bf8208",
+      "amount_paise": 5153339,
+      "transaction_amount": 51533.39,
+      "payment_channel": "UPI",
+      "merchant_category": "electronics",
+      "split": "validation",
+      "ground_truth_fraud_label": 1,
+      "fraud_probability": 0.99,
+      "risk_level": "CRITICAL",
+      "recommended_action": "BLOCK",
+      "reason_codes_fired": [
+        "R01_NEW_DEVICE",
+        "R02_GEO_MISMATCH",
+        "R04_FAILED_ATTEMPTS",
+        "R07_VELOCITY",
+        "R08_HIGH_RISK_MCC"
+      ],
+      "risk_summary": "Authorization TX_0000004204 by customer C_be52159abe85f42a at Merchant_Electronics_052 (M_7d62bc16fb09bc72, MCC=electronics) for Rs. 51533.39 (5153339 paise) via UPI scored fraud_probability=0.9900 (CRITICAL) -> BLOCK. Triggered signals [R01_NEW_DEVICE, R02_GEO_MISMATCH, R04_FAILED_ATTEMPTS, R07_VELOCITY, R08_HIGH_RISK_MCC]: amount_to_avg_ratio=1.86x, distance=500.38 km, hour_of_day=16:00 IST, failed_transactions_24h=4, txn_count_last_1h=4, txn_amount_last_24h_paise=20793599, account_age=999d. Neo4j 2-hop topology on device D_b64f832752bf8208 detected a shared-device ring (distinct_customers_per_device_7d=0, two_hop_fraud_exposure_count=110). Grounded in policy citations [DOC_PLAYBOOK_R08_008, DOC_PLAYBOOK_R07_007, DOC_PLAYBOOK_R04_004].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_PLAYBOOK_R08_008",
+          "document_type": "playbooks",
+          "title": "SOP-R08: High-Risk Liquid Merchant Categories (Gaming, Crypto, Gift Cards)",
+          "topic": "R08_HIGH_RISK_MCC",
+          "chunk_number": 1,
+          "relevance_score": 0.9946,
+          "excerpt": "Standard Operating Procedure SOP-R08 covers R08_HIGH_RISK_MCC triggers when merchant_category belongs to the high-liquidity set: electronics, gaming, travel, gift_cards, or crypto. These five categories exhibit elevated base fraud rates (captured via smoothed Bayesian target enco"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R07_007",
+          "document_type": "playbooks",
+          "title": "SOP-R07: 1-Hour Authorization Burst Velocity (>=4 Attempts) Playbook",
+          "topic": "R07_VELOCITY",
+          "chunk_number": 1,
+          "relevance_score": 0.9773,
+          "excerpt": "Standard Operating Procedure SOP-R07 governs R07_VELOCITY where txn_count_last_1h >= 4 strictly prior attempts within [t - 1h, t). High-frequency bursts of 4 or more transactions within 60 minutes are characteristic of scripted wallet draining and split-ticket structuring designe"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R04_004",
+          "document_type": "playbooks",
+          "title": "SOP-R04: Consecutive Authentication Failures & PIN Retry Lockout Playbook",
+          "topic": "R04_FAILED_ATTEMPTS",
+          "chunk_number": 1,
+          "relevance_score": 0.9846,
+          "excerpt": "Standard Operating Procedure SOP-R04 defines investigator response when R04_FAILED_ATTEMPTS triggers due to has_recent_failures == True (failed_transactions >= 3 within the trailing 24-hour window). Three or more AUTH_DECLINED payment outcomes preceding a successful or high-value"
+        },
+        {
+          "document_id": "DOC_PLAYBOOK_R02_002",
+          "document_type": "playbooks",
+          "title": "SOP-R02: Geodesic Distance Anomaly (>500 km) & Missing Location Playbook",
+          "topic": "R02_GEO_MISMATCH",
+          "chunk_number": 1,
+          "relevance_score": 0.9723,
+          "excerpt": "Standard Operating Procedure SOP-R02 addresses R02_GEO_MISMATCH triggers where is_new_city is True or customer_merchant_distance_km exceeds 500.0 km via the Haversine great-circle formula. When a payer transacts from an unseen city or at a geodesic distance > 500 km from the merc"
+        },
+        {
+          "document_id": "DOC_PLAYBOOKS_037",
+          "document_type": "playbooks",
+          "title": "SOP-R01: Unseen Device Fingerprint & Hardware Binding Escalation Playbook \u2014 card/Grocery Annex #037",
+          "topic": "R01_NEW_DEVICE",
+          "chunk_number": 2,
+          "relevance_score": 0.9465,
+          "excerpt": "immediately to REVIEW or BLOCK to prevent account takeover (ATO) drainage. Investigators validating card flows in grocery must verify point-in-time feature integrity, integer paise alignment, Neo4j 2-hop device contagion, and strict JSON citation grounding before finalizing ALLOW"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_be52159abe85f42a",
+        "device_id": "D_b64f832752bf8208",
+        "merchant_id": "M_7d62bc16fb09bc72",
+        "distinct_customers_per_device_7d": 0,
+        "shared_device_ring_detected": false,
+        "peer_customer_ids_on_device": [
+          "C_0600c71aac8a08a4",
+          "C_11b45814a2b37f34",
+          "C_32691cd772617751",
+          "C_32bcb7477087ff42",
+          "C_41e7cc4543d3929c"
+        ],
+        "two_hop_fraud_exposure_count": 110,
+        "two_hop_fraud_transaction_ids": [
+          "TX_0000000665",
+          "TX_0000001050",
+          "TX_0000001820",
+          "TX_0000001855",
+          "TX_0000001964"
+        ],
+        "merchants_paid_by_device_count": 34,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 1.8564,
+        "is_new_device": true,
+        "customer_merchant_distance_km": 500.38,
+        "is_new_city": true,
+        "hour_of_day": 16,
+        "is_night": false,
+        "has_recent_failures": true,
+        "is_new_account": false,
+        "txn_count_last_1h": 4,
+        "txn_amount_last_24h_paise": 20793599,
+        "distinct_customers_per_device_7d": 0,
+        "combined_risk_flags": 3
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 1.87
+    },
+    {
+      "transaction_id": "TX_0000004132",
+      "customer_id": "C_e111e3d8619c670e",
+      "merchant_id": "M_a0870dd6c203f373",
+      "device_id": "D_fffe49dce5de406a",
+      "amount_paise": 47697,
+      "transaction_amount": 476.97,
+      "payment_channel": "UPI",
+      "merchant_category": "food",
+      "split": "validation",
+      "ground_truth_fraud_label": 0,
+      "fraud_probability": 0.04,
+      "risk_level": "LOW",
+      "recommended_action": "ALLOW",
+      "reason_codes_fired": [],
+      "risk_summary": "Genuine baseline authorization TX_0000004132 by customer C_e111e3d8619c670e at Merchant_Food_096 (M_a0870dd6c203f373, MCC=food) for Rs. 476.97 (47697 paise) via UPI scored fraud_probability=0.0400 (LOW) -> ALLOW. Zero risk flags fired (reason_codes=[]): amount_to_avg_ratio=1.97x, distance=2.96 km, hour_of_day=18:00 IST, failed_transactions_24h=0, txn_count_last_1h=0, account_age=939d, and Neo4j 2-hop device D_fffe49dce5de406a has zero fraud contagion (distinct_customers_per_device_7d=0). Verified against [DOC_RBI_CIRCULARS_070, DOC_RBI_CIRCULARS_022, DOC_RBI_CIRCULARS_094].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_RBI_CIRCULARS_070",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #070",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #070 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_022",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #022",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #022 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_094",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #094",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #094 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_046",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #046",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #046 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_118",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #118",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #118 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_e111e3d8619c670e",
+        "device_id": "D_fffe49dce5de406a",
+        "merchant_id": "M_a0870dd6c203f373",
+        "distinct_customers_per_device_7d": 0,
+        "shared_device_ring_detected": false,
+        "peer_customer_ids_on_device": [],
+        "two_hop_fraud_exposure_count": 2,
+        "two_hop_fraud_transaction_ids": [
+          "TX_0000003122",
+          "TX_0000003875"
+        ],
+        "merchants_paid_by_device_count": 7,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 1.9732,
+        "is_new_device": false,
+        "customer_merchant_distance_km": 2.96,
+        "is_new_city": false,
+        "hour_of_day": 18,
+        "is_night": false,
+        "has_recent_failures": false,
+        "is_new_account": false,
+        "txn_count_last_1h": 0,
+        "txn_amount_last_24h_paise": 0,
+        "distinct_customers_per_device_7d": 0,
+        "combined_risk_flags": 0
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 0.57
+    },
+    {
+      "transaction_id": "TX_0000004133",
+      "customer_id": "C_e3ca7474a62c16c8",
+      "merchant_id": "M_ea970f55dcf96514",
+      "device_id": "D_c315af2e7953ecdc",
+      "amount_paise": 70560,
+      "transaction_amount": 705.6,
+      "payment_channel": "UPI",
+      "merchant_category": "food",
+      "split": "validation",
+      "ground_truth_fraud_label": 0,
+      "fraud_probability": 0.04,
+      "risk_level": "LOW",
+      "recommended_action": "ALLOW",
+      "reason_codes_fired": [],
+      "risk_summary": "Genuine baseline authorization TX_0000004133 by customer C_e3ca7474a62c16c8 at Merchant_Food_022 (M_ea970f55dcf96514, MCC=food) for Rs. 705.60 (70560 paise) via UPI scored fraud_probability=0.0400 (LOW) -> ALLOW. Zero risk flags fired (reason_codes=[]): amount_to_avg_ratio=0.66x, distance=118.94 km, hour_of_day=20:00 IST, failed_transactions_24h=0, txn_count_last_1h=0, account_age=851d, and Neo4j 2-hop device D_c315af2e7953ecdc has zero fraud contagion (distinct_customers_per_device_7d=0). Verified against [DOC_RBI_CIRCULARS_070, DOC_RBI_CIRCULARS_022, DOC_RBI_CIRCULARS_094].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_RBI_CIRCULARS_070",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #070",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #070 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_022",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #022",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #022 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_094",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #094",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #094 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_046",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #046",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #046 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_118",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #118",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8269,
+          "excerpt": "Regional Annex #118 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_e3ca7474a62c16c8",
+        "device_id": "D_c315af2e7953ecdc",
+        "merchant_id": "M_ea970f55dcf96514",
+        "distinct_customers_per_device_7d": 0,
+        "shared_device_ring_detected": false,
+        "peer_customer_ids_on_device": [],
+        "two_hop_fraud_exposure_count": 1,
+        "two_hop_fraud_transaction_ids": [
+          "TX_0000001736"
+        ],
+        "merchants_paid_by_device_count": 3,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 0.6599,
+        "is_new_device": false,
+        "customer_merchant_distance_km": 118.94,
+        "is_new_city": false,
+        "hour_of_day": 20,
+        "is_night": false,
+        "has_recent_failures": false,
+        "is_new_account": false,
+        "txn_count_last_1h": 0,
+        "txn_amount_last_24h_paise": 0,
+        "distinct_customers_per_device_7d": 0,
+        "combined_risk_flags": 0
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 0.71
+    },
+    {
+      "transaction_id": "TX_0000004143",
+      "customer_id": "C_2292a432cb58ea46",
+      "merchant_id": "M_0872b9ba359953ca",
+      "device_id": "D_98603f9ad03b6f86",
+      "amount_paise": 229068,
+      "transaction_amount": 2290.68,
+      "payment_channel": "UPI",
+      "merchant_category": "utilities",
+      "split": "validation",
+      "ground_truth_fraud_label": 0,
+      "fraud_probability": 0.04,
+      "risk_level": "LOW",
+      "recommended_action": "ALLOW",
+      "reason_codes_fired": [],
+      "risk_summary": "Genuine baseline authorization TX_0000004143 by customer C_2292a432cb58ea46 at Merchant_Utilities_029 (M_0872b9ba359953ca, MCC=utilities) for Rs. 2290.68 (229068 paise) via UPI scored fraud_probability=0.0400 (LOW) -> ALLOW. Zero risk flags fired (reason_codes=[]): amount_to_avg_ratio=1.41x, distance=4.21 km, hour_of_day=07:00 IST, failed_transactions_24h=0, txn_count_last_1h=0, account_age=284d, and Neo4j 2-hop device D_98603f9ad03b6f86 has zero fraud contagion (distinct_customers_per_device_7d=0). Verified against [DOC_RBI_CIRCULARS_070, DOC_RBI_CIRCULARS_022, DOC_RBI_CIRCULARS_094].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_RBI_CIRCULARS_070",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #070",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #070 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_022",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #022",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #022 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_094",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #094",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #094 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_046",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #046",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #046 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_118",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #118",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #118 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_2292a432cb58ea46",
+        "device_id": "D_98603f9ad03b6f86",
+        "merchant_id": "M_0872b9ba359953ca",
+        "distinct_customers_per_device_7d": 0,
+        "shared_device_ring_detected": false,
+        "peer_customer_ids_on_device": [
+          "C_1cf3ee6b6f3df147",
+          "C_c3fc63049f56aa02"
+        ],
+        "two_hop_fraud_exposure_count": 2,
+        "two_hop_fraud_transaction_ids": [
+          "TX_0000000132",
+          "TX_0000000604"
+        ],
+        "merchants_paid_by_device_count": 11,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 1.4122,
+        "is_new_device": false,
+        "customer_merchant_distance_km": 4.21,
+        "is_new_city": false,
+        "hour_of_day": 7,
+        "is_night": false,
+        "has_recent_failures": false,
+        "is_new_account": false,
+        "txn_count_last_1h": 0,
+        "txn_amount_last_24h_paise": 0,
+        "distinct_customers_per_device_7d": 0,
+        "combined_risk_flags": 0
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 0.71
+    },
+    {
+      "transaction_id": "TX_0000004145",
+      "customer_id": "C_af62a70504c40132",
+      "merchant_id": "M_416379ac1df3ee16",
+      "device_id": "D_6d193a1d9ed91f71",
+      "amount_paise": 48193,
+      "transaction_amount": 481.93,
+      "payment_channel": "UPI",
+      "merchant_category": "utilities",
+      "split": "validation",
+      "ground_truth_fraud_label": 0,
+      "fraud_probability": 0.04,
+      "risk_level": "LOW",
+      "recommended_action": "ALLOW",
+      "reason_codes_fired": [],
+      "risk_summary": "Genuine baseline authorization TX_0000004145 by customer C_af62a70504c40132 at Merchant_Utilities_008 (M_416379ac1df3ee16, MCC=utilities) for Rs. 481.93 (48193 paise) via UPI scored fraud_probability=0.0400 (LOW) -> ALLOW. Zero risk flags fired (reason_codes=[]): amount_to_avg_ratio=0.47x, distance=4.44 km, hour_of_day=10:00 IST, failed_transactions_24h=0, txn_count_last_1h=0, account_age=507d, and Neo4j 2-hop device D_6d193a1d9ed91f71 has zero fraud contagion (distinct_customers_per_device_7d=0). Verified against [DOC_RBI_SLA_010, DOC_RBI_CIRCULARS_022, DOC_RBI_CIRCULARS_046].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_RBI_SLA_010",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.9912,
+          "excerpt": "RBI Digital Payment Security Architecture Directive RBI-DPSS-SLA-2025 establishes strict availability and latency guardrails for real-time payment risk engines operating at 2,800 TPS peak throughput. Online scoring must achieve p50 <= 80 ms and p99 <= 250 ms latency. If downstrea"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_022",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #022",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.9103,
+          "excerpt": "Regional Annex #022 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_046",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #046",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.9103,
+          "excerpt": "Regional Annex #046 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_118",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #118",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.9103,
+          "excerpt": "Regional Annex #118 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_094",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #094",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.9103,
+          "excerpt": "Regional Annex #094 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_af62a70504c40132",
+        "device_id": "D_6d193a1d9ed91f71",
+        "merchant_id": "M_416379ac1df3ee16",
+        "distinct_customers_per_device_7d": 0,
+        "shared_device_ring_detected": false,
+        "peer_customer_ids_on_device": [],
+        "two_hop_fraud_exposure_count": 0,
+        "two_hop_fraud_transaction_ids": [],
+        "merchants_paid_by_device_count": 3,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 0.4712,
+        "is_new_device": false,
+        "customer_merchant_distance_km": 4.44,
+        "is_new_city": false,
+        "hour_of_day": 10,
+        "is_night": false,
+        "has_recent_failures": false,
+        "is_new_account": false,
+        "txn_count_last_1h": 0,
+        "txn_amount_last_24h_paise": 0,
+        "distinct_customers_per_device_7d": 0,
+        "combined_risk_flags": 0
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 0.58
+    },
+    {
+      "transaction_id": "TX_0000004147",
+      "customer_id": "C_ef3c6ab416ac3ca3",
+      "merchant_id": "M_e7439143ff329a28",
+      "device_id": "D_f58c3db150358641",
+      "amount_paise": 225484,
+      "transaction_amount": 2254.84,
+      "payment_channel": "UPI",
+      "merchant_category": "quick_commerce",
+      "split": "validation",
+      "ground_truth_fraud_label": 0,
+      "fraud_probability": 0.04,
+      "risk_level": "LOW",
+      "recommended_action": "ALLOW",
+      "reason_codes_fired": [],
+      "risk_summary": "Genuine baseline authorization TX_0000004147 by customer C_ef3c6ab416ac3ca3 at Merchant_Quick_Commerce_068 (M_e7439143ff329a28, MCC=quick_commerce) for Rs. 2254.84 (225484 paise) via UPI scored fraud_probability=0.0400 (LOW) -> ALLOW. Zero risk flags fired (reason_codes=[]): amount_to_avg_ratio=0.57x, distance=6.70 km, hour_of_day=13:00 IST, failed_transactions_24h=0, txn_count_last_1h=0, account_age=566d, and Neo4j 2-hop device D_f58c3db150358641 has zero fraud contagion (distinct_customers_per_device_7d=0). Verified against [DOC_RBI_CIRCULARS_070, DOC_RBI_CIRCULARS_022, DOC_RBI_CIRCULARS_094].",
+      "cited_sources": [
+        {
+          "document_id": "DOC_RBI_CIRCULARS_070",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #070",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #070 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_022",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #022",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #022 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_094",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #094",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #094 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_046",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #046",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #046 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        },
+        {
+          "document_id": "DOC_RBI_CIRCULARS_118",
+          "document_type": "rbi_circulars",
+          "title": "RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open \u2014 wallet/Food Annex #118",
+          "topic": "SLA_FAIL_OPEN",
+          "chunk_number": 1,
+          "relevance_score": 0.8266,
+          "excerpt": "Regional Annex #118 (Kolkata Cluster, Channel=wallet, MCC=food): This operational addendum extends DOC_RBI_SLA_010 (RBI-DPSS-SLA-2025: Real-Time Scoring Latency (p99 <= 250ms) & 300ms Fail-Open) for wallet authorizations originating near Kolkata across food merchant terminals. RB"
+        }
+      ],
+      "graph_context": {
+        "customer_id": "C_ef3c6ab416ac3ca3",
+        "device_id": "D_f58c3db150358641",
+        "merchant_id": "M_e7439143ff329a28",
+        "distinct_customers_per_device_7d": 0,
+        "shared_device_ring_detected": false,
+        "peer_customer_ids_on_device": [
+          "C_b2656c7900c5fb42"
+        ],
+        "two_hop_fraud_exposure_count": 1,
+        "two_hop_fraud_transaction_ids": [
+          "TX_0000001190"
+        ],
+        "merchants_paid_by_device_count": 8,
+        "cypher_query_template": "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) WHERE ft.transaction_id <> :tid RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
+      },
+      "feature_snapshot": {
+        "amount_to_avg_ratio": 0.5723,
+        "is_new_device": false,
+        "customer_merchant_distance_km": 6.7,
+        "is_new_city": false,
+        "hour_of_day": 13,
+        "is_night": false,
+        "has_recent_failures": false,
+        "is_new_account": false,
+        "txn_count_last_1h": 0,
+        "txn_amount_last_24h_paise": 0,
+        "distinct_customers_per_device_7d": 0,
+        "combined_risk_flags": 0
+      },
+      "grounding_verification": {
+        "transaction_id_grounded": true,
+        "customer_id_grounded": true,
+        "merchant_id_grounded": true,
+        "amount_paise_grounded": true,
+        "cited_sources_non_empty": true,
+        "citation_doc_id_referenced": true,
+        "probability_in_bounds": true,
+        "valid_risk_level": true,
+        "valid_recommended_action": true,
+        "zero_pii_leakage": true,
+        "all_passed": true
+      },
+      "latency_ms": 0.64
+    }
+  ]
+}

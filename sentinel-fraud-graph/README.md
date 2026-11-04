@@ -45,7 +45,7 @@ While point-in-time tabular gradient-boosted models evaluate individual payment 
 | Path | Description |
 | :--- | :--- |
 | `sentinel_fraud_graph.py` | Main production execution engine: driver initialization, privacy gate, constraint creation, idempotent `MERGE` batch loader, Cypher traversal runner, subgraph renderer, and automated verification gates |
-| `verify_supabase_ingestion.py` | Supabase data ingestion verification script: connects via `DATABASE_URL`, queries customer, merchant, and paid transaction record counts, and validates ingestion |
+| `scripts/verify_supabase_ingestion.py` | Supabase data ingestion verification script: connects via `DATABASE_URL`, queries customer, merchant, and paid transaction record counts, and validates ingestion |
 | `queries.cypher` | Standalone Cypher reference suite containing uniqueness constraints, indexes, parameterized batch `MERGE` statement, and the 3 multi-hop fraud-ring detection queries |
 | `scripts/sentinel_data_loader.py` | 3-Tier telemetry loader and `enforce_data_privacy_guardrails()` validator |
 | `docker-compose.yml` | Container specification for `neo4j:5.20-community` exposing HTTP (`7474`) and Bolt (`7687`) with APOC enabled, heap/pagecache memory tuning, and healthcheck probes |
@@ -124,7 +124,7 @@ pip install -r requirements.txt
 #### (Optional) Verify Supabase Telemetry Replica Ingestion
 
 ```bash
-python verify_supabase_ingestion.py
+python scripts/verify_supabase_ingestion.py
 ```
 *Queries the Supabase feature store (`DATABASE_URL`), verifying record counts for `customers`, `merchants`, and `paid transactions` (`transactions` joined with `payment_outcomes`).*
 
@@ -138,7 +138,7 @@ docker compose ps
 
 * **Neo4j Browser UI**: `http://localhost:7474`
 * **Bolt Binary Endpoint**: `bolt://localhost:7687`
-* **Default Credentials**: `neo4j` / `SentinelGraph@2026!`
+* **Default Credentials**: `neo4j` / `<your-neo4j-password>` (or `${NEO4J_PASSWORD:-neo4j_local_dev_only}`)
 
 ### Step 3: Execute Ingestion, Traversals & Automated Verification Gates
 

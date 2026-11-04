@@ -777,7 +777,7 @@
   "stage4_l2_normalization_proof": {
     "max_unit_norm_deviation_from_1": 2.22e-16,
     "max_abs_diff_cosine_vs_dot": 1.665e-16,
-    "max_abs_diff_euclid_sq_vs_2_1_minus_dot": 1.11e-15,
+    "max_abs_diff_euclid_sq_vs_2_1_minus_dot": 1.776e-15,
     "all_top5_rankings_identical_across_cosine_dot_euclid": true,
     "sample_query_proofs": [
       {
@@ -882,92 +882,92 @@
         "dimension": 3072,
         "fp32_matrix_memory_mb": 11.72,
         "num_queries": 50,
-        "hnsw_index_build_ms": 81.76,
+        "hnsw_index_build_ms": 53.06,
         "brute_force_distance_evaluations_per_query": 1000,
         "hnsw_avg_distance_evaluations_per_query": 155.0,
         "hnsw_computation_reduction_factor": 6.45,
         "numpy_cosine_brute_force": {
-          "mean_ms": 3.1847,
-          "p50_ms": 2.9595,
-          "p95_ms": 4.5912,
-          "p99_ms": 5.3752,
-          "qps": 314.0
+          "mean_ms": 7.5626,
+          "p50_ms": 7.465,
+          "p95_ms": 8.2799,
+          "p99_ms": 8.8483,
+          "qps": 132.2
         },
         "numpy_euclidean_brute_force": {
-          "mean_ms": 4.2524,
-          "p50_ms": 3.9912,
-          "p95_ms": 5.6451,
-          "p99_ms": 7.2897,
-          "qps": 235.2
+          "mean_ms": 12.2181,
+          "p50_ms": 12.1281,
+          "p95_ms": 12.945,
+          "p99_ms": 13.2938,
+          "qps": 81.8
         },
         "numpy_unit_dot_brute_force": {
-          "mean_ms": 0.5784,
-          "p50_ms": 0.5238,
-          "p95_ms": 0.9971,
-          "p99_ms": 1.4221,
-          "qps": 1728.8
+          "mean_ms": 0.7057,
+          "p50_ms": 0.6747,
+          "p95_ms": 0.908,
+          "p99_ms": 1.0458,
+          "qps": 1417.1
         },
         "qdrant_hnsw_graph_search": {
-          "mean_ms": 0.6439,
-          "p50_ms": 0.6144,
-          "p95_ms": 0.7816,
-          "p99_ms": 1.0758,
-          "qps": 1552.9
+          "mean_ms": 0.5174,
+          "p50_ms": 0.4949,
+          "p95_ms": 0.616,
+          "p99_ms": 0.8589,
+          "qps": 1932.9
         },
-        "dot_speedup_over_cosine": 5.51,
-        "dot_speedup_over_euclidean": 7.35
+        "dot_speedup_over_cosine": 10.72,
+        "dot_speedup_over_euclidean": 17.31
       },
       {
         "num_vectors": 10000,
         "dimension": 3072,
         "fp32_matrix_memory_mb": 117.19,
         "num_queries": 50,
-        "hnsw_index_build_ms": 775.24,
+        "hnsw_index_build_ms": 751.06,
         "brute_force_distance_evaluations_per_query": 10000,
         "hnsw_avg_distance_evaluations_per_query": 153.3,
         "hnsw_computation_reduction_factor": 65.23,
         "numpy_cosine_brute_force": {
-          "mean_ms": 173.3723,
-          "p50_ms": 173.5323,
-          "p95_ms": 191.1827,
-          "p99_ms": 194.2879,
-          "qps": 5.8
+          "mean_ms": 68.7258,
+          "p50_ms": 64.0345,
+          "p95_ms": 88.1139,
+          "p99_ms": 99.9334,
+          "qps": 14.6
         },
         "numpy_euclidean_brute_force": {
-          "mean_ms": 268.7087,
-          "p50_ms": 268.4566,
-          "p95_ms": 285.6775,
-          "p99_ms": 302.7324,
-          "qps": 3.7
+          "mean_ms": 101.0462,
+          "p50_ms": 94.6392,
+          "p95_ms": 139.1188,
+          "p99_ms": 157.0168,
+          "qps": 9.9
         },
         "numpy_unit_dot_brute_force": {
-          "mean_ms": 8.439,
-          "p50_ms": 7.8517,
-          "p95_ms": 12.8687,
-          "p99_ms": 14.0496,
-          "qps": 118.5
+          "mean_ms": 5.7682,
+          "p50_ms": 5.6773,
+          "p95_ms": 6.485,
+          "p99_ms": 6.7212,
+          "qps": 173.4
         },
         "qdrant_hnsw_graph_search": {
-          "mean_ms": 1.2512,
-          "p50_ms": 1.0778,
-          "p95_ms": 2.5504,
-          "p99_ms": 3.0617,
-          "qps": 799.2
+          "mean_ms": 0.8497,
+          "p50_ms": 0.8149,
+          "p95_ms": 1.0903,
+          "p99_ms": 1.5519,
+          "qps": 1176.9
         },
-        "dot_speedup_over_cosine": 20.54,
-        "dot_speedup_over_euclidean": 31.84
+        "dot_speedup_over_cosine": 11.91,
+        "dot_speedup_over_euclidean": 17.52
       }
     ],
     "scaling_summary_10k_vs_1k": {
-      "cosine_10k_vs_1k_latency_ratio": 54.44,
-      "euclidean_10k_vs_1k_latency_ratio": 63.19,
-      "unit_dot_10k_vs_1k_latency_ratio": 14.59,
-      "hnsw_10k_vs_1k_latency_ratio": 1.94
+      "cosine_10k_vs_1k_latency_ratio": 9.09,
+      "euclidean_10k_vs_1k_latency_ratio": 8.27,
+      "unit_dot_10k_vs_1k_latency_ratio": 8.17,
+      "hnsw_10k_vs_1k_latency_ratio": 1.64
     }
   },
   "visual_artifacts": {
-    "geometry_plot": "/working_dir/c_a7d820279a0f0b5f/sentinel-vector-search-engine/outputs/2d_vector_geometry.png",
-    "benchmarks_plot": "/working_dir/c_a7d820279a0f0b5f/sentinel-vector-search-engine/outputs/vector_search_benchmarks.png"
+    "geometry_plot": "D:\\Euron\\Work and Learn Super 30\\Fast-Track\\sentinel-fraud-intelligence\\sentinel-vector-search-engine\\outputs\\2d_vector_geometry.png",
+    "benchmarks_plot": "D:\\Euron\\Work and Learn Super 30\\Fast-Track\\sentinel-fraud-intelligence\\sentinel-vector-search-engine\\outputs\\vector_search_benchmarks.png"
   },
   "verification_gates": {
     "Gate 1: DPDP Act 2023 & PCI-DSS v4.0 Zero-PII Privacy Gate": true,

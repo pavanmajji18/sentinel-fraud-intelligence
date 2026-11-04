@@ -212,7 +212,7 @@ Layer 1 (Regional Hubs)    [v_14] ---------> [v_301] --------------> [v_892] ---
 Layer 0 (All N Vectors)    [v_14]--[v_88]--[v_301]--[v_412]--[v_550]--[v_892]--[v_911]--[v_940]--* (Query Q)
 ```
 
-1. **Exponential Layer Assignment**:
+1. **Exponential Layer Selection**:
    When a vector `v_i` is inserted, its maximum layer `l_i` is sampled from an exponentially decaying distribution `l_i = floor(-ln(uniform(0, 1)) * m_L)` where `m_L = 1 / ln(M)`. **Layer 0** contains 100% of the `N` vectors (`120,000+` chunks in full SENTINEL scale), **Layer 1** contains `~N / M` vectors, and **Layer 2** contains `~N / M^2` vectors up to top layer `L = O(log_M(N))`.
 2. **Two-Phase Search Routing (`O(D * log N)`)**:
    * **Phase 1 — Coarse Greedy Descent (Layers `L -> 1`, `ef = 1`)**: Starting at the top-layer Entry Point (`EP`), search inspects the `M` neighbors of the current node and greedily jumps to the neighbor closest to query `Q`. Because upper layers only contain long-range edges spanning wide regions of 3072-d space, each hop traverses a large geometric distance in very few evaluations. When no neighbor in layer `l` improves on the current node, search drops to layer `l - 1`.

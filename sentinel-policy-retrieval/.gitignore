@@ -1,0 +1,54 @@
+# ==============================================================================
+# Project SENTINEL — Hardened DPDP Act 2023 & PCI-DSS v4.0 .gitignore
+# Blocks secrets, private keys, raw data dumps, and unredacted local artifacts.
+# ==============================================================================
+
+# Secrets & Environment Configurations
+.env
+.env.*
+!.env.example
+*.pem
+*.ppk
+*.key
+*.crt
+*.p12
+secrets/
+credentials.json
+
+# Local Telemetry & Unstructured Data Dumps (DPDP Act 2023 / PCI-DSS v4.0)
+sentinel_data/
+data/
+*.parquet
+*.npz
+*.dump
+*.bson
+*.sqlite
+*.db
+qdrant_storage/
+
+# Whitelist committed sample verification artifacts
+!**/outputs/*.csv
+!**/outputs/*.json
+!**/outputs/*.md
+!**/outputs/*.txt
+!**/outputs/*.png
+
+# Large Local Embedding Caches (Regenerated or Verified on Run)
+outputs/embeddings_cache.npz
+
+# Python Bytecode & Virtual Environments
+__pycache__/
+*.py[cod]
+*.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS & Editor Artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

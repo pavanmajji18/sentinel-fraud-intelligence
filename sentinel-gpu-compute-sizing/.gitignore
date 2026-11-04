@@ -1,0 +1,28 @@
+# Environment & Secrets (DPDP Act 2023 & PCI-DSS v4.0 Hardened)
+.env
+.env.*
+!.env.example
+*.pem
+*.ppk
+*.key
+
+# Local Telemetry Dumps & Binary Artifacts (DPDP Act 2023 / PCI-DSS v4.0)
+sentinel_data/
+data/
+*.parquet
+*.npz
+*.dump
+*.bson
+
+# Whitelist committed sample verification artifacts
+!**/outputs/*.csv
+!**/outputs/*.json
+!**/outputs/*.md
+!**/outputs/*.txt
+!**/outputs/*.png
+
+# Python Bytecode & Virtual Environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/

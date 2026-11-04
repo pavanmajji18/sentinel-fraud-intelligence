@@ -1,0 +1,149 @@
+{
+  "service": "sentinel_feature_pipeline",
+  "component": "Point-in-Time Feature Engineering & Leakage-Free Pipeline",
+  "telemetry_tier": "Tier 3 (Deterministic Schema-Compliant Synthetic Telemetry: 5,500 txns, seed=42)",
+  "execution_time_seconds": 6.936,
+  "all_gates_passed": true,
+  "gates": [
+    {
+      "gate": "Gate 1 [DPDP Act 2023 & PCI-DSS v4.0 Privacy Guardrail]",
+      "passed": true
+    },
+    {
+      "gate": "Gate 2 [7-Table Schema, FK Integrity & Integer Paise Invariant]",
+      "passed": true
+    },
+    {
+      "gate": "Gate 3 [Zero Temporal Leakage & 60-Day Label Maturation Guard]",
+      "passed": true
+    },
+    {
+      "gate": "Gate 4 [IST Timezone (UTC+05:30) & FE-01..FE-10 Computation]",
+      "passed": true
+    },
+    {
+      "gate": "Gate 5 [R01..R08 Reason Code Derivation & Client Table Parity]",
+      "passed": true
+    },
+    {
+      "gate": "Gate 6 [Deliverable Reports, CSV & Diagnostic Plot Exported]",
+      "passed": true
+    }
+  ],
+  "privacy_audit": {
+    "compliance_standard": "DPDP Act 2023 & PCI-DSS v4.0 Data Minimization",
+    "forbidden_pii_columns_checked": 12,
+    "redacted_columns": [],
+    "tokenized_customer_ids_verified": 500,
+    "tokenized_merchant_ids_verified": 120,
+    "tokenized_device_ids_verified": 900,
+    "all_records_synthetic_verified": true
+  },
+  "pit_summary": {
+    "total_transactions_scored": 5500,
+    "temporal_leakage_violations": 0,
+    "ist_timezone_offset": "UTC+05:30 (Asia/Kolkata)",
+    "night_window_ist": "00:00 <= time < 05:00 IST (0 <= hour_of_day < 5)",
+    "baseline_fraud_rate_pct": 13.93,
+    "reason_code_analytics": [
+      {
+        "reason_code": "R01_NEW_DEVICE",
+        "trigger_rule": "is_new_device == True (Device unseen for customer in prior 90d)",
+        "triggered_count": 3098,
+        "trigger_rate_pct": 56.33,
+        "fraud_hits": 707,
+        "precision_pct": 22.82,
+        "recall_of_total_fraud_pct": 92.3,
+        "risk_lift_vs_baseline": 1.64
+      },
+      {
+        "reason_code": "R02_GEO_MISMATCH",
+        "trigger_rule": "is_new_city == True OR customer_merchant_distance_km > 500.0 km",
+        "triggered_count": 4253,
+        "trigger_rate_pct": 77.33,
+        "fraud_hits": 714,
+        "precision_pct": 16.79,
+        "recall_of_total_fraud_pct": 93.21,
+        "risk_lift_vs_baseline": 1.21
+      },
+      {
+        "reason_code": "R03_ODD_HOUR",
+        "trigger_rule": "is_night == True (Transaction between 00:00 and 04:59 IST)",
+        "triggered_count": 1077,
+        "trigger_rate_pct": 19.58,
+        "fraud_hits": 321,
+        "precision_pct": 29.81,
+        "recall_of_total_fraud_pct": 41.91,
+        "risk_lift_vs_baseline": 2.14
+      },
+      {
+        "reason_code": "R04_FAILED_ATTEMPTS",
+        "trigger_rule": "has_recent_failures == True (failed_transactions >= 3 in prior 24h)",
+        "triggered_count": 352,
+        "trigger_rate_pct": 6.4,
+        "fraud_hits": 352,
+        "precision_pct": 100.0,
+        "recall_of_total_fraud_pct": 45.95,
+        "risk_lift_vs_baseline": 7.18
+      },
+      {
+        "reason_code": "R05_AMOUNT_SPIKE",
+        "trigger_rule": "amount_to_avg_ratio >= 5.0 (5x spike over customer 90d average)",
+        "triggered_count": 193,
+        "trigger_rate_pct": 3.51,
+        "fraud_hits": 190,
+        "precision_pct": 98.45,
+        "recall_of_total_fraud_pct": 24.8,
+        "risk_lift_vs_baseline": 7.07
+      },
+      {
+        "reason_code": "R06_NEW_ACCOUNT",
+        "trigger_rule": "is_new_account == True (account_age < 30 days at authorization)",
+        "triggered_count": 2,
+        "trigger_rate_pct": 0.04,
+        "fraud_hits": 1,
+        "precision_pct": 50.0,
+        "recall_of_total_fraud_pct": 0.13,
+        "risk_lift_vs_baseline": 3.59
+      },
+      {
+        "reason_code": "R07_VELOCITY",
+        "trigger_rule": "txn_count_last_1h >= 4 (High-frequency burst in prior 60 minutes)",
+        "triggered_count": 78,
+        "trigger_rate_pct": 1.42,
+        "fraud_hits": 78,
+        "precision_pct": 100.0,
+        "recall_of_total_fraud_pct": 10.18,
+        "risk_lift_vs_baseline": 7.18
+      },
+      {
+        "reason_code": "R08_HIGH_RISK_MCC",
+        "trigger_rule": "merchant_category in {electronics, gaming, travel, gift_cards, crypto}",
+        "triggered_count": 1611,
+        "trigger_rate_pct": 29.29,
+        "fraud_hits": 441,
+        "precision_pct": 27.37,
+        "recall_of_total_fraud_pct": 57.57,
+        "risk_lift_vs_baseline": 1.97
+      }
+    ]
+  },
+  "forensic_mismatch_diagnostics": {
+    "fe05_gateway_vs_outcomes": {
+      "raw_outcomes_match_rate_pct": 93.6,
+      "reconciled_gateway_match_rate_pct": 100.0,
+      "divergent_row_count": 352,
+      "divergent_fraud_rate_pct": 100.0,
+      "root_cause": "During coordinated mule-ring attacks (`is_ring_attack`), rapid pre-authorization UPI PIN / OTP retries at the NPCI/acquirer switch increment `transactions.failed_transactions` (>= 3) before terminal authorization rows settle into `payment_outcomes`. Reconciling `max(outcomes_failed_24h, transactions.failed_transactions)` restores 100.00% parity on `has_recent_failures`, `combined_risk_flags`, and `R04_FAILED_ATTEMPTS`."
+    },
+    "fe08_target_encoding_maturation": {
+      "warmup_mature_labels_count": 4,
+      "mean_abs_diff_dynamic_vs_client_bps": 834.47,
+      "mean_abs_diff_leaky_vs_dynamic_bps": 146.95,
+      "client_table_as_of_timestamp": "2024-11-30T18:30:00+00:00",
+      "dataset_start_timestamp": "2024-11-01T00:00:00+00:00",
+      "chargeback_maturation_window_days": 60,
+      "root_cause": "Client table `sentinel-features-1.0.0` froze `mcc_target_encoded_rate` at `mcc_encoding_as_of = 2024-11-30T18:30:00+00:00` (30 days after `2024-11-01` start). Because chargeback labels require 60 days to mature (`label_available_at = transaction_time + 60d`), exactly 0 labels were mature at `2024-11-30`, so the client encoder emitted its m=100 prior (`0.012` for high-risk MCCs, `0.004` for standard MCCs). Dynamic point-in-time Bayesian smoothing `(fraud_count + 0.6) / (total_count + 100)` begins updating only after `2024-12-31` when warmup labels mature, preventing 60-day look-ahead label leakage."
+    }
+  }
+}

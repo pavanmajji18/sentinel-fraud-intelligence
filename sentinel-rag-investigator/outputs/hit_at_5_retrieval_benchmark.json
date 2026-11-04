@@ -1,0 +1,214 @@
+{
+  "benchmark_name": "SENTINEL 10-Query Policy & Playbook Retrieval Benchmark (3072-d Cosine)",
+  "embedding_gateway": "Deterministic Semantic-Anchor 3072-d Unit-Sphere Embedder (Offline Mode)",
+  "vector_store_backend": "Qdrant Local In-Memory Engine (3072-d, Distance.COSINE)",
+  "total_corpus_documents": 220,
+  "total_indexed_chunks": 238,
+  "embedding_dimension": 3072,
+  "num_queries": 10,
+  "hit_at_1": 1.0,
+  "hit_at_3": 1.0,
+  "hit_at_5": 1.0,
+  "queries": [
+    {
+      "query_id": "Q01",
+      "question": "What step-up authentication or escalation action is required when R01_NEW_DEVICE triggers on an unseen hardware fingerprint in 90 days?",
+      "expected_doc_id": "DOC_PLAYBOOK_R01_001",
+      "expected_topic": "R01_NEW_DEVICE",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_PLAYBOOKS_181",
+      "top_1_score": 0.9464,
+      "top_5_doc_ids": [
+        "DOC_PLAYBOOKS_181",
+        "DOC_PLAYBOOKS_037",
+        "DOC_PLAYBOOKS_085",
+        "DOC_PLAYBOOKS_061",
+        "DOC_PLAYBOOKS_157"
+      ],
+      "latency_ms": 0.76
+    },
+    {
+      "query_id": "Q02",
+      "question": "How should investigators handle R02_GEO_MISMATCH when Haversine customer-merchant distance exceeds 500 km or customer_location is missing?",
+      "expected_doc_id": "DOC_PLAYBOOK_R02_002",
+      "expected_topic": "R02_GEO_MISMATCH",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_PLAYBOOK_R02_002",
+      "top_1_score": 0.9728,
+      "top_5_doc_ids": [
+        "DOC_PLAYBOOK_R02_002",
+        "DOC_PLAYBOOKS_014",
+        "DOC_PLAYBOOKS_038",
+        "DOC_PLAYBOOKS_062",
+        "DOC_PLAYBOOKS_086"
+      ],
+      "latency_ms": 0.36
+    },
+    {
+      "query_id": "Q03",
+      "question": "Why are nocturnal transactions between 00:00 and 04:59 IST flagged with R03_ODD_HOUR after UTC+05:30 conversion?",
+      "expected_doc_id": "DOC_PLAYBOOK_R03_003",
+      "expected_topic": "R03_ODD_HOUR",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_PLAYBOOK_R03_003",
+      "top_1_score": 0.7086,
+      "top_5_doc_ids": [
+        "DOC_PLAYBOOK_R03_003",
+        "DOC_PLAYBOOKS_015",
+        "DOC_PLAYBOOKS_039",
+        "DOC_PLAYBOOKS_063",
+        "DOC_PLAYBOOKS_087"
+      ],
+      "latency_ms": 0.29
+    },
+    {
+      "query_id": "Q04",
+      "question": "What is the investigator SOP for R04_FAILED_ATTEMPTS when 3 or more AUTH_DECLINED PIN or OTP failures occur within 24 hours?",
+      "expected_doc_id": "DOC_PLAYBOOK_R04_004",
+      "expected_topic": "R04_FAILED_ATTEMPTS",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_PLAYBOOK_R04_004",
+      "top_1_score": 0.9851,
+      "top_5_doc_ids": [
+        "DOC_PLAYBOOK_R04_004",
+        "DOC_PLAYBOOKS_016",
+        "DOC_PLAYBOOKS_028",
+        "DOC_PLAYBOOKS_040",
+        "DOC_PLAYBOOKS_052"
+      ],
+      "latency_ms": 0.44
+    },
+    {
+      "query_id": "Q05",
+      "question": "How does SOP-R05 evaluate R05_AMOUNT_SPIKE when amount_to_avg_ratio >= 5.0x the 90-day mean while preserving integer paise?",
+      "expected_doc_id": "DOC_PLAYBOOK_R05_005",
+      "expected_topic": "R05_AMOUNT_SPIKE",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_PLAYBOOK_R05_005",
+      "top_1_score": 0.6345,
+      "top_5_doc_ids": [
+        "DOC_PLAYBOOK_R05_005",
+        "DOC_PLAYBOOKS_029",
+        "DOC_PLAYBOOKS_053",
+        "DOC_PLAYBOOKS_077",
+        "DOC_PLAYBOOKS_101"
+      ],
+      "latency_ms": 0.52
+    },
+    {
+      "query_id": "Q06",
+      "question": "What synthetic identity and onboarding velocity checks apply under R06_NEW_ACCOUNT when account_age is under 30 days?",
+      "expected_doc_id": "DOC_PLAYBOOK_R06_006",
+      "expected_topic": "R06_NEW_ACCOUNT",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_PLAYBOOK_R06_006",
+      "top_1_score": 0.9812,
+      "top_5_doc_ids": [
+        "DOC_PLAYBOOK_R06_006",
+        "DOC_PLAYBOOKS_030",
+        "DOC_PLAYBOOKS_054",
+        "DOC_PLAYBOOKS_078",
+        "DOC_PLAYBOOKS_102"
+      ],
+      "latency_ms": 0.7
+    },
+    {
+      "query_id": "Q07",
+      "question": "How should analysts adjudicate R07_VELOCITY bursts when txn_count_last_1h reaches 4 or more attempts within 60 minutes?",
+      "expected_doc_id": "DOC_PLAYBOOK_R07_007",
+      "expected_topic": "R07_VELOCITY",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_PLAYBOOK_R07_007",
+      "top_1_score": 0.9775,
+      "top_5_doc_ids": [
+        "DOC_PLAYBOOK_R07_007",
+        "DOC_PLAYBOOKS_031",
+        "DOC_PLAYBOOKS_055",
+        "DOC_PLAYBOOKS_079",
+        "DOC_PLAYBOOKS_103"
+      ],
+      "latency_ms": 0.41
+    },
+    {
+      "query_id": "Q08",
+      "question": "Which liquid merchant categories trigger R08_HIGH_RISK_MCC and how is Bayesian smoothed mcc_target_encoded_rate computed?",
+      "expected_doc_id": "DOC_PLAYBOOK_R08_008",
+      "expected_topic": "R08_HIGH_RISK_MCC",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_PLAYBOOK_R08_008",
+      "top_1_score": 0.9946,
+      "top_5_doc_ids": [
+        "DOC_PLAYBOOK_R08_008",
+        "DOC_PLAYBOOKS_032",
+        "DOC_PLAYBOOKS_104",
+        "DOC_PLAYBOOKS_080",
+        "DOC_PLAYBOOKS_200"
+      ],
+      "latency_ms": 0.36
+    },
+    {
+      "query_id": "Q09",
+      "question": "How does NPCI-UPI-RING-2025 define a shared-device mule ring (>= 3 customers in 7 days) and 2-hop Neo4j fraud contagion?",
+      "expected_doc_id": "DOC_NPCI_GRAPH_009",
+      "expected_topic": "GRAPH_MULE_RING",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_NPCI_GRAPH_009",
+      "top_1_score": 0.9943,
+      "top_5_doc_ids": [
+        "DOC_NPCI_GRAPH_009",
+        "DOC_NPCI_GUIDELINES_021",
+        "DOC_NPCI_GUIDELINES_045",
+        "DOC_NPCI_GUIDELINES_069",
+        "DOC_NPCI_GUIDELINES_093"
+      ],
+      "latency_ms": 0.41
+    },
+    {
+      "query_id": "Q10",
+      "question": "What is the RBI real-time scoring latency SLA (p99 <= 250 ms) and the 300 ms fail-open Rs. 10,000 threshold rule?",
+      "expected_doc_id": "DOC_RBI_SLA_010",
+      "expected_topic": "SLA_FAIL_OPEN",
+      "first_relevant_rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true,
+      "top_1_doc_id": "DOC_RBI_CIRCULARS_022",
+      "top_1_score": 0.1045,
+      "top_5_doc_ids": [
+        "DOC_RBI_CIRCULARS_022",
+        "DOC_RBI_CIRCULARS_046",
+        "DOC_RBI_CIRCULARS_094",
+        "DOC_RBI_CIRCULARS_070",
+        "DOC_RBI_CIRCULARS_118"
+      ],
+      "latency_ms": 0.34
+    }
+  ]
+}

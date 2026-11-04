@@ -27,14 +27,17 @@ jobs:
       - name: Install Common Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r sentinel_rag_investigator/requirements.txt
+          pip install -r sentinel-rag-investigator/requirements.txt scipy tabulate matplotlib pytest
 
-      - name: Audit Subsystems Code Quality & Artifacts
+      - name: Audit Subsystems Code Quality, Portfolio Hygiene & Privacy Guardrails
         run: |
           python verify_all_subsystems.py --audit
 
+      - name: Execute Full Offline-Mock Verification Across All 8 Subsystems
+        run: |
+          python verify_all_subsystems.py --offline-mock
+
       - name: Run FastAPI RAG Assistant Unit Tests
         run: |
-          cd sentinel_rag_investigator
-          python -m pytest tests/ -v
+          pytest sentinel-rag-investigator/tests/ -v
 

@@ -861,7 +861,7 @@ def main() -> int:
     load_dotenv()
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     user = os.getenv("NEO4J_USER", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "SentinelGraph@2026!")
+    password = os.getenv("NEO4J_PASSWORD", "neo4j_local_dev_only")
     database = os.getenv("NEO4J_DATABASE", "neo4j")
 
     print("=" * 92)

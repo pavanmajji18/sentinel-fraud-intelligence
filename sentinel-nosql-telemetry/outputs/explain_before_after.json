@@ -1,0 +1,205 @@
+{
+  "target_query": {
+    "collection": "transactions",
+    "filter": {
+      "customer_id": "C_7ac08ed4d9feab3c"
+    },
+    "sort": {
+      "transaction_time": -1
+    },
+    "purpose": "Real-time point-in-time customer velocity lookup during p99 <= 250ms scoring"
+  },
+  "indexes_created": {
+    "customers": [
+      "idx_customers_customer_id_1"
+    ],
+    "transactions": [
+      "idx_customer_id_1",
+      "idx_transaction_time_-1",
+      "idx_customer_id_1_transaction_time_-1"
+    ],
+    "index_catalog": {
+      "_id_": {
+        "v": 2,
+        "key": [
+          [
+            "_id",
+            1
+          ]
+        ],
+        "name": "_id_"
+      },
+      "idx_customer_id_1": {
+        "v": 2,
+        "key": [
+          [
+            "customer_id",
+            1
+          ]
+        ],
+        "name": "idx_customer_id_1"
+      },
+      "idx_transaction_time_-1": {
+        "v": 2,
+        "key": [
+          [
+            "transaction_time",
+            -1
+          ]
+        ],
+        "name": "idx_transaction_time_-1"
+      },
+      "idx_customer_id_1_transaction_time_-1": {
+        "v": 2,
+        "key": [
+          [
+            "customer_id",
+            1
+          ],
+          [
+            "transaction_time",
+            -1
+          ]
+        ],
+        "name": "idx_customer_id_1_transaction_time_-1"
+      }
+    }
+  },
+  "comparison_summary": {
+    "winning_plan_before": "SORT <- COLLSCAN",
+    "winning_plan_after": "FETCH <- IXSCAN (idx_customer_id_1_transaction_time_-1)",
+    "nReturned": 26,
+    "totalDocsExamined_before": 5500,
+    "totalDocsExamined_after": 26,
+    "docs_examined_reduction_pct": 99.53,
+    "totalKeysExamined_before": 0,
+    "totalKeysExamined_after": 26,
+    "executionTimeMillisPrecise_before": 3.5721,
+    "executionTimeMillisPrecise_after": 0.0526,
+    "in_memory_sort_eliminated": true
+  },
+  "explain_before_raw": {
+    "explainVersion": "1",
+    "queryPlanner": {
+      "namespace": "sentinel_fraud_db.transactions",
+      "indexFilterSet": false,
+      "parsedQuery": {
+        "customer_id": "C_7ac08ed4d9feab3c"
+      },
+      "winningPlan": {
+        "stage": "SORT",
+        "sortPattern": {
+          "transaction_time": -1
+        },
+        "memLimit": 104857600,
+        "type": "simple",
+        "inputStage": {
+          "stage": "COLLSCAN",
+          "filter": {
+            "customer_id": "C_7ac08ed4d9feab3c"
+          },
+          "direction": "forward"
+        }
+      },
+      "rejectedPlans": []
+    },
+    "executionStats": {
+      "executionSuccess": true,
+      "nReturned": 26,
+      "executionTimeMillis": 4,
+      "executionTimeMillisPrecise": 3.5721,
+      "totalKeysExamined": 0,
+      "totalDocsExamined": 5500,
+      "collectionTotalDocs": 5500,
+      "selectivityRatio": 0.004727,
+      "executionStages": {
+        "stage": "SORT",
+        "sortPattern": {
+          "transaction_time": -1
+        },
+        "memLimit": 104857600,
+        "type": "simple",
+        "inputStage": {
+          "stage": "COLLSCAN",
+          "filter": {
+            "customer_id": "C_7ac08ed4d9feab3c"
+          },
+          "direction": "forward"
+        },
+        "nReturned": 26,
+        "executionTimeMillisEstimate": 4,
+        "docsExamined": 5500,
+        "keysExamined": 0
+      }
+    },
+    "ok": 1.0
+  },
+  "explain_after_raw": {
+    "explainVersion": "1",
+    "queryPlanner": {
+      "namespace": "sentinel_fraud_db.transactions",
+      "indexFilterSet": false,
+      "parsedQuery": {
+        "customer_id": "C_7ac08ed4d9feab3c"
+      },
+      "winningPlan": {
+        "stage": "FETCH",
+        "inputStage": {
+          "stage": "IXSCAN",
+          "keyPattern": {
+            "customer_id": 1,
+            "transaction_time": -1
+          },
+          "indexName": "idx_customer_id_1_transaction_time_-1",
+          "isMultiKey": false,
+          "direction": "forward",
+          "indexBounds": {
+            "customer_id": [
+              "[\"C_7ac08ed4d9feab3c\", \"C_7ac08ed4d9feab3c\"]"
+            ],
+            "transaction_time": [
+              "[MaxKey, MinKey]"
+            ]
+          }
+        }
+      },
+      "rejectedPlans": []
+    },
+    "executionStats": {
+      "executionSuccess": true,
+      "nReturned": 26,
+      "executionTimeMillis": 0,
+      "executionTimeMillisPrecise": 0.0526,
+      "totalKeysExamined": 26,
+      "totalDocsExamined": 26,
+      "collectionTotalDocs": 5500,
+      "selectivityRatio": 1.0,
+      "executionStages": {
+        "stage": "FETCH",
+        "inputStage": {
+          "stage": "IXSCAN",
+          "keyPattern": {
+            "customer_id": 1,
+            "transaction_time": -1
+          },
+          "indexName": "idx_customer_id_1_transaction_time_-1",
+          "isMultiKey": false,
+          "direction": "forward",
+          "indexBounds": {
+            "customer_id": [
+              "[\"C_7ac08ed4d9feab3c\", \"C_7ac08ed4d9feab3c\"]"
+            ],
+            "transaction_time": [
+              "[MaxKey, MinKey]"
+            ]
+          }
+        },
+        "nReturned": 26,
+        "executionTimeMillisEstimate": 0,
+        "docsExamined": 26,
+        "keysExamined": 26
+      }
+    },
+    "ok": 1.0
+  }
+}

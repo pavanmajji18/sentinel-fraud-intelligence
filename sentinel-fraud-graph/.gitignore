@@ -7,13 +7,20 @@
 *.key
 *.crt
 
-# Raw Telemetry & Local Data Dumps
+# Raw Telemetry & Local Data Dumps (DPDP Act 2023 / PCI-DSS v4.0)
 sentinel_data/
 data/
 *.parquet
 *.npz
 *.dump
 *.bson
+
+# Whitelist committed sample verification artifacts
+!**/outputs/*.csv
+!**/outputs/*.json
+!**/outputs/*.md
+!**/outputs/*.txt
+!**/outputs/*.png
 
 # Neo4j Volume Artifacts
 neo4j_data/

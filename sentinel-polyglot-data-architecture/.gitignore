@@ -5,12 +5,20 @@
 *.pem
 *.ppk
 *.key
+# Raw Telemetry Dumps & Vector Binary Caches (DPDP Act 2023 / PCI-DSS v4.0)
 sentinel_data/
 data/
 *.parquet
 *.npz
 *.dump
 *.bson
+
+# Whitelist committed sample verification artifacts
+!**/outputs/*.csv
+!**/outputs/*.json
+!**/outputs/*.md
+!**/outputs/*.txt
+!**/outputs/*.png
 __pycache__/
 *.py[cod]
 .pytest_cache/
