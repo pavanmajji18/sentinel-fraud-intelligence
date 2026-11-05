@@ -1,6 +1,6 @@
 {
   "service": "sentinel_fraud_graph \u2014 Neo4j Graph Fraud Ring & Shared-Device Detection Engine",
-  "execution_backend": "Deterministic Property-Graph Engine (--offline-mock enabled)",
+  "execution_backend": "Deterministic Property-Graph Engine (Bolt neo4j+s://3106f5af.databases.neo4j.io unreachable in sandbox: AuthError)",
   "telemetry_tier": "Tier 3 (Deterministic Schema-Compliant Synthetic Telemetry: 5,500 txns, seed=42)",
   "privacy_audit": {
     "compliance_standard": "DPDP Act 2023 & PCI-DSS v4.0 Data Minimization",
