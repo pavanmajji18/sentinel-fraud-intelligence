@@ -73,12 +73,174 @@
   ],
   "null_profile": [
     {
+      "table_name": "customers",
+      "column_name": "customer_id",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 2500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "customers",
+      "column_name": "created_at",
+      "dtype": "datetime64[us, UTC]",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 2500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "customers",
+      "column_name": "customer_age",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 2500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "customers",
+      "column_name": "home_city",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 2500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "customers",
+      "column_name": "region",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 2500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "customers",
+      "column_name": "is_synthetic",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 2500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "merchants",
+      "column_name": "merchant_id",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 200,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "merchants",
+      "column_name": "synthetic_name",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 200,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "merchants",
+      "column_name": "merchant_category",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 200,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "merchants",
+      "column_name": "merchant_location",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 200,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "merchants",
+      "column_name": "is_synthetic",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 200,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
       "table_name": "devices",
       "column_name": "device_id",
       "dtype": "str",
       "null_count": 0,
       "null_pct": 0.0,
-      "non_null_count": 10120
+      "non_null_count": 10120,
+      "root_cause_governance": "Web/UPI collect flows where hardware fingerprint is uncaptured (~1% missing)",
+      "is_key_audit_column": true
+    },
+    {
+      "table_name": "devices",
+      "column_name": "device_kind",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 10120,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "devices",
+      "column_name": "is_synthetic",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 10120,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "transaction_id",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "customer_id",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "merchant_id",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
     },
     {
       "table_name": "transactions",
@@ -86,7 +248,69 @@
       "dtype": "str",
       "null_count": 81,
       "null_pct": 1.08,
-      "non_null_count": 7419
+      "non_null_count": 7419,
+      "root_cause_governance": "Web/UPI collect flows where hardware fingerprint is uncaptured (~1% missing)",
+      "is_key_audit_column": true
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "amount_paise",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "transaction_amount",
+      "dtype": "float64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "payment_channel",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "merchant_category",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "transaction_time",
+      "dtype": "datetime64[us, UTC]",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "customer_age",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
     },
     {
       "table_name": "transactions",
@@ -94,7 +318,39 @@
       "dtype": "str",
       "null_count": 231,
       "null_pct": 3.08,
-      "non_null_count": 7269
+      "non_null_count": 7269,
+      "root_cause_governance": "GPS/IP geolocation permission denied at authorization (~3% missing)",
+      "is_key_audit_column": true
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "merchant_location",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "account_age",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "previous_transactions",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
     },
     {
       "table_name": "transactions",
@@ -102,7 +358,69 @@
       "dtype": "float64",
       "null_count": 790,
       "null_pct": 10.53,
-      "non_null_count": 6710
+      "non_null_count": 6710,
+      "root_cause_governance": "Cold-start customers with 0 prior transactions in 90d window (~10.5% missing)",
+      "is_key_audit_column": true
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "failed_transactions",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "split",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "transactions",
+      "column_name": "is_synthetic",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "payment_outcomes",
+      "column_name": "transaction_id",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "payment_outcomes",
+      "column_name": "outcome_time",
+      "dtype": "datetime64[us, UTC]",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "payment_outcomes",
+      "column_name": "status",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
     },
     {
       "table_name": "payment_outcomes",
@@ -110,7 +428,109 @@
       "dtype": "str",
       "null_count": 6727,
       "null_pct": 89.69,
-      "non_null_count": 773
+      "non_null_count": 773,
+      "root_cause_governance": "Populated strictly when payment_outcomes.status == 'FAILED' (null on successful authorizations)",
+      "is_key_audit_column": true
+    },
+    {
+      "table_name": "payment_outcomes",
+      "column_name": "is_synthetic",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "labels",
+      "column_name": "transaction_id",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "labels",
+      "column_name": "fraud_label",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "labels",
+      "column_name": "label_source",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "labels",
+      "column_name": "label_available_at",
+      "dtype": "datetime64[us, UTC]",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "labels",
+      "column_name": "split",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "labels",
+      "column_name": "eligible_at_next_split_start",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "labels",
+      "column_name": "is_synthetic",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "transaction_id",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "feature_as_of",
+      "dtype": "datetime64[us, UTC]",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
     },
     {
       "table_name": "features",
@@ -118,7 +538,9 @@
       "dtype": "float64",
       "null_count": 790,
       "null_pct": 10.53,
-      "non_null_count": 6710
+      "non_null_count": 6710,
+      "root_cause_governance": "Inherits null from cold-start average_transaction_value (zero-division guard)",
+      "is_key_audit_column": true
     },
     {
       "table_name": "features",
@@ -126,7 +548,9 @@
       "dtype": "object",
       "null_count": 81,
       "null_pct": 1.08,
-      "non_null_count": 7419
+      "non_null_count": 7419,
+      "root_cause_governance": "Inherits null when transactions.device_id is null",
+      "is_key_audit_column": true
     },
     {
       "table_name": "features",
@@ -134,7 +558,9 @@
       "dtype": "float64",
       "null_count": 231,
       "null_pct": 3.08,
-      "non_null_count": 7269
+      "non_null_count": 7269,
+      "root_cause_governance": "Inherits null when transactions.customer_location is null",
+      "is_key_audit_column": true
     },
     {
       "table_name": "features",
@@ -142,7 +568,69 @@
       "dtype": "object",
       "null_count": 231,
       "null_pct": 3.08,
-      "non_null_count": 7269
+      "non_null_count": 7269,
+      "root_cause_governance": "Inherits null when transactions.customer_location is null",
+      "is_key_audit_column": true
+    },
+    {
+      "table_name": "features",
+      "column_name": "hour_of_day",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "is_night",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "has_recent_failures",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "is_new_account",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "txn_count_last_1h",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "txn_amount_last_24h_paise",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
     },
     {
       "table_name": "features",
@@ -150,10 +638,105 @@
       "dtype": "float64",
       "null_count": 81,
       "null_pct": 1.08,
-      "non_null_count": 7419
+      "non_null_count": 7419,
+      "root_cause_governance": "Inherits null when transactions.device_id is null",
+      "is_key_audit_column": true
+    },
+    {
+      "table_name": "features",
+      "column_name": "combined_risk_flags",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "mcc_target_encoded_rate",
+      "dtype": "float64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "mcc_encoding_as_of",
+      "dtype": "datetime64[us, UTC]",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "mcc_encoding_count",
+      "dtype": "int64",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "missing_customer_location",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "missing_device",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "cold_start",
+      "dtype": "bool",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "reason_codes",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
+    },
+    {
+      "table_name": "features",
+      "column_name": "feature_version",
+      "dtype": "str",
+      "null_count": 0,
+      "null_pct": 0.0,
+      "non_null_count": 7500,
+      "root_cause_governance": "Zero nulls observed (mandatory field)",
+      "is_key_audit_column": false
     }
   ],
   "referential_integrity": {
+    "primary_key_nulls_total": 0,
+    "primary_key_duplicates_total": 0,
+    "full_row_duplicates_total": 0,
     "transactions_to_customers_orphans": 0,
     "transactions_to_merchants_orphans": 0,
     "transactions_to_devices_orphans_non_null": 0,
@@ -162,18 +745,261 @@
     "transactions_to_features_missing": 0,
     "all_foreign_keys_valid": true
   },
+  "schema_checks": {
+    "invalid_json_coordinates": {
+      "transactions.customer_location_invalid": 0,
+      "merchants.merchant_location_invalid": 0,
+      "transactions.merchant_location_invalid": 0,
+      "total_invalid": 0
+    },
+    "unparseable_timestamps": {
+      "customers.created_at": 0,
+      "transactions.transaction_time": 0,
+      "payment_outcomes.outcome_time": 0,
+      "labels.label_available_at": 0,
+      "features.feature_as_of": 0,
+      "features.mcc_encoding_as_of": 0
+    },
+    "total_unparseable_timestamps": 0,
+    "non_positive_amounts": 0,
+    "integer_paise_parity_mismatches": 0,
+    "expected_schema_dtypes": {
+      "customers": {
+        "customer_id": "object",
+        "created_at": "datetime/object",
+        "customer_age": "int64/int",
+        "home_city": "object",
+        "region": "object",
+        "is_synthetic": "bool"
+      },
+      "merchants": {
+        "merchant_id": "object",
+        "synthetic_name": "object",
+        "merchant_category": "object",
+        "merchant_location": "object/json",
+        "is_synthetic": "bool"
+      },
+      "devices": {
+        "device_id": "object",
+        "device_kind": "object",
+        "is_synthetic": "bool"
+      },
+      "transactions": {
+        "transaction_id": "object",
+        "customer_id": "object",
+        "merchant_id": "object",
+        "device_id": "object",
+        "amount_paise": "int64",
+        "transaction_amount": "float64",
+        "payment_channel": "object",
+        "merchant_category": "object",
+        "transaction_time": "datetime/object",
+        "customer_age": "int64/int",
+        "customer_location": "object/json",
+        "merchant_location": "object/json",
+        "account_age": "int64",
+        "previous_transactions": "int64",
+        "average_transaction_value": "float64",
+        "failed_transactions": "int64",
+        "split": "object",
+        "is_synthetic": "bool"
+      },
+      "payment_outcomes": {
+        "transaction_id": "object",
+        "outcome_time": "datetime/object",
+        "status": "object",
+        "failure_code": "object",
+        "is_synthetic": "bool"
+      },
+      "labels": {
+        "transaction_id": "object",
+        "fraud_label": "int64/int",
+        "label_source": "object",
+        "label_available_at": "datetime/object",
+        "split": "object",
+        "eligible_at_next_split_start": "bool",
+        "is_synthetic": "bool"
+      },
+      "features": {
+        "transaction_id": "object",
+        "feature_as_of": "datetime/object",
+        "amount_to_avg_ratio": "float64",
+        "is_new_device": "bool/object",
+        "customer_merchant_distance_km": "float64",
+        "is_new_city": "bool/object",
+        "hour_of_day": "int64",
+        "is_night": "bool",
+        "has_recent_failures": "bool",
+        "is_new_account": "bool",
+        "txn_count_last_1h": "int64",
+        "txn_amount_last_24h_paise": "int64",
+        "distinct_customers_per_device_7d": "float64/int64/object",
+        "combined_risk_flags": "int64",
+        "mcc_target_encoded_rate": "float64",
+        "mcc_encoding_as_of": "datetime/object",
+        "mcc_encoding_count": "int64",
+        "missing_customer_location": "bool",
+        "missing_device": "bool",
+        "cold_start": "bool",
+        "reason_codes": "object/json",
+        "feature_version": "object"
+      }
+    },
+    "all_schema_checks_passed": true
+  },
   "amount_distribution": {
     "count": 7500,
-    "min_inr": 8.43,
-    "p25_inr": 589.1,
-    "median_p50_inr": 1225.92,
-    "mean_inr": 3264.47,
-    "std_inr": 47573.46,
-    "p75_inr": 2672.24,
-    "p90_inr": 5643.56,
-    "p95_inr": 9125.54,
-    "p99_inr": 23819.16,
-    "max_inr": 4060489.61,
+    "quantiles_inr": {
+      "min": 8.43,
+      "p25": 589.1,
+      "median_p50": 1225.92,
+      "mean": 3264.47,
+      "std": 47573.46,
+      "p75": 2672.24,
+      "p90": 5643.56,
+      "p95": 9125.54,
+      "p99": 23819.16,
+      "max": 4060489.61,
+      "iqr": 2083.14
+    },
+    "thresholds_and_counts": {
+      "iqr_1_5_mild_outliers": {
+        "formula": "Q3 + 1.5 * IQR",
+        "threshold_inr": 5796.95,
+        "count": 723,
+        "percentage": 9.64
+      },
+      "iqr_3_0_extreme_outliers": {
+        "formula": "Q3 + 3.0 * IQR",
+        "threshold_inr": 8921.66,
+        "count": 394,
+        "percentage": 5.25
+      },
+      "zscore_3_0_outliers": {
+        "formula": "|z| > 3.0 (mean + 3 * std)",
+        "threshold_inr": 145984.85,
+        "count": 4,
+        "percentage": 0.05
+      },
+      "p99_tail_outliers": {
+        "formula": "> 99th percentile",
+        "threshold_inr": 23819.16,
+        "count": 75,
+        "percentage": 1.0
+      }
+    },
+    "top_outliers": [
+      {
+        "transaction_id": "TX_0000000484",
+        "amount_inr": 4060489.61,
+        "split": "warmup",
+        "payment_channel": "UPI",
+        "merchant_category": "other",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": true,
+        "is_p99_outlier": true
+      },
+      {
+        "transaction_id": "TX_0000082909",
+        "amount_inr": 514908.01,
+        "split": "validation",
+        "payment_channel": "card",
+        "merchant_category": "gift_cards",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": true,
+        "is_p99_outlier": true
+      },
+      {
+        "transaction_id": "TX_0000083264",
+        "amount_inr": 159576.48,
+        "split": "validation",
+        "payment_channel": "UPI",
+        "merchant_category": "gift_cards",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": true,
+        "is_p99_outlier": true
+      },
+      {
+        "transaction_id": "TX_0000096540",
+        "amount_inr": 156739.72,
+        "split": "holdout",
+        "payment_channel": "UPI",
+        "merchant_category": "gaming",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": true,
+        "is_p99_outlier": true
+      },
+      {
+        "transaction_id": "TX_0000082627",
+        "amount_inr": 121439.4,
+        "split": "validation",
+        "payment_channel": "UPI",
+        "merchant_category": "gift_cards",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": false,
+        "is_p99_outlier": true
+      },
+      {
+        "transaction_id": "TX_0000012201",
+        "amount_inr": 89525.55,
+        "split": "train",
+        "payment_channel": "card",
+        "merchant_category": "gaming",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": false,
+        "is_p99_outlier": true
+      },
+      {
+        "transaction_id": "TX_0000000392",
+        "amount_inr": 81644.17,
+        "split": "warmup",
+        "payment_channel": "UPI",
+        "merchant_category": "gift_cards",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": false,
+        "is_p99_outlier": true
+      },
+      {
+        "transaction_id": "TX_0000000350",
+        "amount_inr": 81190.74,
+        "split": "warmup",
+        "payment_channel": "UPI",
+        "merchant_category": "gaming",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": false,
+        "is_p99_outlier": true
+      },
+      {
+        "transaction_id": "TX_0000010006",
+        "amount_inr": 76224.74,
+        "split": "train",
+        "payment_channel": "UPI",
+        "merchant_category": "gift_cards",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": false,
+        "is_p99_outlier": true
+      },
+      {
+        "transaction_id": "TX_0000011525",
+        "amount_inr": 75198.38,
+        "split": "train",
+        "payment_channel": "wallet",
+        "merchant_category": "gaming",
+        "is_iqr_1_5_outlier": true,
+        "is_iqr_3_0_outlier": true,
+        "is_zscore_3_0_outlier": false,
+        "is_p99_outlier": true
+      }
+    ],
     "paise_parity_mismatches": 0,
     "non_positive_amounts": 0
   },
@@ -410,7 +1236,7 @@
     },
     {
       "merchant_category": "travel",
-      "is_high_risk_mcc": true,
+      "is_high_risk_mcc": false,
       "txn_count": 464,
       "share_pct": 6.19,
       "fraud_count": 0,

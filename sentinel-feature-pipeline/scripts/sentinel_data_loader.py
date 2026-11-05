@@ -54,7 +54,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(REPO_ROOT / ".env")
 
 IST = timezone(timedelta(hours=5, minutes=30))
-HIGH_RISK_MCCS = {"electronics", "gaming", "travel", "gift_cards", "crypto"}
+HIGH_RISK_MCCS = {"electronics", "gaming", "gift_cards", "crypto"}
 
 FORBIDDEN_PII_COLUMNS = {
     "customer_name",
@@ -536,10 +536,9 @@ def load_sentinel_tables(
     offline_mock: bool = False,
 ) -> Tuple[Dict[str, pd.DataFrame], str, Dict[str, Any]]:
     """
-    3-Way Automatic Sentinel Telemetry Loader with Pre-Ingestion Privacy Gate:
-      Tier 1: Local `sentinel_data/tables/` (CSV) or `sentinel_data/parquet/` (Parquet)
-      Tier 2: PostgreSQL / Supabase feature store (`DATABASE_URL`)
-      Tier 3: Deterministic schema-exact synthetic generator (>= 5,500 transactions)
+    Strict Tier 2 Telemetry Loader & DPDP/PCI-DSS Privacy Gate:
+      Loads all 7 core tables strictly from PostgreSQL / Supabase feature store (`DATABASE_URL`).
+      Strictly avoids Tier 3 synthetic fallback; raises RuntimeError on connection failure.
     Returns (tables_dict, active_tier_description, privacy_audit_summary).
     """
     required_tables = [
@@ -552,117 +551,86 @@ def load_sentinel_tables(
         "features",
     ]
 
-    if not offline_mock:
-        candidate_dirs = [
-            data_dir or os.getenv("SENTINEL_DATA_DIR", "./sentinel_data"),
-            "../sentinel_data",
-            "./data/sentinel_data",
-        ]
-        for base in candidate_dirs:
-            if not base:
-                continue
-            base_path = Path(base)
-            tables_dir = base_path / "tables"
-            parquet_dir = base_path / "parquet"
-            if tables_dir.is_dir() and all((tables_dir / f"{t}.csv").exists() for t in required_tables):
-                loaded = {t: pd.read_csv(tables_dir / f"{t}.csv") for t in required_tables}
-                privacy_audit = enforce_data_privacy_guardrails(loaded)
-                return loaded, f"Tier 1 (Local Sanitized CSV: {tables_dir.name})", privacy_audit
-            if parquet_dir.is_dir() and all(
-                (parquet_dir / f"{t}.parquet").exists() for t in required_tables
-            ):
-                loaded = {t: pd.read_parquet(parquet_dir / f"{t}.parquet") for t in required_tables}
-                privacy_audit = enforce_data_privacy_guardrails(loaded)
-                return loaded, f"Tier 1 (Local Sanitized Parquet: {parquet_dir.name})", privacy_audit
+    db_url = os.getenv("DATABASE_URL", "").strip().strip("'\"")
+    if not db_url or "<" in db_url:
+        raise RuntimeError(
+            "DATABASE_URL is not configured or contains placeholder values. "
+            "Strict Tier 2 execution is enforced; Tier 3 synthetic fallback is disabled."
+        )
 
-        db_url = os.getenv("DATABASE_URL", "").strip().strip("'\"")
-        if db_url and "<" not in db_url:
-            try:
-                import psycopg2  # type: ignore
+    try:
+        import psycopg2  # type: ignore
 
-                # Ensure URL-encoded credentials if password contains unencoded '@'
-                clean_url = db_url
-                match = re.match(r"^(postgres(?:ql)?://)([^:]+):(.+)@([^@/]+(?::\d+)?(?:/.*)?)$", db_url)
-                if match:
-                    scheme, user, password, host_part = match.groups()
-                    if "@" in password and "%40" not in password:
-                        clean_url = f"{scheme}{user}:{urllib.parse.quote_plus(password)}@{host_part}"
+        # Ensure URL-encoded credentials if password contains unencoded '@'
+        clean_url = db_url
+        match = re.match(r"^(postgres(?:ql)?://)([^:]+):(.+)@([^@/]+(?::\d+)?(?:/.*)?)$", db_url)
+        if match:
+            scheme, user, password, host_part = match.groups()
+            if "@" in password and "%40" not in password:
+                clean_url = f"{scheme}{user}:{urllib.parse.quote_plus(password)}@{host_part}"
 
-                conn = psycopg2.connect(clean_url, connect_timeout=10)
-                with conn.cursor() as cur:
-                    cur.execute(
-                        """
-                        SELECT table_schema 
-                        FROM information_schema.tables 
-                        WHERE table_name = 'transactions' 
-                          AND table_schema IN ('public', 'sentinel_demo') 
-                        ORDER BY (table_schema = 'public') DESC 
-                        LIMIT 1;
-                        """
-                    )
-                    row = cur.fetchone()
-                    schema = row[0] if row else "public"
-
-                loaded = {}
-                for t in ["customers", "merchants", "devices"]:
-                    loaded[t] = pd.read_sql_query(f'SELECT * FROM "{schema}"."{t}";', conn)
-
-                # Query transactions spanning all 4 temporal splits
-                tx_query = f"""
-                (SELECT * FROM "{schema}".transactions WHERE split = 'warmup' ORDER BY transaction_time LIMIT 1500)
-                UNION ALL
-                (SELECT * FROM "{schema}".transactions WHERE split = 'train' ORDER BY transaction_time LIMIT 3000)
-                UNION ALL
-                (SELECT * FROM "{schema}".transactions WHERE split = 'validation' ORDER BY transaction_time LIMIT 1500)
-                UNION ALL
-                (SELECT * FROM "{schema}".transactions WHERE split = 'holdout' ORDER BY transaction_time LIMIT 1500)
-                ORDER BY transaction_time ASC;
+        conn = psycopg2.connect(clean_url, connect_timeout=15)
+        with conn.cursor() as cur:
+            cur.execute(
                 """
-                tx_df = pd.read_sql_query(tx_query, conn)
-                loaded["transactions"] = tx_df
+                SELECT table_schema 
+                FROM information_schema.tables 
+                WHERE table_name = 'transactions' 
+                  AND table_schema IN ('public', 'sentinel_demo') 
+                ORDER BY (table_schema = 'public') DESC 
+                LIMIT 1;
+                """
+            )
+            row = cur.fetchone()
+            schema = row[0] if row else "public"
 
-                tx_ids = tuple(tx_df["transaction_id"].tolist())
-                format_ids = "'" + "','".join(tx_ids) + "'"
+        loaded = {}
+        for t in ["customers", "merchants", "devices"]:
+            loaded[t] = pd.read_sql_query(f'SELECT * FROM "{schema}"."{t}";', conn)
 
-                for t in ["payment_outcomes", "labels", "features"]:
-                    loaded[t] = pd.read_sql_query(
-                        f'SELECT * FROM "{schema}"."{t}" WHERE transaction_id IN ({format_ids});',
-                        conn,
-                    )
-                conn.close()
+        # Query transactions spanning all 4 temporal splits
+        tx_query = f"""
+        (SELECT * FROM "{schema}".transactions WHERE split = 'warmup' ORDER BY transaction_time LIMIT 1500)
+        UNION ALL
+        (SELECT * FROM "{schema}".transactions WHERE split = 'train' ORDER BY transaction_time LIMIT 3000)
+        UNION ALL
+        (SELECT * FROM "{schema}".transactions WHERE split = 'validation' ORDER BY transaction_time LIMIT 1500)
+        UNION ALL
+        (SELECT * FROM "{schema}".transactions WHERE split = 'holdout' ORDER BY transaction_time LIMIT 1500)
+        ORDER BY transaction_time ASC;
+        """
+        tx_df = pd.read_sql_query(tx_query, conn)
+        loaded["transactions"] = tx_df
 
-                # Normalize any JSONB dict/list objects to JSON strings
-                for t_name, df in loaded.items():
-                    for col in df.columns:
-                        if df[col].dtype == object and len(df) > 0:
-                            sample = df[col].dropna().iloc[0] if len(df[col].dropna()) > 0 else None
-                            if isinstance(sample, (dict, list)):
-                                df[col] = df[col].apply(lambda x: json.dumps(x) if isinstance(x, (dict, list)) else x)
+        tx_ids = tuple(tx_df["transaction_id"].tolist())
+        format_ids = "'" + "','".join(tx_ids) + "'"
 
-                if len(loaded["transactions"]) >= 5000:
-                    privacy_audit = enforce_data_privacy_guardrails(loaded)
-                    return loaded, f"Tier 2 (PostgreSQL / Supabase Telemetry Replica: {schema})", privacy_audit
-            except Exception:
-                pass
+        for t in ["payment_outcomes", "labels", "features"]:
+            loaded[t] = pd.read_sql_query(
+                f'SELECT * FROM "{schema}"."{t}" WHERE transaction_id IN ({format_ids});',
+                conn,
+            )
+        conn.close()
 
-    num_customers = int(os.getenv("SENTINEL_NUM_CUSTOMERS", "500"))
-    num_merchants = int(os.getenv("SENTINEL_NUM_MERCHANTS", "120"))
-    num_devices = int(os.getenv("SENTINEL_NUM_DEVICES", "900"))
-    num_txns = max(
-        min_transactions, int(os.getenv("SENTINEL_NUM_TRANSACTIONS", str(min_transactions)))
-    )
-    synth_seed = int(os.getenv("SENTINEL_SYNTHETIC_SEED", str(seed)))
+        # Normalize any JSONB dict/list objects to JSON strings
+        for t_name, df in loaded.items():
+            for col in df.columns:
+                if df[col].dtype == object and len(df) > 0:
+                    sample = df[col].dropna().iloc[0] if len(df[col].dropna()) > 0 else None
+                    if isinstance(sample, (dict, list)):
+                        df[col] = df[col].apply(lambda x: json.dumps(x) if isinstance(x, (dict, list)) else x)
 
-    tables = generate_synthetic_sentinel_dataset(
-        num_customers=num_customers,
-        num_merchants=num_merchants,
-        num_devices=num_devices,
-        num_transactions=num_txns,
-        seed=synth_seed,
-    )
-    privacy_audit = enforce_data_privacy_guardrails(tables)
-    return (
-        tables,
-        f"Tier 3 (Deterministic Schema-Compliant Synthetic Telemetry: {num_txns:,} txns, seed={synth_seed})",
-        privacy_audit,
-    )
+        if len(loaded["transactions"]) < min_transactions:
+            raise RuntimeError(
+                f"Tier 2 query returned {len(loaded['transactions'])} transactions, "
+                f"expected at least {min_transactions}."
+            )
+
+        privacy_audit = enforce_data_privacy_guardrails(loaded)
+        return loaded, f"Tier 2 (PostgreSQL / Supabase Telemetry Replica: {schema})", privacy_audit
+
+    except Exception as e:
+        raise RuntimeError(
+            f"Strict Tier 2 execution failed connecting to PostgreSQL / Supabase replica: {e}. "
+            f"Project SENTINEL prohibits falling back to Tier 3 synthetic data."
+        ) from e

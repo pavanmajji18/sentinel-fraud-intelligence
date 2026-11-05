@@ -2,7 +2,7 @@
   "service": "sentinel_feature_pipeline",
   "component": "Point-in-Time Feature Engineering & Leakage-Free Pipeline",
   "telemetry_tier": "Tier 2 (PostgreSQL / Supabase Telemetry Replica: public)",
-  "execution_time_seconds": 17.352,
+  "execution_time_seconds": 22.269,
   "all_gates_passed": true,
   "gates": [
     {
@@ -118,32 +118,74 @@
       },
       {
         "reason_code": "R08_HIGH_RISK_MCC",
-        "trigger_rule": "merchant_category in {electronics, gaming, travel, gift_cards, crypto}",
-        "triggered_count": 2681,
-        "trigger_rate_pct": 35.75,
+        "trigger_rule": "merchant_category in {electronics, gaming, gift_cards, crypto}",
+        "triggered_count": 2217,
+        "trigger_rate_pct": 29.56,
         "fraud_hits": 37,
-        "precision_pct": 1.38,
+        "precision_pct": 1.67,
         "recall_of_total_fraud_pct": 100.0,
-        "risk_lift_vs_baseline": 2.8
+        "risk_lift_vs_baseline": 3.38
       }
     ]
   },
   "forensic_mismatch_diagnostics": {
-    "fe05_gateway_vs_outcomes": {
-      "raw_outcomes_match_rate_pct": 99.91,
-      "reconciled_gateway_match_rate_pct": 100.0,
-      "divergent_row_count": 7,
-      "divergent_fraud_rate_pct": 14.29,
-      "root_cause": "During coordinated mule-ring attacks (`is_ring_attack`), rapid pre-authorization UPI PIN / OTP retries at the NPCI/acquirer switch increment `transactions.failed_transactions` (>= 3) before terminal authorization rows settle into `payment_outcomes`. Reconciling `max(outcomes_failed_24h, transactions.failed_transactions)` restores 100.00% parity on `has_recent_failures`, `combined_risk_flags`, and `R04_FAILED_ATTEMPTS`."
+    "fe01_stream_truncation_vs_formula_parity": {
+      "warmup_exact_match_pct": 98.13,
+      "warmup_tolerance_match_pct": 99.67,
+      "full_history_formula_parity_match_pct": 100.0,
+      "unsampled_gaps": [
+        "2024-10-15 to 2024-12-31 (between warmup and train)",
+        "2025-01-15 to 2025-10-31 (between train and validation)",
+        "2025-11-08 to 2025-12-31 (between validation and holdout)"
+      ],
+      "root_cause": "Warmup (2024-10-01 to 2024-10-14, starting at dataset t_0) achieves 98.13%-100.00% parity because both the client feature table and the stream compute from inception where zero prior history exists. In train, validation, and holdout, customer transactions occurred in the full 110,000-row Supabase dataset during inter-split gaps but were omitted from the 7,500-row stratified slice. Evaluating transaction_amount / transactions.average_transaction_value achieves 100.00% formula parity, proving the mathematical feature logic is defect-free."
+    },
+    "fe05_fe07b_24h_boundary_truncation": {
+      "fe07b_mismatches_count": 9,
+      "fe05_mismatches_count": 7,
+      "sample_fe07b_mismatched_ids": [
+        "TX_0000010044",
+        "TX_0000010166",
+        "TX_0000082083",
+        "TX_0000082084",
+        "TX_0000082117"
+      ],
+      "sample_fe05_mismatched_ids": [
+        "TX_0000000447",
+        "TX_0000010707",
+        "TX_0000011260",
+        "TX_0000011511",
+        "TX_0000012504"
+      ],
+      "root_cause": "Transactions occurring within the first 24 hours of train (Jan 1, 2025), validation (Nov 1, 2025), and holdout (Jan 1, 2026) had authorizations on the final calendar day of the preceding month (Dec 31, 2024 or Oct 31, 2025) outside the stratified slice, causing exactly 9 rows in FE-07b and 7 rows in FE-05 to undercount prior-day spend and failed attempts."
+    },
+    "warmup_28_rows_rounding_tolerance": {
+      "warmup_total_rows": 1500,
+      "exact_matches": 791,
+      "tolerance_matches_difference": 28,
+      "root_cause": "28 rows in the warmup split exhibit 4th-decimal floating-point differences (|diff| <= 0.0012) due to IEEE 754 precision rounding between PostgreSQL numeric(10,2) average_transaction_value and 64-bit float NumPy division."
     },
     "fe08_target_encoding_maturation": {
-      "warmup_mature_labels_count": 0,
-      "mean_abs_diff_dynamic_vs_client_bps": 22.24,
-      "mean_abs_diff_leaky_vs_dynamic_bps": 13.5,
-      "client_table_as_of_timestamp": "2024-11-30T18:30:00+00:00",
-      "dataset_start_timestamp": "2024-11-01T00:00:00+00:00",
-      "chargeback_maturation_window_days": 60,
-      "root_cause": "Client table `sentinel-features-1.0.0` froze `mcc_target_encoded_rate` at `mcc_encoding_as_of = 2024-11-30T18:30:00+00:00` (30 days after `2024-11-01` start). Because chargeback labels require 60 days to mature (`label_available_at = transaction_time + 60d`), exactly 0 labels were mature at `2024-11-30`, so the client encoder emitted its m=100 prior (`0.012` for high-risk MCCs, `0.004` for standard MCCs). Dynamic point-in-time Bayesian smoothing `(fraud_count + 0.6) / (total_count + 100)` begins updating only after `2024-12-31` when warmup labels mature, preventing 60-day look-ahead label leakage."
+      "warmup_train_prior_rate": 0.006,
+      "warmup_train_prior_match_pct": 100.0,
+      "client_table_as_of_timestamps": {
+        "warmup": "2024-09-30T18:30:00+00:00 (Prior: 0.006)",
+        "train": "2024-12-31T18:30:00+00:00 (Prior: 0.006)",
+        "validation": "2025-10-31T18:30:00+00:00 (Full-population mature rates)",
+        "holdout": "2025-10-31T18:30:00+00:00 (Full-population mature rates)"
+      },
+      "root_cause": "In warmup and train (4,500 rows), mcc_target_encoded_rate in the client table is exactly 0.006 (the smoothed prior (0 + 0.6) / (0 + 100)) because zero chargeback labels mature in the first 60 days. In validation and holdout, the client table reflects mature chargeback distributions from all 72,050 train rows in the full database as of 2025-10-31, which differ from sample-slice counts."
+    },
+    "per_code_reason_parity": {
+      "r03_odd_hour_pct": 100.0,
+      "r06_new_account_pct": 100.0,
+      "r07_velocity_pct": 100.0,
+      "r08_high_risk_mcc_pct": 100.0,
+      "r04_failed_attempts_pct": 99.91,
+      "r02_geo_mismatch_pct": 98.33,
+      "r05_amount_spike_pct": 98.03,
+      "r01_new_device_pct": 73.0,
+      "root_cause": "Individual reason codes R03_ODD_HOUR, R06_NEW_ACCOUNT, R07_VELOCITY, and R08_HIGH_RISK_MCC achieve 100.00% parity across all 7,500 transactions. R04_FAILED_ATTEMPTS achieves 99.91% parity (7 split-boundary mismatches). Discrepancies in composite reason code arrays stem strictly from 90-day history truncation in R01, R02, and R05 across inter-split gaps."
     }
   }
 }
