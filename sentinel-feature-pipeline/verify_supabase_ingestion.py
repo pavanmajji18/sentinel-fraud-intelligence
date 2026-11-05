@@ -42,8 +42,46 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import psycopg2
-from dotenv import load_dotenv
-from tabulate import tabulate
+
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv(dotenv_path: Optional[Any] = None, *args: Any, **kwargs: Any) -> bool:
+        """Zero-dependency fallback parser for .env files."""
+        env_file = Path(dotenv_path) if dotenv_path else Path(".env")
+        if not env_file.is_file():
+            return False
+        try:
+            with open(env_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    k, v = line.split("=", 1)
+                    k = k.strip()
+                    v = v.strip().strip("'\"")
+                    if k not in os.environ:
+                        os.environ[k] = v
+            return True
+        except Exception:
+            return False
+
+try:
+    from tabulate import tabulate
+except ImportError:
+    def tabulate(data: List[List[Any]], headers: List[str], tablefmt: str = "") -> str:
+        """Minimal fallback table formatter when tabulate is not installed."""
+        col_widths = [len(h) for h in headers]
+        for row in data:
+            for i, val in enumerate(row):
+                col_widths[i] = max(col_widths[i], len(str(val)))
+        hdr_line = " | ".join(h.ljust(col_widths[i]) for i, h in enumerate(headers))
+        sep_line = "-+-".join("-" * col_widths[i] for i in range(len(headers)))
+        row_lines = [
+            " | ".join(str(val).ljust(col_widths[i]) for i, val in enumerate(row))
+            for row in data
+        ]
+        return "\n".join([hdr_line, sep_line] + row_lines)
 
 REPO_ROOT = Path(__file__).resolve().parent
 ENV_PATH = REPO_ROOT / ".env"

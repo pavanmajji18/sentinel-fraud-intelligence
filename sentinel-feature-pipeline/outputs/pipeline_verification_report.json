@@ -2,7 +2,7 @@
   "service": "sentinel_feature_pipeline",
   "component": "Point-in-Time Feature Engineering & Leakage-Free Pipeline",
   "telemetry_tier": "Tier 3 (Deterministic Schema-Compliant Synthetic Telemetry: 5,500 txns, seed=42)",
-  "execution_time_seconds": 6.374,
+  "execution_time_seconds": 6.491,
   "all_gates_passed": true,
   "gates": [
     {
