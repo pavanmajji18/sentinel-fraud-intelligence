@@ -1,22 +1,22 @@
 feature_id,feature_name,formula_summary,total_rows,null_matches,exact_non_null_matches,tolerance_matches,mismatched_rows,exact_match_rate_pct,effective_match_rate_pct
-FE-01a,previous_transactions,90d prior customer txn count,5500,0,5500,0,0,100.0,100.0
-FE-01b,average_transaction_value,90d prior customer mean amount (INR),5500,1065,4435,0,0,100.0,100.0
-FE-01,amount_to_avg_ratio,transaction_amount / 90d prior mean,5500,1065,4435,0,0,100.0,100.0
-FE-02,is_new_device,Device unseen for customer in prior 90d,5500,63,5437,0,0,100.0,100.0
-FE-03a,customer_merchant_distance_km,Spherical Haversine distance (km),5500,174,5326,0,0,100.0,100.0
-FE-03b,is_new_city,City unseen in {home_city} U prior 90d,5500,174,5326,0,0,100.0,100.0
-FE-04a,hour_of_day,Authorization hour in IST (UTC+05:30),5500,0,5500,0,0,100.0,100.0
-FE-04b,is_night,00:00 <= time < 05:00 IST (0 <= hour < 5),5500,0,5500,0,0,100.0,100.0
-FE-05a (Reconciled),has_recent_failures (Gateway Reconciled),"Reconciled max(outcomes_24h, tx.failed_transactions) >= 3",5500,0,5500,0,0,100.0,100.0
-FE-05b (Raw Outcomes),has_recent_failures (Raw Outcomes Only),Settled payment_outcomes FAILED in 24h >= 3 (excludes switch pre-auth retries),5500,0,5148,0,352,93.6,93.6
-FE-06a,account_age,Days since customer.created_at,5500,0,5500,0,0,100.0,100.0
-FE-06b,is_new_account,account_age < 30 days,5500,0,5500,0,0,100.0,100.0
-FE-07a,txn_count_last_1h,"Prior customer txns in [t - 1h, t)",5500,0,5500,0,0,100.0,100.0
-FE-07b,txn_amount_last_24h_paise,"Integer paise spend in [t - 24h, t)",5500,0,5500,0,0,100.0,100.0
-FE-08a (Warmup Prior),mcc_target_encoded_rate (Frozen Warmup Prior),Client v1.0.0 as-of 2024-11-30 warmup prior (0.012 high-risk / 0.004 base),5500,0,5500,0,0,100.0,100.0
-FE-08b (Dynamic Bayesian),mcc_target_encoded_rate (Dynamic Mature PIT),Continuous (fraud + 0.6)/(total + 100) gated by label_available_at <= t,5500,0,0,0,5500,0.0,0.0
-FE-09,distinct_customers_per_device_7d,"Distinct customers on device in [t - 7d, t)",5500,63,5437,0,0,100.0,100.0
-FE-10a (Reconciled),combined_risk_flags (Gateway Reconciled),Sum of 5 boolean risk flags (reconciled FE-05),5500,0,5500,0,0,100.0,100.0
-FE-10b (Raw Outcomes),combined_risk_flags (Raw Outcomes Only),Sum of 5 boolean risk flags (raw outcomes FE-05),5500,0,5148,0,352,93.6,93.6
-R01-R08 (Reconciled),reason_codes (Gateway Reconciled),JSON array of triggered R01..R08 codes (reconciled),5500,0,5500,0,0,100.0,100.0
-R01-R08 (Raw Outcomes),reason_codes (Raw Outcomes Only),JSON array of triggered R01..R08 codes (raw outcomes FE-05),5500,0,5148,0,352,93.6,93.6
+FE-01a,previous_transactions,90d prior customer txn count,7500,0,3656,0,3844,48.75,48.75
+FE-01b,average_transaction_value,90d prior customer mean amount (INR),7500,790,1003,0,5707,23.91,23.91
+FE-01,amount_to_avg_ratio,transaction_amount / 90d prior mean,7500,790,1029,28,5653,24.25,24.63
+FE-02,is_new_device,Device unseen for customer in prior 90d,7500,81,5394,0,2025,73.0,73.0
+FE-03a,customer_merchant_distance_km,Spherical Haversine distance (km),7500,231,7269,0,0,100.0,100.0
+FE-03b,is_new_city,City unseen in {home_city} U prior 90d,7500,231,6493,0,776,89.65,89.65
+FE-04a,hour_of_day,Authorization hour in IST (UTC+05:30),7500,0,7500,0,0,100.0,100.0
+FE-04b,is_night,00:00 <= time < 05:00 IST (0 <= hour < 5),7500,0,7500,0,0,100.0,100.0
+FE-05a (Reconciled),has_recent_failures (Gateway Reconciled),"Reconciled max(outcomes_24h, tx.failed_transactions) >= 3",7500,0,7493,0,7,99.91,99.91
+FE-05b (Raw Outcomes),has_recent_failures (Raw Outcomes Only),Settled payment_outcomes FAILED in 24h >= 3 (excludes switch pre-auth retries),7500,0,7493,0,7,99.91,99.91
+FE-06a,account_age,Days since customer.created_at,7500,0,7500,0,0,100.0,100.0
+FE-06b,is_new_account,account_age < 30 days,7500,0,7500,0,0,100.0,100.0
+FE-07a,txn_count_last_1h,"Prior customer txns in [t - 1h, t)",7500,0,7500,0,0,100.0,100.0
+FE-07b,txn_amount_last_24h_paise,"Integer paise spend in [t - 24h, t)",7500,0,7491,0,9,99.88,99.88
+FE-08a (Warmup Prior),mcc_target_encoded_rate (Frozen Warmup Prior),Client v1.0.0 as-of 2024-11-30 warmup prior (0.012 high-risk / 0.004 base),7500,0,0,0,7500,0.0,0.0
+FE-08b (Dynamic Bayesian),mcc_target_encoded_rate (Dynamic Mature PIT),Continuous (fraud + 0.6)/(total + 100) gated by label_available_at <= t,7500,0,1500,0,6000,20.0,20.0
+FE-09,distinct_customers_per_device_7d,"Distinct customers on device in [t - 7d, t)",7500,81,7094,0,325,95.67,95.67
+FE-10a (Reconciled),combined_risk_flags (Gateway Reconciled),Sum of 5 boolean risk flags (reconciled FE-05),7500,0,5355,0,2145,71.4,71.4
+FE-10b (Raw Outcomes),combined_risk_flags (Raw Outcomes Only),Sum of 5 boolean risk flags (raw outcomes FE-05),7500,0,5355,0,2145,71.4,71.4
+R01-R08 (Reconciled),reason_codes (Gateway Reconciled),JSON array of triggered R01..R08 codes (reconciled),7500,0,4939,0,2561,65.85,65.85
+R01-R08 (Raw Outcomes),reason_codes (Raw Outcomes Only),JSON array of triggered R01..R08 codes (raw outcomes FE-05),7500,0,4939,0,2561,65.85,65.85
