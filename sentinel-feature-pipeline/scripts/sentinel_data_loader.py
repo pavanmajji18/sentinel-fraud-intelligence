@@ -20,12 +20,17 @@ import math
 import os
 import random
 import re
+import urllib.parse
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+from dotenv import load_dotenv
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(REPO_ROOT / ".env")
 
 IST = timezone(timedelta(hours=5, minutes=30))
 HIGH_RISK_MCCS = {"electronics", "gaming", "travel", "gift_cards", "crypto"}
@@ -507,6 +512,7 @@ def load_sentinel_tables(
     data_dir: Optional[str] = None,
     min_transactions: int = 5500,
     seed: int = 42,
+    offline_mock: bool = False,
 ) -> Tuple[Dict[str, pd.DataFrame], str, Dict[str, Any]]:
     """
     3-Way Automatic Sentinel Telemetry Loader with Pre-Ingestion Privacy Gate:
@@ -525,50 +531,98 @@ def load_sentinel_tables(
         "features",
     ]
 
-    candidate_dirs = [
-        data_dir or os.getenv("SENTINEL_DATA_DIR", "./sentinel_data"),
-        "../sentinel_data",
-        "./data/sentinel_data",
-    ]
-    for base in candidate_dirs:
-        if not base:
-            continue
-        base_path = Path(base)
-        tables_dir = base_path / "tables"
-        parquet_dir = base_path / "parquet"
-        if tables_dir.is_dir() and all((tables_dir / f"{t}.csv").exists() for t in required_tables):
-            loaded = {t: pd.read_csv(tables_dir / f"{t}.csv") for t in required_tables}
-            privacy_audit = enforce_data_privacy_guardrails(loaded)
-            return loaded, f"Tier 1 (Local Sanitized CSV: {tables_dir.name})", privacy_audit
-        if parquet_dir.is_dir() and all(
-            (parquet_dir / f"{t}.parquet").exists() for t in required_tables
-        ):
-            loaded = {t: pd.read_parquet(parquet_dir / f"{t}.parquet") for t in required_tables}
-            privacy_audit = enforce_data_privacy_guardrails(loaded)
-            return loaded, f"Tier 1 (Local Sanitized Parquet: {parquet_dir.name})", privacy_audit
-
-    db_url = os.getenv("DATABASE_URL", "")
-    if db_url and "<" not in db_url:
-        try:
-            import psycopg2  # type: ignore
-
-            conn = psycopg2.connect(db_url, connect_timeout=5)
-            loaded = {}
-            for t in required_tables:
-                limit_clause = (
-                    "LIMIT 10000"
-                    if t in {"transactions", "payment_outcomes", "labels", "features"}
-                    else ""
-                )
-                loaded[t] = pd.read_sql_query(
-                    f"SELECT * FROM sentinel_demo.{t} {limit_clause}", conn
-                )
-            conn.close()
-            if len(loaded["transactions"]) >= 5000:
+    if not offline_mock:
+        candidate_dirs = [
+            data_dir or os.getenv("SENTINEL_DATA_DIR", "./sentinel_data"),
+            "../sentinel_data",
+            "./data/sentinel_data",
+        ]
+        for base in candidate_dirs:
+            if not base:
+                continue
+            base_path = Path(base)
+            tables_dir = base_path / "tables"
+            parquet_dir = base_path / "parquet"
+            if tables_dir.is_dir() and all((tables_dir / f"{t}.csv").exists() for t in required_tables):
+                loaded = {t: pd.read_csv(tables_dir / f"{t}.csv") for t in required_tables}
                 privacy_audit = enforce_data_privacy_guardrails(loaded)
-                return loaded, "Tier 2 (PostgreSQL / Supabase Telemetry Replica)", privacy_audit
-        except Exception:
-            pass
+                return loaded, f"Tier 1 (Local Sanitized CSV: {tables_dir.name})", privacy_audit
+            if parquet_dir.is_dir() and all(
+                (parquet_dir / f"{t}.parquet").exists() for t in required_tables
+            ):
+                loaded = {t: pd.read_parquet(parquet_dir / f"{t}.parquet") for t in required_tables}
+                privacy_audit = enforce_data_privacy_guardrails(loaded)
+                return loaded, f"Tier 1 (Local Sanitized Parquet: {parquet_dir.name})", privacy_audit
+
+        db_url = os.getenv("DATABASE_URL", "").strip().strip("'\"")
+        if db_url and "<" not in db_url:
+            try:
+                import psycopg2  # type: ignore
+
+                # Ensure URL-encoded credentials if password contains unencoded '@'
+                clean_url = db_url
+                match = re.match(r"^(postgres(?:ql)?://)([^:]+):(.+)@([^@/]+(?::\d+)?(?:/.*)?)$", db_url)
+                if match:
+                    scheme, user, password, host_part = match.groups()
+                    if "@" in password and "%40" not in password:
+                        clean_url = f"{scheme}{user}:{urllib.parse.quote_plus(password)}@{host_part}"
+
+                conn = psycopg2.connect(clean_url, connect_timeout=10)
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        SELECT table_schema 
+                        FROM information_schema.tables 
+                        WHERE table_name = 'transactions' 
+                          AND table_schema IN ('public', 'sentinel_demo') 
+                        ORDER BY (table_schema = 'public') DESC 
+                        LIMIT 1;
+                        """
+                    )
+                    row = cur.fetchone()
+                    schema = row[0] if row else "public"
+
+                loaded = {}
+                for t in ["customers", "merchants", "devices"]:
+                    loaded[t] = pd.read_sql_query(f'SELECT * FROM "{schema}"."{t}";', conn)
+
+                # Query transactions spanning all 4 temporal splits
+                tx_query = f"""
+                (SELECT * FROM "{schema}".transactions WHERE split = 'warmup' ORDER BY transaction_time LIMIT 1500)
+                UNION ALL
+                (SELECT * FROM "{schema}".transactions WHERE split = 'train' ORDER BY transaction_time LIMIT 3000)
+                UNION ALL
+                (SELECT * FROM "{schema}".transactions WHERE split = 'validation' ORDER BY transaction_time LIMIT 1500)
+                UNION ALL
+                (SELECT * FROM "{schema}".transactions WHERE split = 'holdout' ORDER BY transaction_time LIMIT 1500)
+                ORDER BY transaction_time ASC;
+                """
+                tx_df = pd.read_sql_query(tx_query, conn)
+                loaded["transactions"] = tx_df
+
+                tx_ids = tuple(tx_df["transaction_id"].tolist())
+                format_ids = "'" + "','".join(tx_ids) + "'"
+
+                for t in ["payment_outcomes", "labels", "features"]:
+                    loaded[t] = pd.read_sql_query(
+                        f'SELECT * FROM "{schema}"."{t}" WHERE transaction_id IN ({format_ids});',
+                        conn,
+                    )
+                conn.close()
+
+                # Normalize any JSONB dict/list objects to JSON strings
+                for t_name, df in loaded.items():
+                    for col in df.columns:
+                        if df[col].dtype == object and len(df) > 0:
+                            sample = df[col].dropna().iloc[0] if len(df[col].dropna()) > 0 else None
+                            if isinstance(sample, (dict, list)):
+                                df[col] = df[col].apply(lambda x: json.dumps(x) if isinstance(x, (dict, list)) else x)
+
+                if len(loaded["transactions"]) >= 5000:
+                    privacy_audit = enforce_data_privacy_guardrails(loaded)
+                    return loaded, f"Tier 2 (PostgreSQL / Supabase Telemetry Replica: {schema})", privacy_audit
+            except Exception:
+                pass
 
     num_customers = int(os.getenv("SENTINEL_NUM_CUSTOMERS", "500"))
     num_merchants = int(os.getenv("SENTINEL_NUM_MERCHANTS", "120"))

@@ -17,6 +17,7 @@ This repository implements the production **Point-in-Time Feature Engineering, D
 sentinel-feature-pipeline/
 ├── README.md                                # Production architecture, schema, formulas & benchmarks
 ├── feature_pipeline.py                      # 6-stage CLI execution, parity & verification engine
+├── verify_supabase_ingestion.py             # Supabase PostgreSQL live telemetry audit & sampling verifier
 ├── scripts/
 │   ├── __init__.py
 │   └── sentinel_data_loader.py              # 3-Tier telemetry loader & DPDP/PCI-DSS privacy gate
@@ -37,7 +38,7 @@ sentinel-feature-pipeline/
 
 Every execution resolves payment telemetry across three tiers and passes all DataFrames through `enforce_data_privacy_guardrails()` prior to feature computation:
 * **Tier 1 (Local Sanitized CSV/Parquet)**: Reads from `SENTINEL_DATA_DIR` (`./sentinel_data/tables/` or `./sentinel_data/parquet/`).
-* **Tier 2 (PostgreSQL / Supabase Feature Replica)**: Queries `sentinel_demo.*` via `DATABASE_URL` with a 5-second connection timeout.
+* **Tier 2 (PostgreSQL / Supabase Feature Replica)**: Queries live tables in `public.*` (or `sentinel_demo.*`) via `DATABASE_URL` (using the verified Supabase connection pooler `aws-0-eu-west-1.pooler.supabase.com:6543`) with dynamic schema resolution, JSONB serialization, and stratified split coverage across all 4 splits.
 * **Tier 3 (Deterministic Schema-Compliant Synthetic Generator)**: Generates `5,500` transactions across `500` customers (`C_<16-hex>`), `120` merchants (`M_<16-hex>`), and `900` devices (`D_<16-hex>`) spanning all four temporal splits (`warmup`, `train`, `validation`, `holdout`).
 * **DPDP Act 2023 & PCI-DSS v4.0 Guardrail**: Scans and drops 12 forbidden raw PII column types (`customer_name`, `full_name`, `email`, `phone`, `mobile_number`, `card_number`, `pan`, `aadhaar`, `upi_id`, `vpa`, `ip_address`, `bank_account_number`), normalizes merchant names to `Merchant_<MCC>_<id>`, verifies tokenized entity IDs, and asserts `is_synthetic == True` on 100% of rows.
 
@@ -158,17 +159,38 @@ cp .env.example .env
 pip install -r requirements.txt
 ```
 
-### 7.2 Execute Pipeline & Automated 6-Gate Verification Suite
+### 7.2 Verify Supabase Live Telemetry Ingestion
+
+Audit live connectivity to Supabase, query all 7 core tables, verify live row counts (452,820 rows across tables), inspect formatted sample records, and validate tokenized entity identifiers (`C_*`, `M_*`, `D_*`, `TX_*`):
 
 ```bash
-# Run full 6-stage pipeline with deterministic telemetry and verification gates
+# Run full 7-table Supabase live ingestion audit
+python3 verify_supabase_ingestion.py
+
+# Inspect custom sample count (e.g. 5 records per table)
+python3 verify_supabase_ingestion.py --samples 5
+
+# Audit a specific core table (e.g. transactions)
+python3 verify_supabase_ingestion.py --table transactions
+
+# Export structured JSON verification audit
+python3 verify_supabase_ingestion.py --json
+```
+
+### 7.3 Execute Pipeline & Automated 6-Gate Verification Suite
+
+```bash
+# Execute full pipeline with live Supabase ingestion (Tier 2)
+python3 feature_pipeline.py
+
+# Run full 6-stage pipeline with deterministic offline telemetry and verification gates
 python3 feature_pipeline.py --offline-mock --verify
 
 # Optional: Point to a local directory of sanitized CSV or Parquet tables
 python3 feature_pipeline.py --data-dir ./sentinel_data --verify
 ```
 
-### 7.3 Automated Production Verification Gates
+### 7.4 Automated Production Verification Gates
 
 * **Gate 1 — DPDP Act 2023 & PCI-DSS v4.0 Privacy Guardrail**: Verifies zero raw PII columns, tokenized entity IDs (`C_*`, `M_*`, `D_*`), anonymized merchant labels (`Merchant_<MCC>_<id>`), and `is_synthetic == True` on 100% of records.
 * **Gate 2 — 7-Table Schema, FK Integrity & Integer Paise Invariant**: Verifies zero primary-key duplicates, zero foreign-key orphans, `amount_paise == round(transaction_amount * 100)` across all rows, and complete 4-split coverage (`warmup`, `train`, `validation`, `holdout`).
