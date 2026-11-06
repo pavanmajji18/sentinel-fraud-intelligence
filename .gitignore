@@ -61,6 +61,8 @@ htmlcov/
 # ------------------------------------------------------------------------------
 sentinel_data/
 **/sentinel_data/
+corpus/
+**/corpus/
 data/
 **/data/
 *.parquet

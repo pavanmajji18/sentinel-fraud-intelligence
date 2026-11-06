@@ -36,6 +36,14 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 import requests
 
+try:
+    from dotenv import load_dotenv
+
+    REPO_ROOT = Path(__file__).resolve().parent
+    load_dotenv(REPO_ROOT / ".env")
+except ImportError:
+    pass
+
 # Ensure local scripts package is importable
 REPO_ROOT = Path(__file__).resolve().parent
 if str(REPO_ROOT) not in sys.path:
@@ -509,18 +517,30 @@ class DualGatewayGeminiEmbedder:
         headers = {
             "Authorization": f"Bearer {self.euri_api_key}",
             "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         }
         all_vecs: List[List[float]] = []
-        batch_size = 32
+        batch_size = 16
         for i in range(0, len(texts), batch_size):
             batch = texts[i : i + batch_size]
-            resp = requests.post(
-                url,
-                headers=headers,
-                json={"model": self.euri_model, "input": batch, "dimensions": self.dimension},
-                timeout=30,
-            )
-            resp.raise_for_status()
+            max_retries = 3
+            resp = None
+            for attempt in range(max_retries):
+                try:
+                    resp = requests.post(
+                        url,
+                        headers=headers,
+                        json={"model": self.euri_model, "input": batch, "dimensions": self.dimension},
+                        timeout=45,
+                    )
+                    resp.raise_for_status()
+                    break
+                except Exception as req_err:
+                    if attempt == max_retries - 1:
+                        raise req_err
+                    time.sleep(1.5 * (attempt + 1))
+            if resp is None:
+                raise RuntimeError("Failed to obtain response from EURI embeddings endpoint.")
             data = resp.json()["data"]
             data_sorted = sorted(data, key=lambda item: item["index"])
             for item in data_sorted:
@@ -1025,21 +1045,21 @@ def run_policy_retrieval_pipeline(
     for q_spec in INVESTIGATOR_QUERIES:
         t_q0 = time.perf_counter()
         q_vec = embedder.embed_query(q_spec["query_text"])
-        top3 = query_qdrant_top_k(
+        top5 = query_qdrant_top_k(
             client=client,
             collection_name=collection_name,
             query_vector=q_vec,
-            top_k=3,
+            top_k=5,
             query_filter=None,
         )
         q_lat_ms = round((time.perf_counter() - t_q0) * 1000.0, 3)
         latencies_ms.append(q_lat_ms)
 
         expected_cat = q_spec["expected_category"]
-        top1_match = len(top3) > 0 and top3[0]["document_type"] == expected_cat
-        top3_match = any(r["document_type"] == expected_cat for r in top3)
+        top1_match = len(top5) > 0 and top5[0]["document_type"] == expected_cat
+        top3_match = any(r["document_type"] == expected_cat for r in top5[:3])
         rr = 0.0
-        for r in top3:
+        for r in top5:
             if r["document_type"] == expected_cat:
                 rr = 1.0 / float(r["rank"])
                 break
@@ -1050,12 +1070,17 @@ def run_policy_retrieval_pipeline(
             hit_at_3_count += 1
         reciprocal_ranks.append(rr)
 
-        top1 = top3[0]
+        top1 = top5[0]
         print(
             f"  [{q_spec['query_id']}] Target={expected_cat:<17} | Top-1={top1['doc_id']} "
             f"({top1['document_type']}, chunk={top1['chunk_index']}) | "
             f"Cosine={top1['cosine_score']:.4f} | Latency={q_lat_ms:.2f} ms"
         )
+        for r in top5:
+            print(
+                f"     * Rank #{r['rank']}: {r['doc_id']} (type={r['document_type']}, chunk={r['chunk_index']}) | "
+                f"Cosine={r['cosine_score']:.4f} | {r.get('title', '')[:50]}"
+            )
 
         query_results.append(
             {
@@ -1067,7 +1092,8 @@ def run_policy_retrieval_pipeline(
                 "hit_at_1": top1_match,
                 "hit_at_3": top3_match,
                 "reciprocal_rank": round(rr, 4),
-                "top_3_results": top3,
+                "top_3_results": top5[:3],
+                "top_5_results": top5,
             }
         )
 
@@ -1075,7 +1101,7 @@ def run_policy_retrieval_pipeline(
     hit_at_3_rate = round(100.0 * hit_at_3_count / len(INVESTIGATOR_QUERIES), 2)
     mrr_at_3 = round(float(np.mean(reciprocal_ranks)), 4)
     mean_top1_cosine = round(
-        float(np.mean([q["top_3_results"][0]["cosine_score"] for q in query_results])), 4
+        float(np.mean([q["top_5_results"][0]["cosine_score"] for q in query_results])), 4
     )
 
     print(
@@ -1091,11 +1117,11 @@ def run_policy_retrieval_pipeline(
     f_q_vec = embedder.embed_query(FILTERED_PLAYBOOK_QUERY["query_text"])
 
     t_unf = time.perf_counter()
-    unfiltered_top3 = query_qdrant_top_k(
+    unfiltered_top5 = query_qdrant_top_k(
         client=client,
         collection_name=collection_name,
         query_vector=f_q_vec,
-        top_k=3,
+        top_k=5,
         query_filter=None,
     )
     unf_lat_ms = round((time.perf_counter() - t_unf) * 1000.0, 3)
@@ -1109,25 +1135,25 @@ def run_policy_retrieval_pipeline(
         ]
     )
     t_flt = time.perf_counter()
-    filtered_top3 = query_qdrant_top_k(
+    filtered_top5 = query_qdrant_top_k(
         client=client,
         collection_name=collection_name,
         query_vector=f_q_vec,
-        top_k=3,
+        top_k=5,
         query_filter=playbook_filter,
     )
     flt_lat_ms = round((time.perf_counter() - t_flt) * 1000.0, 3)
 
-    all_filtered_are_playbooks = all(r["document_type"] == "playbooks" for r in filtered_top3)
+    all_filtered_are_playbooks = all(r["document_type"] == "playbooks" for r in filtered_top5)
     print(f"  -> Query Text              : {FILTERED_PLAYBOOK_QUERY['query_text']}")
-    print("  -> Unfiltered Top-3 Hits   :")
-    for r in unfiltered_top3:
+    print("  -> Unfiltered Top-5 Hits   :")
+    for r in unfiltered_top5:
         print(
             f"     * Rank #{r['rank']}: {r['doc_id']} | type={r['document_type']:<17} | "
             f"ref={r['regulatory_ref']:<16} | cosine={r['cosine_score']:.4f}"
         )
-    print("  -> Filtered Top-3 Hits (`document_type == 'playbooks'`):")
-    for r in filtered_top3:
+    print("  -> Filtered Top-5 Hits (`document_type == 'playbooks'`):")
+    for r in filtered_top5:
         print(
             f"     * Rank #{r['rank']}: {r['doc_id']} | type={r['document_type']:<17} | "
             f"ref={r['regulatory_ref']:<16} | cosine={r['cosine_score']:.4f}"
@@ -1161,7 +1187,7 @@ def run_policy_retrieval_pipeline(
             hit_at_1_rate >= 90.0
             and hit_at_3_rate == 100.0
             and all_filtered_are_playbooks
-            and len(filtered_top3) == 3
+            and len(filtered_top5) == 5
         ),
     }
 
@@ -1222,8 +1248,8 @@ def run_policy_retrieval_pipeline(
             "unfiltered_latency_ms": unf_lat_ms,
             "filtered_latency_ms": flt_lat_ms,
             "all_filtered_hits_match_playbooks": all_filtered_are_playbooks,
-            "unfiltered_top_3": unfiltered_top3,
-            "filtered_top_3": filtered_top3,
+            "unfiltered_top_5": unfiltered_top5,
+            "filtered_top_5": filtered_top5,
         },
         "verification_gates": {k: ("PASS" if v else "FAIL") for k, v in gates.items()},
     }
@@ -1277,7 +1303,7 @@ def run_policy_retrieval_pipeline(
         "",
         "---",
         "",
-        "## 3. Detailed Top-3 Retrieved Chunks per Query",
+        "## 3. Detailed Top-5 Retrieved Chunks per Query",
         "",
     ])
     for q in query_results:
@@ -1286,7 +1312,7 @@ def run_policy_retrieval_pipeline(
         md_lines.append(f"**Latency**: `{q['latency_ms']:.2f} ms` | **MRR**: `{q['reciprocal_rank']:.4f}`\n")
         md_lines.append("| Rank | Document ID | Category | Title | Cosine | Excerpt |")
         md_lines.append("| :-: | :--- | :--- | :--- | :---: | :--- |")
-        for hit in q["top_3_results"]:
+        for hit in q["top_5_results"]:
             clean_title = (hit.get("title") or "").replace("|", "-")
             clean_excerpt = (hit.get("excerpt") or "")[:100].replace("|", "-")
             md_lines.append(
@@ -1305,11 +1331,11 @@ def run_policy_retrieval_pipeline(
         f"- **Filtered Query Latency**: `{flt_lat_ms:.2f} ms`",
         f"- **100% Playbook Filter Precision**: `{'PASS' if all_filtered_are_playbooks else 'FAIL'}`",
         "",
-        "### Unfiltered Top-3 Hits (Spans multiple document types):",
+        "### Unfiltered Top-5 Hits (Spans multiple document types):",
         "| Rank | Document ID | Category | Regulatory Ref | Cosine | Title |",
         "| :-: | :--- | :--- | :--- | :---: | :--- |",
     ])
-    for hit in unfiltered_top3:
+    for hit in unfiltered_top5:
         clean_title = (hit.get("title") or "").replace("|", "-")
         md_lines.append(
             f"| #{hit['rank']} | `{hit['doc_id']}` | `{hit['document_type']}` | `{hit.get('regulatory_ref')}` | "
@@ -1318,11 +1344,11 @@ def run_policy_retrieval_pipeline(
 
     md_lines.extend([
         "",
-        "### Filtered Top-3 Hits (`document_type == 'playbooks'` strictly enforced):",
+        "### Filtered Top-5 Hits (`document_type == 'playbooks'` strictly enforced):",
         "| Rank | Document ID | Category | Regulatory Ref | Cosine | Title |",
         "| :-: | :--- | :--- | :--- | :---: | :--- |",
     ])
-    for hit in filtered_top3:
+    for hit in filtered_top5:
         clean_title = (hit.get("title") or "").replace("|", "-")
         md_lines.append(
             f"| #{hit['rank']} | `{hit['doc_id']}` | `{hit['document_type']}` | `{hit.get('regulatory_ref')}` | "

@@ -17,7 +17,11 @@ credentials.json
 
 # Local Telemetry & Unstructured Data Dumps (DPDP Act 2023 / PCI-DSS v4.0)
 sentinel_data/
+**/sentinel_data/
+corpus/
+**/corpus/
 data/
+**/data/
 *.parquet
 *.npz
 *.dump

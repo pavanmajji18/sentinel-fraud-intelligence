@@ -27,6 +27,14 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
+try:
+    from dotenv import load_dotenv
+
+    REPO_ROOT = Path(__file__).resolve().parent.parent
+    load_dotenv(REPO_ROOT / ".env")
+except ImportError:
+    pass
+
 IST = timezone(timedelta(hours=5, minutes=30))
 HIGH_RISK_MCCS = {"electronics", "gaming", "travel", "gift_cards", "crypto"}
 
@@ -565,21 +573,27 @@ def load_sentinel_corpus(
       Tier 3: Deterministic 225-document regulatory, policy, playbook & case narrative generator
     Returns (documents_list, active_tier_description, corpus_privacy_audit).
     """
+    corpus_env = os.getenv("SENTINEL_CORPUS_DIR") or os.getenv("SENTINEL_CORPUS_PATH", "")
     candidate_dirs = [
-        data_dir or os.getenv("SENTINEL_DATA_DIR", "./sentinel_data"),
+        corpus_env,
+        data_dir,
+        os.getenv("SENTINEL_DATA_DIR", "./sentinel_data"),
+        r"D:\Euron\Work and Learn Super 30\Fast-Track\sentinel-fraud-intelligence\sentinel_data\corpus",
+        r"D:\Euron\Work and Learn Super 30\Fast-Track\sentinel-fraud-intelligence\sentinel_data",
         "../sentinel_data",
+        "./sentinel_data",
         "./data/sentinel_data",
     ]
     for base in candidate_dirs:
         if not base:
             continue
         base_path = Path(base)
-        corpus_json = base_path / "corpus" / "documents.json"
-        if corpus_json.exists():
-            docs = json.loads(corpus_json.read_text(encoding="utf-8"))
-            if len(docs) >= 200:
-                audit = enforce_corpus_privacy_guardrails(docs)
-                return docs, f"Tier 1 (Local Sanitized Corpus JSON: {corpus_json})", audit
+        for cand in [base_path / "documents.json", base_path / "corpus" / "documents.json"]:
+            if cand.is_file():
+                docs = json.loads(cand.read_text(encoding="utf-8"))
+                if len(docs) >= 200:
+                    audit = enforce_corpus_privacy_guardrails(docs)
+                    return docs, f"Tier 1 (Local Sanitized Corpus JSON: {cand})", audit
 
     db_url = os.getenv("DATABASE_URL", "")
     if db_url and "<" not in db_url:
@@ -968,6 +982,7 @@ def load_sentinel_tables(
 
     candidate_dirs = [
         data_dir or os.getenv("SENTINEL_DATA_DIR", "./sentinel_data"),
+        r"D:\Euron\Work and Learn Super 30\Fast-Track\sentinel-fraud-intelligence\sentinel_data",
         "../sentinel_data",
         "./data/sentinel_data",
     ]
