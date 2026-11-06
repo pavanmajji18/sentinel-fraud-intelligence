@@ -2,6 +2,13 @@
   "component": "sentinel_vector_search_engine",
   "title": "Project SENTINEL \u2014 Vector Search Internals: Cosine vs. Euclidean & HNSW Benchmarking",
   "domain_context": "Tier-1 RBI-Regulated Digital Payment Aggregator (3072-d Policy Corpus)",
+  "vector_provenance": {
+    "source": "sentinel-policy-retrieval/outputs/embeddings_cache.npz",
+    "model": "gemini-embedding-2",
+    "dimension": 3072,
+    "vector_count": 450,
+    "zero_mock_enforced": true
+  },
   "privacy_governance": {
     "compliance_standard": "DPDP Act 2023 & PCI-DSS v4.0 Data Minimization",
     "forbidden_pii_columns_checked": 12,
@@ -14,93 +21,69 @@
   "stage1_2d_hand_verified_proof": {
     "query": {
       "coords": [
-        2,
-        4
+        2.0,
+        4.0
       ],
-      "l2_norm_exact": "sqrt(20)",
-      "l2_norm": 4.472136
+      "l2_norm": 4.47213595499958,
+      "unit_coords": [
+        0.4472135954999579,
+        0.8944271909999159
+      ]
     },
     "points": [
       {
         "point": "A",
         "coords": [
-          2,
-          3
+          2.0,
+          3.0
         ],
         "dot_product": 16.0,
-        "point_l2_norm_exact": "sqrt(13)",
-        "point_l2_norm": 3.605551,
-        "query_l2_norm_exact": "sqrt(20)",
-        "query_l2_norm": 4.472136,
-        "cosine_formula": "16 / (sqrt(20) * sqrt(13))",
-        "cosine_similarity": 0.992278,
-        "cosine_similarity_4dp": 0.9923,
-        "angle_degrees": 7.125,
-        "euclidean_sq": 1.0,
-        "euclidean_formula": "sqrt((2-2)^2 + (4-3)^2) = sqrt(1)",
+        "point_l2_norm": 3.605551275463989,
+        "cosine_similarity": 0.9922778767136677,
+        "angle_degrees": 7.125016348901757,
         "euclidean_distance": 1.0,
-        "euclidean_distance_4dp": 1.0,
-        "unit_vector": [
-          0.5547,
-          0.83205
+        "unit_normalized_coords": [
+          0.5547001962252291,
+          0.8320502943378437
         ],
-        "unit_dot_product": 0.992278,
-        "unit_euclidean_sq": 0.015444,
-        "unit_euclidean_dist": 0.124275
+        "unit_normalized_dot": 0.9922778767136676,
+        "unit_normalized_euclidean": 0.12427488311265757
       },
       {
         "point": "B",
         "coords": [
-          1,
-          2
+          1.0,
+          2.0
         ],
         "dot_product": 10.0,
-        "point_l2_norm_exact": "sqrt(5)",
-        "point_l2_norm": 2.236068,
-        "query_l2_norm_exact": "sqrt(20)",
-        "query_l2_norm": 4.472136,
-        "cosine_formula": "10 / (sqrt(20) * sqrt(5))",
-        "cosine_similarity": 1.0,
-        "cosine_similarity_4dp": 1.0,
-        "angle_degrees": 0.0,
-        "euclidean_sq": 5.0,
-        "euclidean_formula": "sqrt((2-1)^2 + (4-2)^2) = sqrt(5)",
-        "euclidean_distance": 2.236068,
-        "euclidean_distance_4dp": 2.2361,
-        "unit_vector": [
-          0.447214,
-          0.894427
+        "point_l2_norm": 2.23606797749979,
+        "cosine_similarity": 0.9999999999999998,
+        "angle_degrees": 1.2074182697257333e-06,
+        "euclidean_distance": 2.23606797749979,
+        "unit_normalized_coords": [
+          0.4472135954999579,
+          0.8944271909999159
         ],
-        "unit_dot_product": 1.0,
-        "unit_euclidean_sq": 0.0,
-        "unit_euclidean_dist": 0.0
+        "unit_normalized_dot": 0.9999999999999999,
+        "unit_normalized_euclidean": 0.0
       },
       {
         "point": "C",
         "coords": [
-          0,
-          4
+          0.0,
+          4.0
         ],
         "dot_product": 16.0,
-        "point_l2_norm_exact": "sqrt(16)",
         "point_l2_norm": 4.0,
-        "query_l2_norm_exact": "sqrt(20)",
-        "query_l2_norm": 4.472136,
-        "cosine_formula": "16 / (sqrt(20) * sqrt(16))",
-        "cosine_similarity": 0.894427,
-        "cosine_similarity_4dp": 0.8944,
-        "angle_degrees": 26.5651,
-        "euclidean_sq": 4.0,
-        "euclidean_formula": "sqrt((2-0)^2 + (4-4)^2) = sqrt(4)",
+        "cosine_similarity": 0.8944271909999159,
+        "angle_degrees": 26.565051177077994,
         "euclidean_distance": 2.0,
-        "euclidean_distance_4dp": 2.0,
-        "unit_vector": [
+        "unit_normalized_coords": [
           0.0,
           1.0
         ],
-        "unit_dot_product": 0.894427,
-        "unit_euclidean_sq": 0.211146,
-        "unit_euclidean_dist": 0.459506
+        "unit_normalized_dot": 0.8944271909999159,
+        "unit_normalized_euclidean": 0.45950584109472237
       }
     ],
     "rankings": {
@@ -114,764 +97,1116 @@
         "C",
         "B"
       ],
-      "unnormalized_dot_desc": [
-        "A",
-        "C",
-        "B"
-      ],
       "unit_normalized_euclidean_asc": [
         "B",
         "A",
         "C"
       ]
     },
-    "geometric_insight": "Query Q=(2,4) is an exact scalar multiple of B=(1,2) (Q = 2*B), making their angle 0.0000 degrees and Cosine Similarity exactly 1.0000 (Rank #1), followed closely by A=(2,3) at 0.9923 (7.1250 degrees, Rank #2) and C=(0,4) at 0.8944 (26.5651 degrees, Rank #3). However, unnormalized Euclidean distance measures physical coordinate separation rather than directional alignment: A=(2,3) is only 1.0000 unit from Q=(2,4) (Rank #1), C=(0,4) is 2.0000 units away (Rank #2), and B=(1,2) is penalized for its smaller norm (||B||_2=sqrt(5) vs ||Q||_2=sqrt(20)), placing B last at sqrt(5)=2.2361 (Rank #3). Once vectors are L2-normalized onto the unit circle, Euclidean distance ranking becomes ['B', 'A', 'C'], restoring 100% parity with Cosine Similarity."
+    "analytical_takeaways": {
+      "divergence_observed": true,
+      "explanation": "Unnormalized Euclidean distance is sensitive to vector magnitude: B=(1,2) has angle=0 deg to Q=(2,4) so cos(Q,B)=1.0000 (Rank #1), but ||B||_2=2.2361 vs ||Q||_2=4.4721 pushes Euclidean distance to 2.2361 (Rank #3). A=(2,3) sits 1.0 unit from Q on the y-axis, making it Rank #1 in Euclidean space despite a 7.125 deg angular offset. Normalizing vectors restores identical rankings."
+    }
   },
   "stage2_and_3_3072d_qdrant_parity": {
-    "corpus_size": 240,
+    "corpus_size": 450,
     "embedding_dimension": 3072,
-    "corpus_norm_min": 1.5,
-    "corpus_norm_max": 7.77,
+    "vector_source": "Gemini Embedding 2 (sentinel-policy-retrieval/outputs/embeddings_cache.npz)",
     "num_queries_evaluated": 10,
     "top_k": 5,
     "all_cosine_top5_ids_identical": true,
     "all_euclid_top5_ids_identical": true,
-    "max_cosine_abs_score_diff": 0.0,
-    "max_euclid_abs_score_diff": 0.0,
-    "unnormalized_cosine_vs_euclid_rank_divergences": 10,
-    "semantic_hit_at_1_rate": 1.0,
-    "playbook_filtered_top1_doc_id": "DOC_PLAY_0027",
+    "max_cosine_abs_score_diff": 2.753e-07,
+    "max_euclid_abs_score_diff": 5.258e-08,
+    "unnormalized_cosine_vs_euclid_rank_divergences": 0,
     "query_parity_records": [
       {
         "query_id": "Q01",
         "expected_reason_code": "R01_NEW_DEVICE",
-        "top1_retrieved_reason_code": "R01_NEW_DEVICE",
         "numpy_cosine_top5_ids": [
-          208,
-          160,
-          224,
-          96,
-          24
+          0,
+          20,
+          60,
+          70,
+          40
         ],
         "qdrant_cosine_top5_ids": [
-          208,
-          160,
-          224,
-          96,
-          24
+          0,
+          20,
+          60,
+          70,
+          40
         ],
         "numpy_cosine_top5_scores": [
-          0.447523,
-          0.44642,
-          0.442015,
-          0.438603,
-          0.438308
+          0.804806,
+          0.802827,
+          0.80244,
+          0.802136,
+          0.799227
         ],
         "qdrant_cosine_top5_scores": [
-          0.447523,
-          0.44642,
-          0.442015,
-          0.438603,
-          0.438308
+          0.804806,
+          0.802827,
+          0.802441,
+          0.802136,
+          0.799227
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          208,
           0,
-          40,
-          16,
-          48
+          20,
+          60,
+          70,
+          40
         ],
         "qdrant_euclid_top5_ids": [
-          208,
           0,
-          40,
-          16,
-          48
+          20,
+          60,
+          70,
+          40
         ],
         "numpy_euclid_top5_scores": [
-          4.981699,
-          5.032407,
-          5.043479,
-          5.045813,
-          5.049545
+          0.62481,
+          0.62797,
+          0.628585,
+          0.62907,
+          0.633676
         ],
         "qdrant_euclid_top5_scores": [
-          4.981699,
-          5.032407,
-          5.043479,
-          5.045813,
-          5.049545
+          0.62481,
+          0.62797,
+          0.628585,
+          0.62907,
+          0.633676
         ],
         "euclid_exact_parity": true
       },
       {
         "query_id": "Q02",
-        "expected_reason_code": "R02_GEO_MISMATCH",
-        "top1_retrieved_reason_code": "R02_GEO_MISMATCH",
+        "expected_reason_code": "R04_FAILED_ATTEMPTS",
         "numpy_cosine_top5_ids": [
-          25,
-          233,
-          1,
-          177,
-          185
+          52,
+          82,
+          12,
+          72,
+          62
         ],
         "qdrant_cosine_top5_ids": [
-          25,
-          233,
-          1,
-          177,
-          185
+          52,
+          82,
+          12,
+          72,
+          62
         ],
         "numpy_cosine_top5_scores": [
-          0.440664,
-          0.436858,
-          0.43611,
-          0.433624,
-          0.431629
+          0.80714,
+          0.800898,
+          0.798902,
+          0.797888,
+          0.797179
         ],
         "qdrant_cosine_top5_scores": [
-          0.440664,
-          0.436858,
-          0.43611,
-          0.433624,
-          0.431629
+          0.807141,
+          0.800898,
+          0.798902,
+          0.797888,
+          0.797179
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          185,
-          57,
-          233,
-          89,
-          153
+          52,
+          82,
+          12,
+          72,
+          62
         ],
         "qdrant_euclid_top5_ids": [
-          185,
-          57,
-          233,
-          89,
-          153
+          52,
+          82,
+          12,
+          72,
+          62
         ],
         "numpy_euclid_top5_scores": [
-          3.586925,
-          3.606362,
-          3.606761,
-          3.64044,
-          3.683108
+          0.621063,
+          0.631034,
+          0.63419,
+          0.635786,
+          0.636901
         ],
         "qdrant_euclid_top5_scores": [
-          3.586925,
-          3.606362,
-          3.606761,
-          3.64044,
-          3.683108
+          0.621063,
+          0.631034,
+          0.63419,
+          0.635786,
+          0.636901
         ],
         "euclid_exact_parity": true
       },
       {
         "query_id": "Q03",
-        "expected_reason_code": "R03_ODD_HOUR",
-        "top1_retrieved_reason_code": "R03_ODD_HOUR",
+        "expected_reason_code": "R01_NEW_DEVICE",
         "numpy_cosine_top5_ids": [
-          82,
-          98,
-          106,
+          110,
           170,
-          226
+          160,
+          120,
+          90
         ],
         "qdrant_cosine_top5_ids": [
-          82,
-          98,
-          106,
+          110,
           170,
-          226
+          160,
+          120,
+          90
         ],
         "numpy_cosine_top5_scores": [
-          0.472778,
-          0.469684,
-          0.467266,
-          0.466022,
-          0.46518
+          0.820167,
+          0.818316,
+          0.817447,
+          0.817107,
+          0.816856
         ],
         "qdrant_cosine_top5_scores": [
-          0.472778,
-          0.469684,
-          0.467266,
-          0.466022,
-          0.46518
+          0.820167,
+          0.818316,
+          0.817447,
+          0.817107,
+          0.816856
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          82,
-          210,
+          110,
           170,
-          58,
-          122
+          160,
+          120,
+          90
         ],
         "qdrant_euclid_top5_ids": [
-          82,
-          210,
+          110,
           170,
-          58,
-          122
+          160,
+          120,
+          90
         ],
         "numpy_euclid_top5_scores": [
-          5.844577,
-          5.896601,
-          5.912504,
-          5.931401,
-          5.934918
+          0.599722,
+          0.6028,
+          0.60424,
+          0.604802,
+          0.605218
         ],
         "qdrant_euclid_top5_scores": [
-          5.844577,
-          5.896601,
-          5.912504,
-          5.931401,
-          5.934918
+          0.599722,
+          0.6028,
+          0.60424,
+          0.604802,
+          0.605218
         ],
         "euclid_exact_parity": true
       },
       {
         "query_id": "Q04",
-        "expected_reason_code": "R04_FAILED_ATTEMPTS",
-        "top1_retrieved_reason_code": "R04_FAILED_ATTEMPTS",
+        "expected_reason_code": "R08_HIGH_RISK_MCC",
         "numpy_cosine_top5_ids": [
-          147,
-          11,
-          107,
-          203,
-          59
+          96,
+          176,
+          106,
+          136,
+          146
         ],
         "qdrant_cosine_top5_ids": [
-          147,
-          11,
-          107,
-          203,
-          59
+          96,
+          176,
+          106,
+          136,
+          146
         ],
         "numpy_cosine_top5_scores": [
-          0.481981,
-          0.47883,
-          0.478267,
-          0.478096,
-          0.477311
+          0.834441,
+          0.834351,
+          0.832647,
+          0.830855,
+          0.830109
         ],
         "qdrant_cosine_top5_scores": [
-          0.481981,
-          0.47883,
-          0.478267,
-          0.478096,
-          0.477311
+          0.834441,
+          0.834351,
+          0.832647,
+          0.830856,
+          0.830109
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          107,
-          59,
-          67,
-          3,
-          203
+          96,
+          176,
+          106,
+          136,
+          146
         ],
         "qdrant_euclid_top5_ids": [
-          107,
-          59,
-          67,
-          3,
-          203
+          96,
+          176,
+          106,
+          136,
+          146
         ],
         "numpy_euclid_top5_scores": [
-          2.019932,
-          2.059532,
-          2.082554,
-          2.240396,
-          2.387991
+          0.575429,
+          0.575585,
+          0.578539,
+          0.581626,
+          0.582908
         ],
         "qdrant_euclid_top5_scores": [
-          2.019932,
-          2.059532,
-          2.082554,
-          2.240396,
-          2.387991
+          0.575429,
+          0.575585,
+          0.578539,
+          0.581626,
+          0.582908
         ],
         "euclid_exact_parity": true
       },
       {
         "query_id": "Q05",
         "expected_reason_code": "R05_AMOUNT_SPIKE",
-        "top1_retrieved_reason_code": "R05_AMOUNT_SPIKE",
         "numpy_cosine_top5_ids": [
-          44,
-          172,
-          164,
-          124,
-          92
+          250,
+          240,
+          200,
+          230,
+          210
         ],
         "qdrant_cosine_top5_ids": [
-          44,
-          172,
-          164,
-          124,
-          92
+          250,
+          240,
+          200,
+          230,
+          210
         ],
         "numpy_cosine_top5_scores": [
-          0.44596,
-          0.44539,
-          0.44202,
-          0.4419,
-          0.434652
+          0.84264,
+          0.839308,
+          0.839183,
+          0.838127,
+          0.837497
         ],
         "qdrant_cosine_top5_scores": [
-          0.44596,
-          0.44539,
-          0.44202,
-          0.4419,
-          0.434652
+          0.84264,
+          0.839308,
+          0.839183,
+          0.838127,
+          0.837497
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          44,
-          84,
-          164,
-          204,
-          124
+          250,
+          240,
+          200,
+          230,
+          210
         ],
         "qdrant_euclid_top5_ids": [
-          44,
-          84,
-          164,
-          204,
-          124
+          250,
+          240,
+          200,
+          230,
+          210
         ],
         "numpy_euclid_top5_scores": [
-          6.824778,
-          6.840346,
-          6.87092,
-          6.873037,
-          6.881936
+          0.561,
+          0.566907,
+          0.567128,
+          0.568986,
+          0.570094
         ],
         "qdrant_euclid_top5_scores": [
-          6.824778,
-          6.840346,
-          6.87092,
-          6.873037,
-          6.881936
+          0.561,
+          0.566907,
+          0.567128,
+          0.568986,
+          0.570094
         ],
         "euclid_exact_parity": true
       },
       {
         "query_id": "Q06",
-        "expected_reason_code": "R06_NEW_ACCOUNT",
-        "top1_retrieved_reason_code": "R06_NEW_ACCOUNT",
+        "expected_reason_code": "R07_VELOCITY",
         "numpy_cosine_top5_ids": [
-          77,
-          133,
-          69,
-          45,
-          149
+          212,
+          252,
+          232,
+          222,
+          262
         ],
         "qdrant_cosine_top5_ids": [
-          77,
-          133,
-          69,
-          45,
-          149
+          212,
+          252,
+          232,
+          222,
+          262
         ],
         "numpy_cosine_top5_scores": [
-          0.22776,
-          0.221503,
-          0.220793,
-          0.220782,
-          0.218075
+          0.791284,
+          0.786937,
+          0.78591,
+          0.781765,
+          0.780997
         ],
         "qdrant_cosine_top5_scores": [
-          0.22776,
-          0.221503,
-          0.220793,
-          0.220782,
-          0.218075
+          0.791284,
+          0.786937,
+          0.78591,
+          0.781765,
+          0.780997
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          57,
-          185,
-          229,
-          178,
-          212
+          212,
+          252,
+          232,
+          222,
+          262
         ],
         "qdrant_euclid_top5_ids": [
-          57,
-          185,
-          229,
-          178,
-          212
+          212,
+          252,
+          232,
+          222,
+          262
         ],
         "numpy_euclid_top5_scores": [
-          2.249925,
-          2.26285,
-          2.278518,
-          2.368405,
-          2.382981
+          0.646089,
+          0.652783,
+          0.654355,
+          0.660659,
+          0.66182
         ],
         "qdrant_euclid_top5_scores": [
-          2.249925,
-          2.26285,
-          2.278518,
-          2.368405,
-          2.382981
+          0.646089,
+          0.652783,
+          0.654355,
+          0.660659,
+          0.66182
         ],
         "euclid_exact_parity": true
       },
       {
         "query_id": "Q07",
-        "expected_reason_code": "R07_VELOCITY",
-        "top1_retrieved_reason_code": "R07_VELOCITY",
+        "expected_reason_code": "R01_NEW_DEVICE",
         "numpy_cosine_top5_ids": [
-          158,
-          174,
-          134,
-          182,
-          118
+          270,
+          330,
+          310,
+          300,
+          350
         ],
         "qdrant_cosine_top5_ids": [
-          158,
-          174,
-          134,
-          182,
-          118
+          270,
+          330,
+          310,
+          300,
+          350
         ],
         "numpy_cosine_top5_scores": [
-          0.417465,
-          0.416091,
-          0.407899,
-          0.406451,
-          0.405459
+          0.843511,
+          0.841201,
+          0.840891,
+          0.838433,
+          0.838425
         ],
         "qdrant_cosine_top5_scores": [
-          0.417465,
-          0.416091,
-          0.407899,
-          0.406451,
-          0.405459
+          0.843511,
+          0.8412,
+          0.840891,
+          0.838433,
+          0.838425
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          238,
-          206,
-          62,
-          57,
-          185
+          270,
+          330,
+          310,
+          300,
+          350
         ],
         "qdrant_euclid_top5_ids": [
-          238,
-          206,
-          62,
-          57,
-          185
+          270,
+          330,
+          310,
+          300,
+          350
         ],
         "numpy_euclid_top5_scores": [
-          2.809988,
-          3.053833,
-          3.144522,
-          3.15236,
-          3.156871
+          0.559444,
+          0.563559,
+          0.564108,
+          0.56845,
+          0.568464
         ],
         "qdrant_euclid_top5_scores": [
-          2.809988,
-          3.053833,
-          3.144522,
-          3.15236,
-          3.156871
+          0.559444,
+          0.563559,
+          0.564108,
+          0.56845,
+          0.568464
         ],
         "euclid_exact_parity": true
       },
       {
         "query_id": "Q08",
-        "expected_reason_code": "R08_HIGH_RISK_MCC",
-        "top1_retrieved_reason_code": "R08_HIGH_RISK_MCC",
+        "expected_reason_code": "R07_VELOCITY",
         "numpy_cosine_top5_ids": [
-          63,
-          55,
-          191,
-          159,
-          231
+          272,
+          302,
+          342,
+          312,
+          292
         ],
         "qdrant_cosine_top5_ids": [
-          63,
-          55,
-          191,
-          159,
-          231
+          272,
+          302,
+          342,
+          312,
+          292
         ],
         "numpy_cosine_top5_scores": [
-          0.382736,
-          0.381099,
-          0.378068,
-          0.37708,
-          0.374701
+          0.824951,
+          0.821304,
+          0.820192,
+          0.818724,
+          0.816998
         ],
         "qdrant_cosine_top5_scores": [
-          0.382736,
-          0.381099,
-          0.378068,
-          0.37708,
-          0.374701
+          0.824951,
+          0.821304,
+          0.820192,
+          0.818724,
+          0.816998
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          39,
-          23,
-          71,
-          172,
-          212
+          272,
+          302,
+          342,
+          312,
+          292
         ],
         "qdrant_euclid_top5_ids": [
-          39,
-          23,
-          71,
-          172,
-          212
+          272,
+          302,
+          342,
+          312,
+          292
         ],
         "numpy_euclid_top5_scores": [
-          2.71086,
-          2.714141,
-          2.851173,
-          3.082287,
-          3.092484
+          0.591691,
+          0.597822,
+          0.599681,
+          0.602123,
+          0.604982
         ],
         "qdrant_euclid_top5_scores": [
-          2.71086,
-          2.714141,
-          2.851173,
-          3.082287,
-          3.092484
+          0.591691,
+          0.597822,
+          0.599681,
+          0.602123,
+          0.604982
         ],
         "euclid_exact_parity": true
       },
       {
         "query_id": "Q09",
         "expected_reason_code": "R01_NEW_DEVICE",
-        "top1_retrieved_reason_code": "R01_NEW_DEVICE",
         "numpy_cosine_top5_ids": [
-          64,
-          104,
-          80,
-          32,
-          112
+          360,
+          380,
+          400,
+          390,
+          370
         ],
         "qdrant_cosine_top5_ids": [
-          64,
-          104,
-          80,
-          32,
-          112
+          360,
+          380,
+          400,
+          390,
+          370
         ],
         "numpy_cosine_top5_scores": [
-          0.345734,
-          0.344129,
-          0.3439,
-          0.338762,
-          0.333557
+          0.827069,
+          0.82189,
+          0.821086,
+          0.818655,
+          0.818226
         ],
         "qdrant_cosine_top5_scores": [
-          0.345734,
-          0.344129,
-          0.3439,
-          0.338762,
-          0.333557
+          0.827069,
+          0.82189,
+          0.821086,
+          0.818655,
+          0.818226
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          56,
-          128,
-          40,
-          0,
-          16
+          360,
+          380,
+          400,
+          390,
+          370
         ],
         "qdrant_euclid_top5_ids": [
-          56,
-          128,
-          40,
-          0,
-          16
+          360,
+          380,
+          400,
+          390,
+          370
         ],
         "numpy_euclid_top5_scores": [
-          2.278331,
-          2.303819,
-          2.32553,
-          2.437321,
-          2.51772
+          0.5881,
+          0.596841,
+          0.598187,
+          0.602237,
+          0.602949
         ],
         "qdrant_euclid_top5_scores": [
-          2.278331,
-          2.303819,
-          2.32553,
-          2.437321,
-          2.51772
+          0.5881,
+          0.596841,
+          0.598187,
+          0.602237,
+          0.602949
         ],
         "euclid_exact_parity": true
       },
       {
         "query_id": "Q10",
-        "expected_reason_code": "R05_AMOUNT_SPIKE",
-        "top1_retrieved_reason_code": "R05_AMOUNT_SPIKE",
+        "expected_reason_code": "R02_GEO_MISMATCH",
         "numpy_cosine_top5_ids": [
-          140,
-          156,
-          188,
-          44,
-          132
+          408,
+          388,
+          368,
+          398,
+          378
         ],
         "qdrant_cosine_top5_ids": [
-          140,
-          156,
-          188,
-          44,
-          132
+          408,
+          388,
+          368,
+          398,
+          378
         ],
         "numpy_cosine_top5_scores": [
-          0.232301,
-          0.232173,
-          0.230467,
-          0.228341,
-          0.227952
+          0.812831,
+          0.808655,
+          0.808276,
+          0.807351,
+          0.807207
         ],
         "qdrant_cosine_top5_scores": [
-          0.232301,
-          0.232173,
-          0.230467,
-          0.228341,
-          0.227952
+          0.812831,
+          0.808655,
+          0.808276,
+          0.807351,
+          0.807207
         ],
         "cosine_exact_parity": true,
         "numpy_euclid_top5_ids": [
-          212,
-          172,
-          100,
-          4,
-          156
+          408,
+          388,
+          368,
+          398,
+          378
         ],
         "qdrant_euclid_top5_ids": [
-          212,
-          172,
-          100,
-          4,
-          156
+          408,
+          388,
+          368,
+          398,
+          378
         ],
         "numpy_euclid_top5_scores": [
-          2.796373,
-          2.812187,
-          2.853378,
-          2.856325,
-          2.870764
+          0.611831,
+          0.61862,
+          0.619231,
+          0.620724,
+          0.620955
         ],
         "qdrant_euclid_top5_scores": [
-          2.796373,
-          2.812187,
-          2.853378,
-          2.856325,
-          2.870764
+          0.611831,
+          0.61862,
+          0.619231,
+          0.620724,
+          0.620955
         ],
         "euclid_exact_parity": true
       }
     ]
   },
   "stage4_l2_normalization_proof": {
-    "max_unit_norm_deviation_from_1": 2.22e-16,
-    "max_abs_diff_cosine_vs_dot": 1.665e-16,
-    "max_abs_diff_euclid_sq_vs_2_1_minus_dot": 1.776e-15,
+    "max_unit_norm_deviation_from_1": 1.1920928955078125e-07,
+    "max_abs_diff_cosine_vs_dot": 1.1920928955078125e-07,
+    "max_abs_diff_euclid_sq_vs_2_1_minus_dot": 6.556510925292969e-07,
     "all_top5_rankings_identical_across_cosine_dot_euclid": true,
-    "sample_query_proofs": [
+    "proof_records": [
       {
-        "query_id": "Q01",
-        "top1_chunk_id": 208,
-        "cosine_score": 0.447523,
-        "dot_product_score": 0.447523,
-        "abs_diff_cos_vs_dot": 1.11e-16,
-        "euclidean_distance": 1.05116792,
-        "euclidean_sq_measured": 1.104954,
-        "identity_2_minus_2dot": 1.104954,
-        "top5_ids_cosine": [
-          208,
-          160,
-          224,
-          96,
-          24
+        "query_index": 0,
+        "cosine_top5_ids": [
+          0,
+          20,
+          60,
+          70,
+          40
         ],
-        "top5_ids_dot": [
-          208,
-          160,
-          224,
-          96,
-          24
+        "dot_top5_ids": [
+          0,
+          20,
+          60,
+          70,
+          40
         ],
-        "top5_ids_euclidean": [
-          208,
-          160,
-          224,
-          96,
-          24
-        ]
+        "euclidean_top5_ids": [
+          0,
+          20,
+          60,
+          70,
+          40
+        ],
+        "cosine_scores": [
+          0.804806,
+          0.802827,
+          0.80244,
+          0.802136,
+          0.799227
+        ],
+        "dot_scores": [
+          0.804806,
+          0.802827,
+          0.802441,
+          0.802136,
+          0.799228
+        ],
+        "euclid_scores": [
+          0.62481,
+          0.62797,
+          0.628585,
+          0.62907,
+          0.633676
+        ],
+        "all_rankings_identical": true
       },
       {
-        "query_id": "Q02",
-        "top1_chunk_id": 25,
-        "cosine_score": 0.4406643,
-        "dot_product_score": 0.4406643,
-        "abs_diff_cos_vs_dot": 1.11e-16,
-        "euclidean_distance": 1.05767263,
-        "euclidean_sq_measured": 1.1186714,
-        "identity_2_minus_2dot": 1.1186714,
-        "top5_ids_cosine": [
-          25,
-          233,
-          1,
-          177,
-          185
+        "query_index": 1,
+        "cosine_top5_ids": [
+          52,
+          82,
+          12,
+          72,
+          62
         ],
-        "top5_ids_dot": [
-          25,
-          233,
-          1,
-          177,
-          185
+        "dot_top5_ids": [
+          52,
+          82,
+          12,
+          72,
+          62
         ],
-        "top5_ids_euclidean": [
-          25,
-          233,
-          1,
-          177,
-          185
-        ]
+        "euclidean_top5_ids": [
+          52,
+          82,
+          12,
+          72,
+          62
+        ],
+        "cosine_scores": [
+          0.80714,
+          0.800898,
+          0.798902,
+          0.797888,
+          0.797179
+        ],
+        "dot_scores": [
+          0.80714,
+          0.800898,
+          0.798902,
+          0.797888,
+          0.797179
+        ],
+        "euclid_scores": [
+          0.621063,
+          0.631034,
+          0.63419,
+          0.635786,
+          0.636901
+        ],
+        "all_rankings_identical": true
       },
       {
-        "query_id": "Q03",
-        "top1_chunk_id": 82,
-        "cosine_score": 0.47277804,
-        "dot_product_score": 0.47277804,
-        "abs_diff_cos_vs_dot": 0.0,
-        "euclidean_distance": 1.02686119,
-        "euclidean_sq_measured": 1.05444391,
-        "identity_2_minus_2dot": 1.05444391,
-        "top5_ids_cosine": [
-          82,
-          98,
-          106,
+        "query_index": 2,
+        "cosine_top5_ids": [
+          110,
           170,
-          226
+          160,
+          120,
+          90
         ],
-        "top5_ids_dot": [
-          82,
-          98,
-          106,
+        "dot_top5_ids": [
+          110,
           170,
-          226
+          160,
+          120,
+          90
         ],
-        "top5_ids_euclidean": [
-          82,
-          98,
-          106,
+        "euclidean_top5_ids": [
+          110,
           170,
-          226
-        ]
+          160,
+          120,
+          90
+        ],
+        "cosine_scores": [
+          0.820167,
+          0.818316,
+          0.817447,
+          0.817107,
+          0.816856
+        ],
+        "dot_scores": [
+          0.820167,
+          0.818317,
+          0.817447,
+          0.817107,
+          0.816856
+        ],
+        "euclid_scores": [
+          0.599722,
+          0.6028,
+          0.60424,
+          0.604802,
+          0.605218
+        ],
+        "all_rankings_identical": true
+      },
+      {
+        "query_index": 3,
+        "cosine_top5_ids": [
+          96,
+          176,
+          106,
+          136,
+          146
+        ],
+        "dot_top5_ids": [
+          96,
+          176,
+          106,
+          136,
+          146
+        ],
+        "euclidean_top5_ids": [
+          96,
+          176,
+          106,
+          136,
+          146
+        ],
+        "cosine_scores": [
+          0.834441,
+          0.834351,
+          0.832647,
+          0.830855,
+          0.830109
+        ],
+        "dot_scores": [
+          0.834441,
+          0.834351,
+          0.832647,
+          0.830855,
+          0.830109
+        ],
+        "euclid_scores": [
+          0.575429,
+          0.575585,
+          0.578539,
+          0.581626,
+          0.582908
+        ],
+        "all_rankings_identical": true
+      },
+      {
+        "query_index": 4,
+        "cosine_top5_ids": [
+          250,
+          240,
+          200,
+          230,
+          210
+        ],
+        "dot_top5_ids": [
+          250,
+          240,
+          200,
+          230,
+          210
+        ],
+        "euclidean_top5_ids": [
+          250,
+          240,
+          200,
+          230,
+          210
+        ],
+        "cosine_scores": [
+          0.84264,
+          0.839308,
+          0.839183,
+          0.838127,
+          0.837497
+        ],
+        "dot_scores": [
+          0.84264,
+          0.839308,
+          0.839183,
+          0.838127,
+          0.837497
+        ],
+        "euclid_scores": [
+          0.561,
+          0.566907,
+          0.567128,
+          0.568986,
+          0.570094
+        ],
+        "all_rankings_identical": true
+      },
+      {
+        "query_index": 5,
+        "cosine_top5_ids": [
+          212,
+          252,
+          232,
+          222,
+          262
+        ],
+        "dot_top5_ids": [
+          212,
+          252,
+          232,
+          222,
+          262
+        ],
+        "euclidean_top5_ids": [
+          212,
+          252,
+          232,
+          222,
+          262
+        ],
+        "cosine_scores": [
+          0.791284,
+          0.786937,
+          0.78591,
+          0.781765,
+          0.780997
+        ],
+        "dot_scores": [
+          0.791284,
+          0.786937,
+          0.78591,
+          0.781765,
+          0.780997
+        ],
+        "euclid_scores": [
+          0.646089,
+          0.652783,
+          0.654355,
+          0.660659,
+          0.66182
+        ],
+        "all_rankings_identical": true
+      },
+      {
+        "query_index": 6,
+        "cosine_top5_ids": [
+          270,
+          330,
+          310,
+          300,
+          350
+        ],
+        "dot_top5_ids": [
+          270,
+          330,
+          310,
+          300,
+          350
+        ],
+        "euclidean_top5_ids": [
+          270,
+          330,
+          310,
+          300,
+          350
+        ],
+        "cosine_scores": [
+          0.843511,
+          0.841201,
+          0.840891,
+          0.838433,
+          0.838425
+        ],
+        "dot_scores": [
+          0.843511,
+          0.8412,
+          0.840891,
+          0.838433,
+          0.838425
+        ],
+        "euclid_scores": [
+          0.559444,
+          0.563559,
+          0.564108,
+          0.568449,
+          0.568464
+        ],
+        "all_rankings_identical": true
+      },
+      {
+        "query_index": 7,
+        "cosine_top5_ids": [
+          272,
+          302,
+          342,
+          312,
+          292
+        ],
+        "dot_top5_ids": [
+          272,
+          302,
+          342,
+          312,
+          292
+        ],
+        "euclidean_top5_ids": [
+          272,
+          302,
+          342,
+          312,
+          292
+        ],
+        "cosine_scores": [
+          0.824951,
+          0.821304,
+          0.820192,
+          0.818724,
+          0.816998
+        ],
+        "dot_scores": [
+          0.824951,
+          0.821304,
+          0.820192,
+          0.818724,
+          0.816998
+        ],
+        "euclid_scores": [
+          0.591691,
+          0.597822,
+          0.599681,
+          0.602123,
+          0.604982
+        ],
+        "all_rankings_identical": true
+      },
+      {
+        "query_index": 8,
+        "cosine_top5_ids": [
+          360,
+          380,
+          400,
+          390,
+          370
+        ],
+        "dot_top5_ids": [
+          360,
+          380,
+          400,
+          390,
+          370
+        ],
+        "euclidean_top5_ids": [
+          360,
+          380,
+          400,
+          390,
+          370
+        ],
+        "cosine_scores": [
+          0.827069,
+          0.82189,
+          0.821086,
+          0.818655,
+          0.818226
+        ],
+        "dot_scores": [
+          0.827069,
+          0.82189,
+          0.821086,
+          0.818655,
+          0.818226
+        ],
+        "euclid_scores": [
+          0.5881,
+          0.596841,
+          0.598187,
+          0.602237,
+          0.602949
+        ],
+        "all_rankings_identical": true
+      },
+      {
+        "query_index": 9,
+        "cosine_top5_ids": [
+          408,
+          388,
+          368,
+          398,
+          378
+        ],
+        "dot_top5_ids": [
+          408,
+          388,
+          368,
+          398,
+          378
+        ],
+        "euclidean_top5_ids": [
+          408,
+          388,
+          368,
+          398,
+          378
+        ],
+        "cosine_scores": [
+          0.812831,
+          0.808655,
+          0.808276,
+          0.807351,
+          0.807207
+        ],
+        "dot_scores": [
+          0.812831,
+          0.808655,
+          0.808276,
+          0.807351,
+          0.807207
+        ],
+        "euclid_scores": [
+          0.611831,
+          0.61862,
+          0.619231,
+          0.620724,
+          0.620955
+        ],
+        "all_rankings_identical": true
       }
     ]
   },
@@ -882,87 +1217,87 @@
         "dimension": 3072,
         "fp32_matrix_memory_mb": 11.72,
         "num_queries": 50,
-        "hnsw_index_build_ms": 53.06,
+        "hnsw_index_build_ms": 20.26,
         "brute_force_distance_evaluations_per_query": 1000,
-        "hnsw_avg_distance_evaluations_per_query": 155.0,
-        "hnsw_computation_reduction_factor": 6.45,
+        "hnsw_avg_distance_evaluations_per_query": 612.0,
+        "hnsw_computation_reduction_factor": 1.63,
         "numpy_cosine_brute_force": {
-          "mean_ms": 7.5626,
-          "p50_ms": 7.465,
-          "p95_ms": 8.2799,
-          "p99_ms": 8.8483,
-          "qps": 132.2
+          "mean_ms": 6.0491,
+          "p50_ms": 6.0265,
+          "p95_ms": 6.5623,
+          "p99_ms": 6.7513,
+          "qps": 165.3
         },
         "numpy_euclidean_brute_force": {
-          "mean_ms": 12.2181,
-          "p50_ms": 12.1281,
-          "p95_ms": 12.945,
-          "p99_ms": 13.2938,
-          "qps": 81.8
+          "mean_ms": 8.7159,
+          "p50_ms": 8.6579,
+          "p95_ms": 9.5237,
+          "p99_ms": 9.8632,
+          "qps": 114.7
         },
         "numpy_unit_dot_brute_force": {
-          "mean_ms": 0.7057,
-          "p50_ms": 0.6747,
-          "p95_ms": 0.908,
-          "p99_ms": 1.0458,
-          "qps": 1417.1
+          "mean_ms": 0.7283,
+          "p50_ms": 0.7126,
+          "p95_ms": 0.8655,
+          "p99_ms": 0.9237,
+          "qps": 1373.1
         },
         "qdrant_hnsw_graph_search": {
-          "mean_ms": 0.5174,
-          "p50_ms": 0.4949,
-          "p95_ms": 0.616,
-          "p99_ms": 0.8589,
-          "qps": 1932.9
+          "mean_ms": 1.888,
+          "p50_ms": 1.8421,
+          "p95_ms": 2.2403,
+          "p99_ms": 2.3668,
+          "qps": 529.7
         },
-        "dot_speedup_over_cosine": 10.72,
-        "dot_speedup_over_euclidean": 17.31
+        "dot_speedup_over_cosine": 8.31,
+        "dot_speedup_over_euclidean": 11.97
       },
       {
         "num_vectors": 10000,
         "dimension": 3072,
         "fp32_matrix_memory_mb": 117.19,
         "num_queries": 50,
-        "hnsw_index_build_ms": 751.06,
+        "hnsw_index_build_ms": 209.49,
         "brute_force_distance_evaluations_per_query": 10000,
-        "hnsw_avg_distance_evaluations_per_query": 153.3,
-        "hnsw_computation_reduction_factor": 65.23,
+        "hnsw_avg_distance_evaluations_per_query": 1255.9,
+        "hnsw_computation_reduction_factor": 7.96,
         "numpy_cosine_brute_force": {
-          "mean_ms": 68.7258,
-          "p50_ms": 64.0345,
-          "p95_ms": 88.1139,
-          "p99_ms": 99.9334,
-          "qps": 14.6
+          "mean_ms": 59.9273,
+          "p50_ms": 58.5289,
+          "p95_ms": 65.3997,
+          "p99_ms": 72.4467,
+          "qps": 16.7
         },
         "numpy_euclidean_brute_force": {
-          "mean_ms": 101.0462,
-          "p50_ms": 94.6392,
-          "p95_ms": 139.1188,
-          "p99_ms": 157.0168,
-          "qps": 9.9
+          "mean_ms": 88.8488,
+          "p50_ms": 87.7375,
+          "p95_ms": 96.8439,
+          "p99_ms": 111.7932,
+          "qps": 11.3
         },
         "numpy_unit_dot_brute_force": {
-          "mean_ms": 5.7682,
-          "p50_ms": 5.6773,
-          "p95_ms": 6.485,
-          "p99_ms": 6.7212,
-          "qps": 173.4
+          "mean_ms": 5.3943,
+          "p50_ms": 5.298,
+          "p95_ms": 6.4357,
+          "p99_ms": 6.9699,
+          "qps": 185.4
         },
         "qdrant_hnsw_graph_search": {
-          "mean_ms": 0.8497,
-          "p50_ms": 0.8149,
-          "p95_ms": 1.0903,
-          "p99_ms": 1.5519,
-          "qps": 1176.9
+          "mean_ms": 3.9781,
+          "p50_ms": 3.9243,
+          "p95_ms": 5.0844,
+          "p99_ms": 5.126,
+          "qps": 251.4
         },
-        "dot_speedup_over_cosine": 11.91,
-        "dot_speedup_over_euclidean": 17.52
+        "dot_speedup_over_cosine": 11.11,
+        "dot_speedup_over_euclidean": 16.47
       }
     ],
     "scaling_summary_10k_vs_1k": {
-      "cosine_10k_vs_1k_latency_ratio": 9.09,
-      "euclidean_10k_vs_1k_latency_ratio": 8.27,
-      "unit_dot_10k_vs_1k_latency_ratio": 8.17,
-      "hnsw_10k_vs_1k_latency_ratio": 1.64
+      "cosine_10k_vs_1k_latency_ratio": 9.91,
+      "euclidean_10k_vs_1k_latency_ratio": 10.19,
+      "unit_dot_10k_vs_1k_latency_ratio": 7.41,
+      "hnsw_10k_vs_1k_latency_ratio": 2.11
     }
   },
   "visual_artifacts": {
@@ -970,7 +1305,7 @@
     "benchmarks_plot": "D:\\Euron\\Work and Learn Super 30\\Fast-Track\\sentinel-fraud-intelligence\\sentinel-vector-search-engine\\outputs\\vector_search_benchmarks.png"
   },
   "verification_gates": {
-    "Gate 1: DPDP Act 2023 & PCI-DSS v4.0 Zero-PII Privacy Gate": true,
+    "Gate 1: Strict Gemini Embedding 2 Vector Provenance Gate (Zero Mock Vectors)": true,
     "Gate 2: 2D Analytical Geometry Proof Exactness Gate (A, B, C vs Q)": true,
     "Gate 3: 3072-d NumPy Brute-Force vs. Qdrant 100% Top-5 Parity Gate": true,
     "Gate 4: Unit-Sphere L2 Normalization Proof Gate (Cos == Dot == Monotonic L2)": true,
