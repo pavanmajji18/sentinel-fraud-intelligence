@@ -1,51 +1,51 @@
 {
   "service": "sentinel_fraud_graph \u2014 Neo4j Graph Fraud Ring & Shared-Device Detection Engine",
-  "execution_backend": "Deterministic Property-Graph Engine (Bolt neo4j+s://3106f5af.databases.neo4j.io unreachable in sandbox: AuthError)",
-  "telemetry_tier": "Tier 3 (Deterministic Schema-Compliant Synthetic Telemetry: 5,500 txns, seed=42)",
+  "execution_backend": "Live Neo4j 5.x Bolt/Aura (neo4j+s://3106f5af.databases.neo4j.io)",
+  "telemetry_tier": "Tier 2 (PostgreSQL / Supabase Telemetry Replica)",
   "privacy_audit": {
     "compliance_standard": "DPDP Act 2023 & PCI-DSS v4.0 Data Minimization",
     "forbidden_pii_columns_checked": 12,
     "redacted_columns": [],
-    "tokenized_customer_ids_verified": 500,
-    "tokenized_merchant_ids_verified": 120,
-    "tokenized_device_ids_verified": 900,
+    "tokenized_customer_ids_verified": 2500,
+    "tokenized_merchant_ids_verified": 200,
+    "tokenized_device_ids_verified": 10120,
     "all_records_synthetic_verified": true
   },
   "constraints": [
     {
       "name": "customer_id_unique",
       "cypher": "CREATE CONSTRAINT customer_id_unique IF NOT EXISTS FOR (c:Customer) REQUIRE c.customer_id IS UNIQUE",
-      "status": "ENFORCED (Unique Key Dict)"
+      "status": "ONLINE (Neo4j)"
     },
     {
       "name": "device_id_unique",
       "cypher": "CREATE CONSTRAINT device_id_unique IF NOT EXISTS FOR (d:Device) REQUIRE d.device_id IS UNIQUE",
-      "status": "ENFORCED (Unique Key Dict)"
+      "status": "ONLINE (Neo4j)"
     },
     {
       "name": "merchant_id_unique",
       "cypher": "CREATE CONSTRAINT merchant_id_unique IF NOT EXISTS FOR (m:Merchant) REQUIRE m.merchant_id IS UNIQUE",
-      "status": "ENFORCED (Unique Key Dict)"
+      "status": "ONLINE (Neo4j)"
     },
     {
       "name": "paid_transaction_id_idx",
       "cypher": "CREATE INDEX paid_transaction_id_idx IF NOT EXISTS FOR ()-[p:PAID]-() ON (p.transaction_id)",
-      "status": "ENFORCED (Unique Key Dict)"
+      "status": "ONLINE (Neo4j)"
     },
     {
       "name": "paid_fraud_label_idx",
       "cypher": "CREATE INDEX paid_fraud_label_idx IF NOT EXISTS FOR ()-[p:PAID]-() ON (p.fraud_label)",
-      "status": "ENFORCED (Unique Key Dict)"
+      "status": "ONLINE (Neo4j)"
     }
   ],
   "graph_counts": {
-    "customers": 500,
-    "devices": 899,
-    "merchants": 120,
-    "total_nodes": 1519,
-    "used_device_edges": 1846,
-    "paid_edges": 5500,
-    "total_edges": 7346
+    "customers": 2002,
+    "devices": 2335,
+    "merchants": 200,
+    "total_nodes": 4537,
+    "used_device_edges": 2366,
+    "paid_edges": 10000,
+    "total_edges": 12366
   },
   "idempotency_proof": {
     "replayed_transactions": 500,
@@ -55,237 +55,168 @@
   },
   "query_1_shared_devices_7d_top5": [
     {
-      "device_id": "D_b64f832752bf8208",
-      "device_kind": "desktop_web",
-      "distinct_customers_7d": 28,
-      "total_device_txns": 32,
-      "confirmed_fraud_txns": 30,
-      "total_exposure_inr": 1364964.33,
+      "device_id": "D_0c947fb45bb50e72",
+      "device_kind": "mobile",
+      "distinct_customers_7d": 3,
+      "total_device_txns": 19,
+      "confirmed_fraud_txns": 1,
+      "total_exposure_inr": 262206.51,
       "sample_customer_ids": [
-        "C_08b8ffde55aee343",
-        "C_0ccbea32a85d6241",
-        "C_203e48776e04dc91",
-        "C_2043b666b2a1f2ae",
-        "C_27c7e9189409bb1a",
-        "C_3e091a159cff9b82"
+        "C_1aa451e90647f952",
+        "C_984cb84b0a294365",
+        "C_148927ad36a84923"
       ]
     },
     {
-      "device_id": "D_4719e96e57524728",
-      "device_kind": "mobile_ios",
-      "distinct_customers_7d": 27,
-      "total_device_txns": 37,
-      "confirmed_fraud_txns": 34,
-      "total_exposure_inr": 1331649.04,
+      "device_id": "D_0ca596389cdb3569",
+      "device_kind": "mobile",
+      "distinct_customers_7d": 3,
+      "total_device_txns": 19,
+      "confirmed_fraud_txns": 1,
+      "total_exposure_inr": 63395.08,
       "sample_customer_ids": [
-        "C_054319d45929712a",
-        "C_0687b872d71438a8",
-        "C_0ccbea32a85d6241",
-        "C_105d9a98de65fb18",
-        "C_203e48776e04dc91",
-        "C_2043b666b2a1f2ae"
-      ]
-    },
-    {
-      "device_id": "D_8bc56ee8a19df557",
-      "device_kind": "desktop_web",
-      "distinct_customers_7d": 26,
-      "total_device_txns": 34,
-      "confirmed_fraud_txns": 29,
-      "total_exposure_inr": 945512.28,
-      "sample_customer_ids": [
-        "C_0e165ded2d945eb1",
-        "C_105d9a98de65fb18",
-        "C_1314e6a50965b967",
-        "C_19a681edd0c962d5",
-        "C_234933bfe9e2507d",
-        "C_3a2b249f7771c4ea"
-      ]
-    },
-    {
-      "device_id": "D_1316c0b28d5165c3",
-      "device_kind": "mobile_ios",
-      "distinct_customers_7d": 24,
-      "total_device_txns": 33,
-      "confirmed_fraud_txns": 30,
-      "total_exposure_inr": 1157890.05,
-      "sample_customer_ids": [
-        "C_0b4df1a1818d5098",
-        "C_0b6c61e6b6d3d0df",
-        "C_203e48776e04dc91",
-        "C_27c7e9189409bb1a",
-        "C_3069276b407e98c8",
-        "C_3e091a159cff9b82"
-      ]
-    },
-    {
-      "device_id": "D_6f9bfcd66777d915",
-      "device_kind": "desktop_web",
-      "distinct_customers_7d": 24,
-      "total_device_txns": 30,
-      "confirmed_fraud_txns": 25,
-      "total_exposure_inr": 928719.34,
-      "sample_customer_ids": [
-        "C_054319d45929712a",
-        "C_0687b872d71438a8",
-        "C_0e165ded2d945eb1",
-        "C_203e48776e04dc91",
-        "C_26beb2db86c5543c",
-        "C_3f930d01b863982d"
+        "C_d7627b94e4877d99",
+        "C_ad8cb0a748d2bf8f",
+        "C_a0d5f855464cb60e"
       ]
     }
   ],
   "query_2_two_hop_fraud_customers_top5": [
     {
-      "suspect_customer_id": "C_c2029a5f382793db",
-      "home_city": "Bengaluru",
-      "linked_fraud_customers": 201,
-      "shared_mule_devices": 14,
-      "shared_fraud_merchants": 19,
-      "suspect_total_txns": 28,
-      "suspect_fraud_txns": 12,
-      "suspect_spend_inr": 646652.38,
-      "bridge_devices": [
-        "D_1316c0b28d5165c3",
-        "D_15aad262671ffd44",
-        "D_2009582bd89761fe",
-        "D_3595df107900522d"
-      ]
-    },
-    {
-      "suspect_customer_id": "C_b4c6d52359b64cee",
-      "home_city": "Chennai",
-      "linked_fraud_customers": 176,
-      "shared_mule_devices": 13,
-      "shared_fraud_merchants": 13,
-      "suspect_total_txns": 23,
-      "suspect_fraud_txns": 11,
-      "suspect_spend_inr": 504197.0,
-      "bridge_devices": [
-        "D_15aad262671ffd44",
-        "D_2009582bd89761fe",
-        "D_4719e96e57524728",
-        "D_5c0f089da573de78"
-      ]
-    },
-    {
-      "suspect_customer_id": "C_4a17b7185c5215b6",
-      "home_city": "Pune",
-      "linked_fraud_customers": 189,
-      "shared_mule_devices": 10,
-      "shared_fraud_merchants": 12,
-      "suspect_total_txns": 17,
-      "suspect_fraud_txns": 8,
-      "suspect_spend_inr": 480025.83,
-      "bridge_devices": [
-        "D_1316c0b28d5165c3",
-        "D_15aad262671ffd44",
-        "D_4719e96e57524728",
-        "D_68bce2ce0da34b0f"
-      ]
-    },
-    {
-      "suspect_customer_id": "C_549b6851bf65034f",
-      "home_city": "Kolkata",
-      "linked_fraud_customers": 169,
-      "shared_mule_devices": 10,
-      "shared_fraud_merchants": 11,
-      "suspect_total_txns": 15,
-      "suspect_fraud_txns": 10,
-      "suspect_spend_inr": 580784.33,
-      "bridge_devices": [
-        "D_15aad262671ffd44",
-        "D_4719e96e57524728",
-        "D_5ca245340c743a27",
-        "D_5f84525cd6bbaac0"
-      ]
-    },
-    {
-      "suspect_customer_id": "C_c888fbd6264b01c6",
+      "suspect_customer_id": "C_a5d397884ef7d444",
       "home_city": "Delhi",
-      "linked_fraud_customers": 165,
-      "shared_mule_devices": 10,
-      "shared_fraud_merchants": 15,
-      "suspect_total_txns": 23,
-      "suspect_fraud_txns": 12,
-      "suspect_spend_inr": 575487.01,
+      "linked_fraud_customers": 10,
+      "shared_mule_devices": 1,
+      "shared_fraud_merchants": 7,
+      "suspect_total_txns": 12,
+      "suspect_fraud_txns": 0,
+      "suspect_spend_inr": 34886.51,
       "bridge_devices": [
-        "D_1316c0b28d5165c3",
-        "D_2009582bd89761fe",
-        "D_2a253d142d7c6c1b",
-        "D_33d038ca2eccf4de"
+        "D_184ed5721b197852"
+      ]
+    },
+    {
+      "suspect_customer_id": "C_8079445181ec2bbd",
+      "home_city": "Bengaluru",
+      "linked_fraud_customers": 9,
+      "shared_mule_devices": 1,
+      "shared_fraud_merchants": 8,
+      "suspect_total_txns": 25,
+      "suspect_fraud_txns": 0,
+      "suspect_spend_inr": 123463.62,
+      "bridge_devices": [
+        "D_0a7613e59c6db90f"
+      ]
+    },
+    {
+      "suspect_customer_id": "C_dd72b6c98c6b31e2",
+      "home_city": "Patna",
+      "linked_fraud_customers": 9,
+      "shared_mule_devices": 1,
+      "shared_fraud_merchants": 7,
+      "suspect_total_txns": 11,
+      "suspect_fraud_txns": 0,
+      "suspect_spend_inr": 11731.7,
+      "bridge_devices": [
+        "D_af12d309bf36c3cc"
+      ]
+    },
+    {
+      "suspect_customer_id": "C_4c80552c1bd9fbca",
+      "home_city": "Kochi",
+      "linked_fraud_customers": 8,
+      "shared_mule_devices": 1,
+      "shared_fraud_merchants": 6,
+      "suspect_total_txns": 10,
+      "suspect_fraud_txns": 0,
+      "suspect_spend_inr": 265209.02,
+      "bridge_devices": [
+        "D_d94ce79d00671ba9"
+      ]
+    },
+    {
+      "suspect_customer_id": "C_c50bd4184f42e61b",
+      "home_city": "Delhi",
+      "linked_fraud_customers": 8,
+      "shared_mule_devices": 1,
+      "shared_fraud_merchants": 7,
+      "suspect_total_txns": 19,
+      "suspect_fraud_txns": 0,
+      "suspect_spend_inr": 112735.18,
+      "bridge_devices": [
+        "D_efd85dd21b6a2370"
       ]
     }
   ],
   "query_3_merchants_shared_devices_top5": [
     {
-      "merchant_id": "M_b15c5e4c19a34cc6",
-      "merchant_name": "Merchant_Electronics_028",
+      "merchant_id": "M_9dd7da301c13c892",
+      "merchant_name": "Synthetic Merchant 000146",
+      "merchant_category": "gift_cards",
+      "shared_device_txns": 28,
+      "distinct_shared_devices": 4,
+      "distinct_shared_customers": 4,
+      "confirmed_fraud_txns": 0,
+      "fraud_rate_pct": 0.0,
+      "shared_device_volume_inr": 353281.39
+    },
+    {
+      "merchant_id": "M_5fde3bb6a98424ab",
+      "merchant_name": "Synthetic Merchant 000056",
+      "merchant_category": "gift_cards",
+      "shared_device_txns": 20,
+      "distinct_shared_devices": 3,
+      "distinct_shared_customers": 3,
+      "confirmed_fraud_txns": 1,
+      "fraud_rate_pct": 5.0,
+      "shared_device_volume_inr": 169873.11
+    },
+    {
+      "merchant_id": "M_ce0b45ab7127ca6a",
+      "merchant_name": "Synthetic Merchant 000014",
       "merchant_category": "electronics",
-      "shared_device_txns": 76,
-      "distinct_shared_devices": 44,
-      "distinct_shared_customers": 60,
-      "confirmed_fraud_txns": 48,
-      "fraud_rate_pct": 63.16,
-      "shared_device_volume_inr": 2046665.84
+      "shared_device_txns": 17,
+      "distinct_shared_devices": 2,
+      "distinct_shared_customers": 2,
+      "confirmed_fraud_txns": 1,
+      "fraud_rate_pct": 5.88,
+      "shared_device_volume_inr": 273931.62
     },
     {
-      "merchant_id": "M_91fd430abec5a213",
-      "merchant_name": "Merchant_Electronics_021",
-      "merchant_category": "electronics",
-      "shared_device_txns": 74,
-      "distinct_shared_devices": 36,
-      "distinct_shared_customers": 63,
-      "confirmed_fraud_txns": 54,
-      "fraud_rate_pct": 72.97,
-      "shared_device_volume_inr": 2201725.89
+      "merchant_id": "M_06868839e93b9a80",
+      "merchant_name": "Synthetic Merchant 000026",
+      "merchant_category": "gift_cards",
+      "shared_device_txns": 16,
+      "distinct_shared_devices": 2,
+      "distinct_shared_customers": 2,
+      "confirmed_fraud_txns": 0,
+      "fraud_rate_pct": 0.0,
+      "shared_device_volume_inr": 73384.76
     },
     {
-      "merchant_id": "M_284df6b5c8a360ae",
-      "merchant_name": "Merchant_Travel_032",
-      "merchant_category": "travel",
-      "shared_device_txns": 68,
-      "distinct_shared_devices": 41,
-      "distinct_shared_customers": 60,
-      "confirmed_fraud_txns": 42,
-      "fraud_rate_pct": 61.76,
-      "shared_device_volume_inr": 1826968.38
-    },
-    {
-      "merchant_id": "M_f4caa346bafafd3e",
-      "merchant_name": "Merchant_Travel_033",
-      "merchant_category": "travel",
-      "shared_device_txns": 65,
-      "distinct_shared_devices": 41,
-      "distinct_shared_customers": 55,
-      "confirmed_fraud_txns": 40,
-      "fraud_rate_pct": 61.54,
-      "shared_device_volume_inr": 1456717.53
-    },
-    {
-      "merchant_id": "M_fbc56865d6f27b2d",
-      "merchant_name": "Merchant_Travel_020",
-      "merchant_category": "travel",
-      "shared_device_txns": 62,
-      "distinct_shared_devices": 28,
-      "distinct_shared_customers": 54,
-      "confirmed_fraud_txns": 43,
-      "fraud_rate_pct": 69.35,
-      "shared_device_volume_inr": 1756328.1
+      "merchant_id": "M_cfe75c4398440f99",
+      "merchant_name": "Synthetic Merchant 000176",
+      "merchant_category": "gift_cards",
+      "shared_device_txns": 16,
+      "distinct_shared_devices": 2,
+      "distinct_shared_customers": 2,
+      "confirmed_fraud_txns": 0,
+      "fraud_rate_pct": 0.0,
+      "shared_device_volume_inr": 77599.68
     }
   ],
   "visualization_stats": {
-    "subgraph_nodes": 24,
-    "subgraph_edges": 51,
-    "device_hubs": 4,
-    "customers_plotted": 13,
-    "merchants_plotted": 7
+    "subgraph_nodes": 11,
+    "subgraph_edges": 9,
+    "device_hubs": 2,
+    "customers_plotted": 6,
+    "merchants_plotted": 3
   },
   "verification_gates": {
     "Gate 1 (DPDP Act 2023 & PCI-DSS v4.0 Zero-PII Guardrail)": true,
     "Gate 2 (Uniqueness Constraints Enforced on Customer, Device, Merchant)": true,
     "Gate 3 (>= 5,000 Transactions Loaded & MERGE Idempotency Proven)": true,
-    "Gate 4 (Query 1 Detects Shared Mule Devices >= 3 Customers in 7d)": true,
+    "Gate 4 (Query 1 Detects Shared Mule Devices >= 3 Customers in 7d)": false,
     "Gate 5 (Query 2 & Query 3 Detect 2-Hop Suspects & Collusive Merchants)": true,
     "Gate 6 (Suspicious Cluster Visualization Rendered & Non-Empty)": true
   }

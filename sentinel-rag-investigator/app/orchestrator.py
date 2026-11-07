@@ -130,7 +130,7 @@ class SentinelInvestigatorOrchestrator:
             tx_df["split"] = splits
             lbl_df["split"] = splits
 
-        # Build fast O(1) lookup dictionaries keyed by primary key for sub-10ms feature retrieval
+        # Fast O(1) lookup dictionaries
         self.tx_by_id: Dict[str, Dict[str, Any]] = {
             str(r["transaction_id"]): r
             for r in self.tables["transactions"].to_dict(orient="records")
@@ -155,6 +155,40 @@ class SentinelInvestigatorOrchestrator:
             str(r["merchant_id"]): r
             for r in self.tables["merchants"].to_dict(orient="records")
         }
+
+        # Neo4j Graph Connection (Store 2)
+        self.neo4j_driver = None
+        self.neo4j_db = os.getenv("NEO4J_DATABASE", "3106f5af")
+        if not self.force_offline and os.getenv("NEO4J_URI"):
+            try:
+                from neo4j import GraphDatabase
+                uri = os.getenv("NEO4J_URI", "")
+                user = os.getenv("NEO4J_USER") or os.getenv("NEO4J_USERNAME", "neo4j")
+                pwd = os.getenv("NEO4J_PASSWORD", "")
+                if uri and "<" not in uri:
+                    self.neo4j_driver = GraphDatabase.driver(uri, auth=(user, pwd), max_connection_lifetime=300)
+            except Exception:
+                self.neo4j_driver = None
+
+        # MongoDB Client Connection (Store 1 fallback / query)
+        self.mongo_client = None
+        self.mongo_db = None
+        if not self.force_offline and os.getenv("MONGODB_URI"):
+            try:
+                from pymongo import MongoClient
+                m_uri = os.getenv("MONGODB_URI", "")
+                if m_uri and "<" not in m_uri:
+                    self.mongo_client = MongoClient(m_uri, serverSelectionTimeoutMS=2000)
+                    self.mongo_db = self.mongo_client[os.getenv("MONGODB_DATABASE", "sentinel_fraud_db")]
+            except Exception:
+                self.mongo_client = None
+                self.mongo_db = None
+
+        # LLM Synthesis Gateway
+        self.euri_api_key = "" if self.force_offline else os.getenv("EURI_API_KEY", "")
+        self.euri_base_url = os.getenv("EURI_BASE_URL", "https://api.euron.one/api/v1/euri")
+        self.euri_chat_model = os.getenv("EURI_CHAT_MODEL", "euri-chat-fast")
+        self.gemini_api_key = "" if self.force_offline else os.getenv("GEMINI_API_KEY", "")
 
         # Precompute 2-hop graph adjacency indexes (used when Neo4j Bolt is offline or as fast cache)
         self._build_graph_index()
@@ -200,8 +234,32 @@ class SentinelInvestigatorOrchestrator:
         feat = dict(self.feat_by_id[transaction_id])
         outcome = dict(self.outcome_by_id[transaction_id])
         label = dict(self.label_by_id[transaction_id])
-        cust = dict(self.cust_by_id[str(tx["customer_id"])])
-        merch = dict(self.merch_by_id[str(tx["merchant_id"])])
+        cid = str(tx["customer_id"])
+        mid = str(tx["merchant_id"])
+        cust = dict(
+            self.cust_by_id.get(
+                cid,
+                {
+                    "customer_id": cid,
+                    "home_city": "Bengaluru",
+                    "region": "South",
+                    "customer_age": int(tx.get("customer_age", 35)),
+                    "is_synthetic": True,
+                },
+            )
+        )
+        merch = dict(
+            self.merch_by_id.get(
+                mid,
+                {
+                    "merchant_id": mid,
+                    "synthetic_name": f"Merchant_{str(tx.get('merchant_category', 'Retail')).title()}",
+                    "merchant_category": str(tx.get("merchant_category", "retail")),
+                    "merchant_location": tx.get("merchant_location", "{}"),
+                    "is_synthetic": True,
+                },
+            )
+        )
 
         raw_codes = feat.get("reason_codes", "[]")
         if isinstance(raw_codes, str):
@@ -244,7 +302,29 @@ class SentinelInvestigatorOrchestrator:
         two_hop_fraud_txns: List[str] = []
         shared_merchants_count = 1
 
-        if did_str:
+        cypher_executed = (
+            "MATCH (c:Customer {customer_id: $cid})-[:USED_DEVICE]->(d:Device) "
+            "OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer) WHERE peer.customer_id <> $cid "
+            "OPTIONAL MATCH (d)<-[:USED_DEVICE]-(other:Customer)-[p:PAID]->(m:Merchant) "
+            "WHERE p.fraud_label = 1 AND p.transaction_id <> $tid "
+            "RETURN d.device_id AS device_id, collect(DISTINCT peer.customer_id)[0..5] AS peers, "
+            "collect(DISTINCT p.transaction_id)[0..5] AS fraud_txns"
+        )
+
+        # Attempt Live Neo4j Query via Bolt driver
+        if self.neo4j_driver is not None:
+            try:
+                with self.neo4j_driver.session(database=self.neo4j_db) as session:
+                    res = session.run(cypher_executed, cid=cid, tid=transaction_id).single()
+                    if res and res["device_id"]:
+                        did_str = str(res["device_id"])
+                        shared_customers = [str(x) for x in res["peers"]]
+                        two_hop_fraud_txns = [str(x) for x in res["fraud_txns"]]
+            except Exception:
+                pass
+
+        # In-memory graph index fallback / augmentation
+        if did_str and not shared_customers:
             peer_custs = sorted(self.device_to_customers.get(did_str, set()) - {cid})
             shared_customers = peer_custs[:10]
             shared_merchants_count = len(self.device_to_merchants.get(did_str, {mid}))
@@ -256,13 +336,10 @@ class SentinelInvestigatorOrchestrator:
                     if f_tid != transaction_id and f_tid not in two_hop_fraud_txns:
                         two_hop_fraud_txns.append(f_tid)
 
+        if distinct_7d == 0 and shared_customers:
+            distinct_7d = len(shared_customers) + 1
+
         is_shared_ring = bool(distinct_7d >= 3)
-        cypher_executed = (
-            "MATCH (c:Customer {customer_id: :cid})-[:USED_DEVICE]->(d:Device) "
-            "OPTIONAL MATCH (d)<-[:USED_DEVICE]-(peer:Customer)-[:INITIATED]->(ft:Transaction {fraud_label: 1}) "
-            "WHERE ft.transaction_id <> :tid "
-            "RETURN d.device_id, count(DISTINCT peer) AS peer_customers, collect(DISTINCT ft.transaction_id)[0..5] AS two_hop_fraud_txns"
-        )
 
         return {
             "customer_id": cid,
@@ -415,6 +492,65 @@ class SentinelInvestigatorOrchestrator:
 
         top_doc_ids = [c["document_id"] for c in cited_sources[:3]]
         citations_inline = ", ".join(top_doc_ids)
+
+        # Attempt real LLM Synthesis via Euron EURI Gateway / Gemini
+        if not self.force_offline and self.euri_api_key and "<REDACTED" not in self.euri_api_key:
+            try:
+                import requests
+
+                prompt = (
+                    f"You are Project SENTINEL's Senior Payment Fraud Investigator AI Assistant.\n"
+                    f"Analyze this authorization context:\n"
+                    f"- Transaction ID: {tid}\n"
+                    f"- Customer ID: {cid}\n"
+                    f"- Merchant ID: {mid} ({merch_name}, MCC={mcc})\n"
+                    f"- Amount: Rs. {amt_inr:.2f} ({amt_paise} paise) via {channel}\n"
+                    f"- Fraud Probability: {fraud_prob:.4f} ({risk_level}) -> Action: {recommended_action}\n"
+                    f"- Reason Codes Fired: {', '.join(reason_codes) if reason_codes else 'None'}\n"
+                    f"- Feature Signals: amount_to_avg_ratio={ratio_str}, distance={dist_str}, "
+                    f"hour_of_day={hour_ist:02d}:00 IST, failed_transactions_24h={failed_24h}, "
+                    f"txn_count_last_1h={txn_1h}, txn_amount_last_24h_paise={txn_24h_paise}, account_age={acct_age}d\n"
+                    f"- Neo4j 2-Hop Graph: Device {did}, distinct_customers_7d={graph_ctx['distinct_customers_per_device_7d']}, "
+                    f"shared_ring={graph_ctx['shared_device_ring_detected']}, "
+                    f"two_hop_fraud_count={graph_ctx['two_hop_fraud_exposure_count']}\n"
+                    f"- Retrieved Authoritative Policies: {citations_inline}\n\n"
+                    f"Return strictly valid JSON only with keys:\n"
+                    f"{{\n"
+                    f'  "risk_summary": "Comprehensive narrative citing {tid}, customer {cid}, merchant {mid}, '
+                    f'{amt_paise} paise, anomaly signals, Neo4j device topology, and grounded in policy [{citations_inline}].",\n'
+                    f'  "reason_codes_fired": {json.dumps(reason_codes)},\n'
+                    f'  "recommended_action": "{recommended_action}",\n'
+                    f'  "cited_sources": {json.dumps(top_doc_ids)}\n'
+                    f"}}"
+                )
+
+                resp = requests.post(
+                    f"{self.euri_base_url.rstrip('/')}/chat/completions",
+                    headers={"Authorization": f"Bearer {self.euri_api_key}", "Content-Type": "application/json"},
+                    json={
+                        "model": self.euri_chat_model,
+                        "messages": [
+                            {"role": "system", "content": "You are a professional fraud intelligence investigator. Return valid JSON only."},
+                            {"role": "user", "content": prompt},
+                        ],
+                        "temperature": 0.1,
+                        "max_tokens": 800,
+                    },
+                    timeout=10,
+                )
+                if resp.status_code == 200:
+                    raw_content = resp.json()["choices"][0]["message"]["content"].strip()
+                    if raw_content.startswith("```json"):
+                        raw_content = raw_content[7:]
+                    if raw_content.endswith("```"):
+                        raw_content = raw_content[:-3]
+                    parsed = json.loads(raw_content.strip())
+                    llm_summary = parsed.get("risk_summary", "").strip()
+                    # Ensure strict numeric and entity grounding
+                    if tid in llm_summary and str(amt_paise) in llm_summary and cid in llm_summary:
+                        return llm_summary, False
+            except Exception:
+                pass
 
         if reason_codes or graph_ctx["shared_device_ring_detected"]:
             codes_str = ", ".join(reason_codes) if reason_codes else "GRAPH_MULE_RING"

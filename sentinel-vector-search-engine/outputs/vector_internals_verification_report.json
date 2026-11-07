@@ -1217,87 +1217,87 @@
         "dimension": 3072,
         "fp32_matrix_memory_mb": 11.72,
         "num_queries": 50,
-        "hnsw_index_build_ms": 20.26,
+        "hnsw_index_build_ms": 18.12,
         "brute_force_distance_evaluations_per_query": 1000,
         "hnsw_avg_distance_evaluations_per_query": 612.0,
         "hnsw_computation_reduction_factor": 1.63,
         "numpy_cosine_brute_force": {
-          "mean_ms": 6.0491,
-          "p50_ms": 6.0265,
-          "p95_ms": 6.5623,
-          "p99_ms": 6.7513,
-          "qps": 165.3
+          "mean_ms": 5.7092,
+          "p50_ms": 5.6754,
+          "p95_ms": 6.1376,
+          "p99_ms": 6.4979,
+          "qps": 175.2
         },
         "numpy_euclidean_brute_force": {
-          "mean_ms": 8.7159,
-          "p50_ms": 8.6579,
-          "p95_ms": 9.5237,
-          "p99_ms": 9.8632,
-          "qps": 114.7
+          "mean_ms": 8.2026,
+          "p50_ms": 8.1674,
+          "p95_ms": 9.072,
+          "p99_ms": 9.5863,
+          "qps": 121.9
         },
         "numpy_unit_dot_brute_force": {
-          "mean_ms": 0.7283,
-          "p50_ms": 0.7126,
-          "p95_ms": 0.8655,
-          "p99_ms": 0.9237,
-          "qps": 1373.1
+          "mean_ms": 0.6436,
+          "p50_ms": 0.6291,
+          "p95_ms": 0.746,
+          "p99_ms": 0.7565,
+          "qps": 1553.9
         },
         "qdrant_hnsw_graph_search": {
-          "mean_ms": 1.888,
-          "p50_ms": 1.8421,
-          "p95_ms": 2.2403,
-          "p99_ms": 2.3668,
-          "qps": 529.7
+          "mean_ms": 1.7832,
+          "p50_ms": 1.764,
+          "p95_ms": 2.1191,
+          "p99_ms": 2.2065,
+          "qps": 560.8
         },
-        "dot_speedup_over_cosine": 8.31,
-        "dot_speedup_over_euclidean": 11.97
+        "dot_speedup_over_cosine": 8.87,
+        "dot_speedup_over_euclidean": 12.74
       },
       {
         "num_vectors": 10000,
         "dimension": 3072,
         "fp32_matrix_memory_mb": 117.19,
         "num_queries": 50,
-        "hnsw_index_build_ms": 209.49,
+        "hnsw_index_build_ms": 207.26,
         "brute_force_distance_evaluations_per_query": 10000,
         "hnsw_avg_distance_evaluations_per_query": 1255.9,
         "hnsw_computation_reduction_factor": 7.96,
         "numpy_cosine_brute_force": {
-          "mean_ms": 59.9273,
-          "p50_ms": 58.5289,
-          "p95_ms": 65.3997,
-          "p99_ms": 72.4467,
-          "qps": 16.7
+          "mean_ms": 56.7855,
+          "p50_ms": 55.3438,
+          "p95_ms": 65.4742,
+          "p99_ms": 68.2663,
+          "qps": 17.6
         },
         "numpy_euclidean_brute_force": {
-          "mean_ms": 88.8488,
-          "p50_ms": 87.7375,
-          "p95_ms": 96.8439,
-          "p99_ms": 111.7932,
-          "qps": 11.3
+          "mean_ms": 84.9838,
+          "p50_ms": 82.3528,
+          "p95_ms": 102.2818,
+          "p99_ms": 107.1974,
+          "qps": 11.8
         },
         "numpy_unit_dot_brute_force": {
-          "mean_ms": 5.3943,
-          "p50_ms": 5.298,
-          "p95_ms": 6.4357,
-          "p99_ms": 6.9699,
-          "qps": 185.4
+          "mean_ms": 5.2178,
+          "p50_ms": 5.0482,
+          "p95_ms": 6.2206,
+          "p99_ms": 6.4823,
+          "qps": 191.7
         },
         "qdrant_hnsw_graph_search": {
-          "mean_ms": 3.9781,
-          "p50_ms": 3.9243,
-          "p95_ms": 5.0844,
-          "p99_ms": 5.126,
-          "qps": 251.4
+          "mean_ms": 3.8605,
+          "p50_ms": 3.7647,
+          "p95_ms": 4.8893,
+          "p99_ms": 6.05,
+          "qps": 259.0
         },
-        "dot_speedup_over_cosine": 11.11,
-        "dot_speedup_over_euclidean": 16.47
+        "dot_speedup_over_cosine": 10.88,
+        "dot_speedup_over_euclidean": 16.29
       }
     ],
     "scaling_summary_10k_vs_1k": {
-      "cosine_10k_vs_1k_latency_ratio": 9.91,
-      "euclidean_10k_vs_1k_latency_ratio": 10.19,
-      "unit_dot_10k_vs_1k_latency_ratio": 7.41,
-      "hnsw_10k_vs_1k_latency_ratio": 2.11
+      "cosine_10k_vs_1k_latency_ratio": 9.95,
+      "euclidean_10k_vs_1k_latency_ratio": 10.36,
+      "unit_dot_10k_vs_1k_latency_ratio": 8.11,
+      "hnsw_10k_vs_1k_latency_ratio": 2.16
     }
   },
   "visual_artifacts": {

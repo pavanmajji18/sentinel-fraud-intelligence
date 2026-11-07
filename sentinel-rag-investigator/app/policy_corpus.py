@@ -504,7 +504,7 @@ class QdrantPolicyRetriever:
             from qdrant_client.http import models as qmodels
 
             if qdrant_url and "<REDACTED" not in qdrant_url:
-                client = QdrantClient(url=qdrant_url, api_key=qdrant_key or None, timeout=5)
+                client = QdrantClient(url=qdrant_url, api_key=qdrant_key or None, timeout=10)
                 client.get_collections()
                 self.backend_mode = f"Qdrant Cloud ({qdrant_url})"
             else:
@@ -512,6 +512,10 @@ class QdrantPolicyRetriever:
                 self.backend_mode = "Qdrant Local In-Memory Engine (3072-d, Distance.COSINE)"
 
             if client.collection_exists(self.collection_name):
+                info = client.get_collection(self.collection_name)
+                if info.points_count and info.points_count > 0:
+                    self.qdrant_client = client
+                    return
                 client.delete_collection(self.collection_name)
             client.create_collection(
                 collection_name=self.collection_name,
@@ -555,27 +559,43 @@ class QdrantPolicyRetriever:
                             )
                         ]
                     )
-                hits = self.qdrant_client.search(
-                    collection_name=self.collection_name,
-                    query_vector=q_vec.tolist(),
-                    query_filter=q_filter,
-                    limit=top_k,
-                )
+                if hasattr(self.qdrant_client, "query_points"):
+                    res = self.qdrant_client.query_points(
+                        collection_name=self.collection_name,
+                        query=q_vec.tolist(),
+                        query_filter=q_filter,
+                        limit=top_k,
+                    )
+                    hits = res.points
+                else:
+                    hits = self.qdrant_client.search(
+                        collection_name=self.collection_name,
+                        query_vector=q_vec.tolist(),
+                        query_filter=q_filter,
+                        limit=top_k,
+                    )
                 results = []
                 for h in hits:
                     payload = dict(h.payload or {})
+                    doc_id = payload.get("document_id") or payload.get("doc_id") or "UNKNOWN_DOC"
+                    chunk_num = payload.get("chunk_number")
+                    if chunk_num is None:
+                        chunk_num = payload.get("chunk_index", 0)
+                    content = payload.get("content") or payload.get("text") or ""
+                    topic = payload.get("topic") or payload.get("reason_code") or ""
                     results.append(
                         {
-                            "document_id": payload["document_id"],
-                            "document_type": payload["document_type"],
+                            "document_id": doc_id,
+                            "document_type": payload.get("document_type", "playbooks"),
                             "title": payload.get("title", ""),
-                            "topic": payload.get("topic", ""),
-                            "chunk_number": int(payload["chunk_number"]),
+                            "topic": topic,
+                            "chunk_number": int(chunk_num),
                             "relevance_score": round(float(h.score), 4),
-                            "excerpt": payload["content"][:280],
+                            "excerpt": content[:280],
                         }
                     )
-                return results
+                if results:
+                    return results
             except Exception:
                 pass
 

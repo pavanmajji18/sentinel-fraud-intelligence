@@ -3,9 +3,9 @@
     "compliance_standard": "DPDP Act 2023 & PCI-DSS v4.0 Data Minimization",
     "forbidden_pii_columns_checked": 12,
     "redacted_columns": [],
-    "tokenized_customer_ids_verified": 500,
-    "tokenized_merchant_ids_verified": 120,
-    "tokenized_device_ids_verified": 900,
+    "tokenized_customer_ids_verified": 25000,
+    "tokenized_merchant_ids_verified": 2000,
+    "tokenized_device_ids_verified": 60000,
     "all_records_synthetic_verified": true
   },
   "service_metrics": {
@@ -13,9 +13,9 @@
     "grounding_pass_rate": 1.0,
     "schema_compliance_rate": 1.0,
     "template_fallback_invocations": 0,
-    "latency_p50_ms": 1.29,
-    "latency_p95_ms": 2.75,
-    "latency_p99_ms": 2.77,
+    "latency_p50_ms": 13.09,
+    "latency_p95_ms": 29.24,
+    "latency_p99_ms": 29.6,
     "sla_p99_target_ms": 250.0,
     "sla_compliant": true
   },

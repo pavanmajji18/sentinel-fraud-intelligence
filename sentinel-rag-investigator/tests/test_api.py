@@ -25,10 +25,12 @@ def test_health_and_explain_lifecycle() -> None:
     assert r404.status_code == 404
 
     # Test valid transaction explanation
-    r200 = client.post("/explain", json={"transaction_id": "TX_0000004935"})
+    from app.main import get_orchestrator
+    sample_tid = next(iter(get_orchestrator().tx_by_id.keys()))
+    r200 = client.post("/explain", json={"transaction_id": sample_tid})
     assert r200.status_code == 200
     body = r200.json()
-    assert body["transaction_id"] == "TX_0000004935"
+    assert body["transaction_id"] == sample_tid
     assert 0.0 <= body["fraud_probability"] <= 1.0
     assert body["risk_level"] in {"LOW", "MEDIUM", "HIGH", "CRITICAL"}
     assert body["recommended_action"] in {"ALLOW", "REVIEW", "BLOCK"}

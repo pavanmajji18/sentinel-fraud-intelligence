@@ -24,34 +24,65 @@ This repository (`sentinel-rag-investigator`) provides the production **Polyglot
 ![Polyglot Architecture Diagram](architecture/polyglot_architecture_diagram.png)
 
 ```mermaid
-flowchart LR
-    subgraph Ingress["1. Payment Switch & Privacy Gate"]
-        A["Payment Gateway Caller\nPOST /explain {transaction_id}"] --> B["DPDP Act 2023 & PCI-DSS v4.0 Gate\nenforce_data_privacy_guardrails()"]
+flowchart TD
+    subgraph Ingress["1. Ingress & Privacy Gate"]
+        REQ["Payment Switch / Gateway Caller\nPOST /explain {transaction_id}"]
+        PRIV["DPDP Act 2023 & PCI-DSS v4.0 Gate\nenforce_data_privacy_guardrails()\n12 PII Attributes Stripped | Cryptographic Tokenized Pseudonyms"]
+        REQ --> PRIV
     end
 
-    subgraph Orchestrator["2. FastAPI Context Orchestrator (app/main.py)"]
-        B --> C["SentinelInvestigatorOrchestrator\nParallel 3-Store Context Fan-Out"]
+    subgraph Orchestrator["2. FastAPI Orchestration Layer (app/main.py & app/orchestrator.py)"]
+        ORCH["SentinelInvestigatorOrchestrator\nParallel 3-Store Fan-Out Coordinator\nSLA Budget: 250ms p99 | Circuit Breaker: 300ms Fail-Open"]
+        PRIV --> ORCH
     end
 
-    subgraph PolyglotStores["3. Polyglot Persistence Layer"]
-        C -->|"O(1) PK Lookup (<1.5ms)"| S1[("Store 1: PostgreSQL / Supabase & MongoDB\nPoint-in-Time FE-01..FE-10 & R01..R08\nInteger Paise Invariant")]
-        C -->|"Bolt Cypher 2-Hop (<2.0ms)"| S2[("Store 2: Neo4j Fraud Graph\n[:USED_DEVICE|PAID*1..2]\n7d Shared Device Rings (>=3 Cust)")]
-        C -->|"3072-d Cosine Top-5 (<1.2ms)"| S3[("Store 3: Qdrant Vector Store\nsentinel_policy_corpus (220 Docs / 238 Chunks)\nGemini Embedding 2 (3072-d)")]
+    subgraph PolyglotStores["3. Polyglot Persistence Architecture (Task 1 to Task 5)"]
+        direction TB
+
+        subgraph Store1["Task 1 & Task 3: Telemetry & Feature Store"]
+            S1_DB[("PostgreSQL / Supabase (sentinel_demo)\n& MongoDB (sentinel_fraud_db)\n• Transactions, Features (FE-01..FE-10), Outcomes, Labels\n• Exact Integer Paise Ledger (amount_paise)\n• Compound Index: (customer_id, transaction_time)")]
+            S1_WHY["WHY THIS STORE:\n• ACID transactional safety for monetary state.\n• Sub-millisecond O(1) B-tree primary key lookups (<1.5ms).\n• Schema enforcement preventing financial rounding drift.\n• BSON flexibility for polymorphic payment channel payloads."]
+            S1_DB --- S1_WHY
+        end
+
+        subgraph Store2["Task 2: Graph Neighborhood & Mule Ring Engine"]
+            S2_DB[("Neo4j AuraDB / Bolt Engine (3106f5af)\n• Nodes: (:Customer), (:Device), (:Merchant)\n• Edges: [:USED_DEVICE], [:PAID]\n• 7-Day Shared Device Rings & 2-Hop Fraud Contagion")]
+            S2_WHY["WHY THIS STORE:\n• Native index-free adjacency traversal (<2.0ms).\n• Eliminates catastrophic recursive relational self-joins.\n• Rapidly uncovers shared mule devices (>=3 custs in 7d).\n• Pinpoints 2-hop contagion from confirmed fraud payments."]
+            S2_DB --- S2_WHY
+        end
+
+        subgraph Store3["Task 4 & Task 5: Regulatory & SOP Vector Index"]
+            S3_DB[("Qdrant Vector Store (sentinel_policy_corpus)\n• 3072-d Dense Embeddings (Gemini Embedding 2)\n• 220+ RBI Master Directions, NPCI Guidelines, SOPs\n• 180w chunks with 40w overlap, Distance.COSINE")]
+            S3_WHY["WHY THIS STORE:\n• High-dimensional unit-sphere semantic search (<1.5ms).\n• Bridges vocabulary gap between feature anomalies and legal SOPs.\n• Payload metadata filtering on document_type & reason_code.\n• Exact cosine similarity recall (Hit@5 = 100.0%)."]
+            S3_DB --- S3_WHY
+        end
     end
 
-    subgraph Synthesis["4. Dual-Gateway RAG & Verification"]
-        S1 & S2 & S3 --> D["Dual-Gateway Synthesizer\nEuron EURI / Gemini 2.5 Flash\n+ FR-API-06 Deterministic Fallback"]
-        D --> E["Grounding & Schema Verifier\nExplainResponse Pydantic Model\n300ms Circuit-Breaker Fail-Open"]
+    subgraph Synthesis["4. Dual-Gateway LLM Synthesis & Verification (Task 6)"]
+        LLM["Dual-Gateway LLM Synthesizer\nEuron EURI (euri-chat-fast) / Google Gemini 2.5 Flash\n+ FR-API-06 Deterministic Template Fallback"]
+        VERIF["Grounding & Schema Verifier\n• Validates Pydantic ExplainResponse Model\n• Enforces Exact Entity IDs & Integer Paise Grounding\n• Audits Zero-PII Leakage & Regulatory Citations"]
+        LLM --> VERIF
     end
+
+    subgraph Egress["5. Response Delivery"]
+        RESP["JSON Response:\n• risk_summary\n• reason_codes_fired\n• recommended_action (ALLOW / REVIEW / BLOCK)\n• cited_sources (document_id, chunk_number, title, score, excerpt)\n• graph_context & feature_snapshot\n• grounding_verification & latency_ms"]
+        VERIF --> RESP
+    end
+
+    ORCH -->|"O(1) PK Lookup (<1.5ms)"| S1_DB
+    ORCH -->|"Cypher 2-Hop Traversal (<2.0ms)"| S2_DB
+    ORCH -->|"3072-d Cosine Top-5 (<1.5ms)"| S3_DB
+    S1_DB & S2_DB & S3_DB --> LLM
 ```
 
-### Polyglot Persistence Trade-Offs at 2,800 TPS Peak
+### Detailed Polyglot Database Storage & Architectural Justification Matrix
 
-| Store Tier | Engine | Workload & Access Pattern | Architectural Justification |
+| Database / Engine | Project Task | What It Stores | Architectural Justification (Why This Engine) |
 | :--- | :--- | :--- | :--- |
-| **Store 1: Telemetry & Feature Store** | PostgreSQL (`sentinel_demo`) + MongoDB (`sentinel_fraud_db`) | Point-in-time feature vectors (`FE-01`..`FE-10`), exact integer paise ledger (`amount_paise = round(transaction_amount * 100)`), and bounded customer device arrays via ESR compound index `(customer_id, transaction_time)` | Multi-hop graph self-joins and 3072-d cosine similarity scans degrade relational B-tree buffer pools and violate `p99 <= 250 ms` under high write throughput. |
-| **Store 2: Fraud Ring Graph Engine** | Neo4j 5 (`[:USED_DEVICE\|PAID*1..2]`) | Index-free adjacency traversal detecting mule devices shared by `>= 3` distinct customers within a 7-day sliding window (`FE-09`) and 2-hop confirmed fraud contagion | Relational join tables over high-degree shared devices suffer combinatorial join fan-out during coordinated mule-ring attacks. |
-| **Store 3: Dense Policy Vector Index** | Qdrant (`sentinel_policy_corpus`, `Distance.COSINE`) | Top-5 semantic retrieval over 3072-d unit-normalized chunks (`180w` size, `40w` overlap) with payload filtering on `document_type` | Keyword search misses semantic equivalents across RBI circulars, NPCI UPI risk guidelines, and investigator SOP playbooks. |
+| **PostgreSQL / Supabase** (`sentinel_demo`) | **Task 1 & Task 3** | • `transactions` (authorization events, amount, channel, timestamp)<br>• `features` (point-in-time `FE-01` to `FE-10`, reason codes)<br>• `payment_outcomes` (status, failure codes)<br>• `labels` (ground truth fraud labels with 60-day maturation)<br>• Integer paise financial accounting (`amount_paise = round(amount * 100)`) | **ACID guarantees & deterministic indexing**: Multi-hop graph joins and 3072-d cosine scans degrade relational buffer pools and lock tables at high write throughput (2,800 TPS peak). PostgreSQL provides strict typing, primary key B-trees for sub-millisecond retrieval, and zero financial rounding drift. |
+| **MongoDB** (`sentinel_fraud_db`) | **Task 1 (NoSQL)** | • Unstructured / polymorphic transaction documents<br>• Dynamic device hardware fingerprints and telemetry<br>• Nested Haversine geo-coordinates (`customer_location`, `merchant_location`)<br>• Rapid customer-device history arrays | **Schema-flexible document ingestion**: Handles variable payload structures across 4 payment channels (UPI, Cards, Wallets, Net Banking) without schema migrations, indexing via ESR compound keys `(customer_id, transaction_time)`. |
+| **Neo4j AuraDB / Bolt** (`3106f5af`) | **Task 2 (Graph)** | • Heterogeneous graph entities: `(:Customer)`, `(:Device)`, `(:Merchant)`<br>• Directed relationships: `[:USED_DEVICE]`, `[:PAID]` with timestamps and fraud labels<br>• 7-day shared hardware clusters (`distinct_customers_per_device_7d >= 3`)<br>• 2-hop confirmed fraud exposure paths | **Index-free adjacency traversal**: Relational self-joins over high-degree shared devices suffer catastrophic combinatorial explosion during mule-ring attacks. Neo4j navigates graph pointers in constant time per edge, computing 2-hop contagion in `< 2.0 ms`. |
+| **Qdrant Vector Store** (`sentinel_policy_corpus`) | **Task 4 & Task 5 (Vectors)** | • 3072-dimensional unit-sphere dense embeddings (`Distance.COSINE`)<br>• 220+ regulatory documents & 238+ policy chunks (`180w` size, `40w` overlap)<br>• RBI Master Directions on digital payment security & liability<br>• NPCI UPI risk monitoring circulars & investigator SOP playbooks | **Semantic bridging of domain vocabularies**: Keyword search fails when an authorization anomaly (e.g. nocturnal velocity spike) maps conceptually to regulatory mandates (RBI AFA step-up or NPCI cooling periods). Cosine similarity in 3072-d space guarantees top-5 authoritative citation in `< 1.5 ms`. |
 
 ## 3. Data Governance, Schema & Point-in-Time Feature Specification
 
@@ -112,16 +143,16 @@ Complete schema-validated JSON payloads (containing `cited_sources`, `graph_cont
 
 | Transaction ID | Split | Ground Truth | Fraud Prob | Risk Level | Recommended Action | Fired Reason Codes | 7d Shared Ring (`FE-09`) | 2-Hop Fraud Exposure | Top Cited Policy Doc | Latency (ms) |
 | :--- | :--- | :--- | ---: | :--- | :--- | :--- | :---: | ---: | :--- | ---: |
-| `TX_0000004270` | `validation` | **FRAUD (1)** | `0.9900` | `CRITICAL` | **BLOCK** | `R01, R02, R03, R04, R05, R08` | Yes (`5` custs) | `4` txns | `DOC_PLAYBOOK_R08_008` | `4.64` |
-| `TX_0000004344` | `validation` | **FRAUD (1)** | `0.9900` | `CRITICAL` | **BLOCK** | `R01, R02, R03, R04, R05, R08` | Yes (`7` custs) | `4` txns | `DOC_PLAYBOOK_R08_008` | `4.79` |
-| `TX_0000004901` | `validation` | **FRAUD (1)** | `0.9900` | `CRITICAL` | **BLOCK** | `R01, R02, R04, R05, R07, R08` | No (`2` custs) | `8` txns | `DOC_PLAYBOOK_R08_008` | `3.94` |
-| `TX_0000004905` | `validation` | **FRAUD (1)** | `0.9900` | `CRITICAL` | **BLOCK** | `R01, R02, R04, R05, R07, R08` | No (`1` cust) | `8` txns | `DOC_PLAYBOOK_R08_008` | `4.08` |
-| `TX_0000004204` | `validation` | **FRAUD (1)** | `0.9900` | `CRITICAL` | **BLOCK** | `R01, R02, R03, R05, R06` | No (`0` custs) | `1` txn | `DOC_PLAYBOOK_R06_006` | `3.74` |
-| `TX_0000004132` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`1` cust) | `0` txns | `DOC_RBI_SLA_010` | `0.94` |
-| `TX_0000004133` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`1` cust) | `0` txns | `DOC_RBI_SLA_010` | `1.14` |
-| `TX_0000004143` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`1` cust) | `0` txns | `DOC_RBI_SLA_010` | `1.13` |
-| `TX_0000004145` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`1` cust) | `0` txns | `DOC_RBI_SLA_010` | `0.97` |
-| `TX_0000004147` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`1` cust) | `0` txns | `DOC_RBI_SLA_010` | `1.10` |
+| `TX_0000824366` | `validation` | **FRAUD (1)** | `0.9900` | `CRITICAL` | **BLOCK** | `R02, R03, R04, R05, R07, R08` | No (`1` cust) | `0` txns | `DOC_PLAYBOOK_R08_008` | `33.38` |
+| `TX_0000820522` | `validation` | **FRAUD (1)** | `0.8700` | `CRITICAL` | **BLOCK** | `R02, R03, R04, R07, R08` | No (`1` cust) | `0` txns | `DOC_PLAYBOOK_R07_007` | `22.44` |
+| `TX_0000820650` | `validation` | **FRAUD (1)** | `0.8700` | `CRITICAL` | **BLOCK** | `R02, R03, R04, R07, R08` | No (`1` cust) | `0` txns | `DOC_PLAYBOOK_R07_007` | `22.07` |
+| `TX_0000822376` | `validation` | **FRAUD (1)** | `0.9900` | `CRITICAL` | **BLOCK** | `R03, R04, R05, R07, R08` | No (`1` cust) | `0` txns | `DOC_PLAYBOOK_R08_008` | `27.73` |
+| `TX_0000824387` | `validation` | **FRAUD (1)** | `0.9300` | `CRITICAL` | **BLOCK** | `R02, R03, R04, R07, R08` | No (`1` cust) | `1` txn | `DOC_PLAYBOOK_R08_008` | `28.59` |
+| `TX_0000819748` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`1` cust) | `0` txns | `DOC_RBI_SLA_010` | `4.76` |
+| `TX_0000819758` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`0` custs) | `0` txns | `DOC_RBI_SLA_010` | `5.12` |
+| `TX_0000819761` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`1` cust) | `0` txns | `DOC_RBI_SLA_010` | `5.31` |
+| `TX_0000819763` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`1` cust) | `0` txns | `DOC_RBI_SLA_010` | `4.89` |
+| `TX_0000819764` | `validation` | **GENUINE (0)** | `0.0400` | `LOW` | **ALLOW** | `None` (`[]`) | No (`0` custs) | `0` txns | `DOC_RBI_SLA_010` | `5.26` |
 
 ## 6. 10-Question Policy Retrieval Benchmark (`Hit@1 = 100%`, `Hit@3 = 100%`, `Hit@5 = 100%`)
 

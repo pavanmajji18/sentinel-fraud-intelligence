@@ -535,10 +535,50 @@ def load_sentinel_tables(
         base_path = Path(base)
         tables_dir = base_path / "tables"
         parquet_dir = base_path / "parquet"
-        if tables_dir.is_dir() and all((tables_dir / f"{t}.csv").exists() for t in required_tables):
-            loaded = {t: pd.read_csv(tables_dir / f"{t}.csv") for t in required_tables}
-            privacy_audit = enforce_data_privacy_guardrails(loaded)
-            return loaded, f"Tier 1 (Local Sanitized CSV: {tables_dir.name})", privacy_audit
+        if tables_dir.is_dir() and all(
+            (tables_dir / f"{t}.csv").exists() or (tables_dir / t).is_dir() for t in required_tables
+        ):
+            loaded = {}
+            for t in required_tables:
+                csv_file = tables_dir / f"{t}.csv"
+                table_dir = tables_dir / t
+                if csv_file.exists():
+                    loaded[t] = pd.read_csv(csv_file)
+                elif table_dir.is_dir():
+                    val_files = list((table_dir / "validation").glob("*.csv*")) if (table_dir / "validation").is_dir() else []
+                    other_files = [f for f in table_dir.rglob("*.csv*") if "validation" not in str(f)]
+                    dfs = []
+                    def _safe_read(file_path: Path) -> Optional[pd.DataFrame]:
+                        for comp in ["infer", "gzip"]:
+                            try:
+                                return pd.read_csv(file_path, compression=comp)
+                            except Exception:
+                                continue
+                        return None
+
+                    for f in val_files[:3]:
+                        df = _safe_read(f)
+                        if df is not None:
+                            dfs.append(df)
+                    for f in other_files:
+                        df = _safe_read(f)
+                        if df is not None:
+                            dfs.append(df)
+                        if t not in {"customers", "merchants", "devices"} and sum(len(d) for d in dfs) >= 10000:
+                            break
+                    loaded[t] = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
+            if all(t in loaded and not loaded[t].empty for t in required_tables):
+                common_tids = (
+                    set(loaded["transactions"]["transaction_id"])
+                    & set(loaded["features"]["transaction_id"])
+                    & set(loaded["labels"]["transaction_id"])
+                    & set(loaded["payment_outcomes"]["transaction_id"])
+                )
+                if len(common_tids) >= 1000:
+                    for t in ["transactions", "features", "labels", "payment_outcomes"]:
+                        loaded[t] = loaded[t][loaded[t]["transaction_id"].isin(common_tids)].copy()
+                privacy_audit = enforce_data_privacy_guardrails(loaded)
+                return loaded, f"Tier 1 (Local Sanitized CSV: {tables_dir.name})", privacy_audit
         if parquet_dir.is_dir() and all(
             (parquet_dir / f"{t}.parquet").exists() for t in required_tables
         ):

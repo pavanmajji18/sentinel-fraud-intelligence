@@ -23,12 +23,12 @@
       "top_1_score": 0.9464,
       "top_5_doc_ids": [
         "DOC_PLAYBOOKS_181",
-        "DOC_PLAYBOOKS_037",
-        "DOC_PLAYBOOKS_085",
-        "DOC_PLAYBOOKS_061",
-        "DOC_PLAYBOOKS_157"
+        "DOC_PLAYBOOKS_109",
+        "DOC_PLAYBOOKS_013",
+        "DOC_PLAYBOOKS_157",
+        "DOC_PLAYBOOKS_133"
       ],
-      "latency_ms": 0.76
+      "latency_ms": 5.08
     },
     {
       "query_id": "Q02",
@@ -43,12 +43,12 @@
       "top_1_score": 0.9728,
       "top_5_doc_ids": [
         "DOC_PLAYBOOK_R02_002",
-        "DOC_PLAYBOOKS_014",
-        "DOC_PLAYBOOKS_038",
-        "DOC_PLAYBOOKS_062",
-        "DOC_PLAYBOOKS_086"
+        "DOC_PLAYBOOKS_206",
+        "DOC_PLAYBOOKS_134",
+        "DOC_PLAYBOOKS_158",
+        "DOC_PLAYBOOKS_062"
       ],
-      "latency_ms": 0.36
+      "latency_ms": 5.23
     },
     {
       "query_id": "Q03",
@@ -63,12 +63,12 @@
       "top_1_score": 0.7086,
       "top_5_doc_ids": [
         "DOC_PLAYBOOK_R03_003",
-        "DOC_PLAYBOOKS_015",
-        "DOC_PLAYBOOKS_039",
-        "DOC_PLAYBOOKS_063",
-        "DOC_PLAYBOOKS_087"
+        "DOC_PLAYBOOKS_207",
+        "DOC_PLAYBOOKS_135",
+        "DOC_PLAYBOOKS_159",
+        "DOC_PLAYBOOKS_111"
       ],
-      "latency_ms": 0.29
+      "latency_ms": 5.77
     },
     {
       "query_id": "Q04",
@@ -83,12 +83,12 @@
       "top_1_score": 0.9851,
       "top_5_doc_ids": [
         "DOC_PLAYBOOK_R04_004",
-        "DOC_PLAYBOOKS_016",
-        "DOC_PLAYBOOKS_028",
+        "DOC_PLAYBOOKS_220",
         "DOC_PLAYBOOKS_040",
-        "DOC_PLAYBOOKS_052"
+        "DOC_PLAYBOOKS_124",
+        "DOC_PLAYBOOKS_184"
       ],
-      "latency_ms": 0.44
+      "latency_ms": 5.13
     },
     {
       "query_id": "Q05",
@@ -103,12 +103,12 @@
       "top_1_score": 0.6345,
       "top_5_doc_ids": [
         "DOC_PLAYBOOK_R05_005",
-        "DOC_PLAYBOOKS_029",
+        "DOC_PLAYBOOKS_197",
+        "DOC_PLAYBOOKS_149",
         "DOC_PLAYBOOKS_053",
-        "DOC_PLAYBOOKS_077",
         "DOC_PLAYBOOKS_101"
       ],
-      "latency_ms": 0.52
+      "latency_ms": 4.79
     },
     {
       "query_id": "Q06",
@@ -123,12 +123,12 @@
       "top_1_score": 0.9812,
       "top_5_doc_ids": [
         "DOC_PLAYBOOK_R06_006",
-        "DOC_PLAYBOOKS_030",
         "DOC_PLAYBOOKS_054",
-        "DOC_PLAYBOOKS_078",
-        "DOC_PLAYBOOKS_102"
+        "DOC_PLAYBOOKS_150",
+        "DOC_PLAYBOOKS_126",
+        "DOC_PLAYBOOKS_198"
       ],
-      "latency_ms": 0.7
+      "latency_ms": 4.71
     },
     {
       "query_id": "Q07",
@@ -143,12 +143,12 @@
       "top_1_score": 0.9775,
       "top_5_doc_ids": [
         "DOC_PLAYBOOK_R07_007",
-        "DOC_PLAYBOOKS_031",
+        "DOC_PLAYBOOKS_199",
+        "DOC_PLAYBOOKS_127",
         "DOC_PLAYBOOKS_055",
-        "DOC_PLAYBOOKS_079",
         "DOC_PLAYBOOKS_103"
       ],
-      "latency_ms": 0.41
+      "latency_ms": 5.08
     },
     {
       "query_id": "Q08",
@@ -163,12 +163,12 @@
       "top_1_score": 0.9946,
       "top_5_doc_ids": [
         "DOC_PLAYBOOK_R08_008",
-        "DOC_PLAYBOOKS_032",
+        "DOC_PLAYBOOKS_056",
+        "DOC_PLAYBOOKS_128",
         "DOC_PLAYBOOKS_104",
-        "DOC_PLAYBOOKS_080",
         "DOC_PLAYBOOKS_200"
       ],
-      "latency_ms": 0.36
+      "latency_ms": 5.57
     },
     {
       "query_id": "Q09",
@@ -183,12 +183,12 @@
       "top_1_score": 0.9943,
       "top_5_doc_ids": [
         "DOC_NPCI_GRAPH_009",
-        "DOC_NPCI_GUIDELINES_021",
+        "DOC_NPCI_GUIDELINES_213",
+        "DOC_NPCI_GUIDELINES_141",
         "DOC_NPCI_GUIDELINES_045",
-        "DOC_NPCI_GUIDELINES_069",
-        "DOC_NPCI_GUIDELINES_093"
+        "DOC_NPCI_GUIDELINES_117"
       ],
-      "latency_ms": 0.41
+      "latency_ms": 5.23
     },
     {
       "query_id": "Q10",
@@ -199,16 +199,16 @@
       "hit_at_1": true,
       "hit_at_3": true,
       "hit_at_5": true,
-      "top_1_doc_id": "DOC_RBI_CIRCULARS_022",
+      "top_1_doc_id": "DOC_RBI_CIRCULARS_214",
       "top_1_score": 0.1045,
       "top_5_doc_ids": [
-        "DOC_RBI_CIRCULARS_022",
-        "DOC_RBI_CIRCULARS_046",
-        "DOC_RBI_CIRCULARS_094",
+        "DOC_RBI_CIRCULARS_214",
+        "DOC_RBI_CIRCULARS_190",
+        "DOC_RBI_CIRCULARS_142",
         "DOC_RBI_CIRCULARS_070",
-        "DOC_RBI_CIRCULARS_118"
+        "DOC_RBI_CIRCULARS_094"
       ],
-      "latency_ms": 0.34
+      "latency_ms": 5.18
     }
   ]
 }

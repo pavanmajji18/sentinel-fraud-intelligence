@@ -804,8 +804,9 @@ def build_batch_payload(tables: Dict[str, pd.DataFrame]) -> List[Dict[str, Any]]
 
         c_info = cust_map[cid]
         m_info = merch_map[mid]
-        m_loc = json.loads(m_info["merchant_location"])
-        dt_iso = str(row["transaction_time"])
+        raw_m_loc = m_info["merchant_location"]
+        m_loc = json.loads(raw_m_loc) if isinstance(raw_m_loc, str) else (raw_m_loc or {})
+        dt_iso = str(row["transaction_time"]).replace(" ", "T")
         epoch_sec = int(datetime.fromisoformat(dt_iso).timestamp())
 
         payload.append(
