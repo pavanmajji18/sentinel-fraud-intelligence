@@ -3,13 +3,13 @@
 Project SENTINEL — Master Subsystems Verification & Quality Audit Runner.
 Executes and audits all 8 specialized subsystems in offline-mock mode:
   1. sentinel-polyglot-data-architecture : 18-table relational & unstructured schema verifier
-  2. sentinel-feature-pipeline           : Point-in-time feature store & leakage verification
-  3. sentinel-nosql-telemetry            : MongoDB BSON schema, ESR compound indexing & aggregations
-  4. sentinel-fraud-graph                : Neo4j property-graph mule-ring & shared-device engine
-  5. sentinel-vector-search-engine       : 3072-d NumPy vs Qdrant vector retrieval & HNSW benchmarks
-  6. sentinel-policy-retrieval           : 225-doc regulatory corpus chunking & Qdrant retrieval
+  2. sentinel-nosql-telemetry            : MongoDB BSON schema, ESR compound indexing & aggregations
+  3. sentinel-fraud-graph                : Neo4j property-graph mule-ring & shared-device engine
+  4. sentinel-feature-pipeline           : Point-in-time feature store & leakage verification
+  5. sentinel-policy-retrieval           : 225-doc regulatory corpus chunking & Qdrant retrieval
+  6. sentinel-vector-search-engine       : 3072-d NumPy vs Qdrant vector retrieval & HNSW benchmarks
   7. sentinel-rag-investigator           : FastAPI polyglot RAG investigator assistant (POST /explain)
-  8. sentinel-gpu-compute-sizing         : Compute sizing (6ND vs 4ND), VRAM & 2,800 TPS cluster
+  8. sentinel_gpu_compute_sizing_and_granularity (sentinel-gpu-compute-sizing) : Compute sizing (6ND vs 4ND), VRAM & 2,800 TPS cluster
 
 Usage:
   python verify_all_subsystems.py --audit         # Portfolio hygiene, AST syntax, and artifact audit
@@ -42,6 +42,9 @@ SUBSYSTEMS = [
         "sla": "18-table schema integrity, zero look-ahead leakage",
         "artifacts": [
             "outputs/architecture_audit_summary.json",
+            "outputs/polyglot_18_table_er_and_routing.png",
+            "outputs/temporal_60d_maturation_timeline.png",
+            "outputs/linkedin_post1_architecture_showcase.png",
             "outputs/sentinel_er_diagram_18_tables.png",
             "outputs/polyglot_18_table_schema_reference.md",
             "outputs/verification_report.txt",
@@ -49,6 +52,35 @@ SUBSYSTEMS = [
     },
     {
         "id": "2",
+        "dir": "sentinel-nosql-telemetry",
+        "name": "High-Throughput NoSQL Telemetry",
+        "entrypoint": "sentinel_nosql_telemetry.py",
+        "args": ["--offline-mock", "--verify"],
+        "sla": "O(1) customer device lookup, ESR index, 0 COLLSCAN",
+        "artifacts": [
+            "outputs/aggregation_results.json",
+            "outputs/explain_before_after.json",
+            "outputs/sample_bson_documents.json",
+            "outputs/verification_report.json",
+        ],
+    },
+    {
+        "id": "3",
+        "dir": "sentinel-fraud-graph",
+        "name": "Graph Mule Ring Detection",
+        "entrypoint": "sentinel_fraud_graph.py",
+        "args": ["--offline-mock", "--verify"],
+        "sla": "2-hop device sharing graph, Cypher queries Q1-Q3",
+        "artifacts": [
+            "outputs/graph_execution_audit.json",
+            "outputs/query_1_shared_devices_7d.csv",
+            "outputs/query_2_two_hop_fraud_customers.csv",
+            "outputs/query_3_merchants_shared_devices.csv",
+            "outputs/suspicious_cluster_graph.png",
+        ],
+    },
+    {
+        "id": "4",
         "dir": "sentinel-feature-pipeline",
         "name": "Point-in-Time Feature Store",
         "entrypoint": "feature_pipeline.py",
@@ -64,49 +96,7 @@ SUBSYSTEMS = [
         ],
     },
     {
-        "id": "3",
-        "dir": "sentinel-nosql-telemetry",
-        "name": "High-Throughput NoSQL Telemetry",
-        "entrypoint": "sentinel_nosql_telemetry.py",
-        "args": ["--offline-mock", "--verify"],
-        "sla": "O(1) customer device lookup, ESR index, 0 COLLSCAN",
-        "artifacts": [
-            "outputs/aggregation_results.json",
-            "outputs/explain_before_after.json",
-            "outputs/sample_bson_documents.json",
-            "outputs/verification_report.json",
-        ],
-    },
-    {
-        "id": "4",
-        "dir": "sentinel-fraud-graph",
-        "name": "Graph Mule Ring Detection",
-        "entrypoint": "sentinel_fraud_graph.py",
-        "args": ["--offline-mock", "--verify"],
-        "sla": "2-hop device sharing graph, Cypher queries Q1-Q3",
-        "artifacts": [
-            "outputs/graph_execution_audit.json",
-            "outputs/query_1_shared_devices_7d.csv",
-            "outputs/query_2_two_hop_fraud_customers.csv",
-            "outputs/query_3_merchants_shared_devices.csv",
-            "outputs/suspicious_cluster_graph.png",
-        ],
-    },
-    {
         "id": "5",
-        "dir": "sentinel-vector-search-engine",
-        "name": "3072-d Vector Retrieval Engine",
-        "entrypoint": "vector_search_engine.py",
-        "args": ["--offline-mock", "--verify"],
-        "sla": "Unit-norm cosine == dot, 100% Qdrant parity, HNSW O(log N)",
-        "artifacts": [
-            "outputs/2d_vector_geometry.png",
-            "outputs/vector_search_benchmarks.png",
-            "outputs/vector_internals_verification_report.json",
-        ],
-    },
-    {
-        "id": "6",
         "dir": "sentinel-policy-retrieval",
         "name": "Dense Policy Retrieval Engine",
         "entrypoint": "qdrant_embeddings_pipeline.py",
@@ -116,6 +106,19 @@ SUBSYSTEMS = [
             "outputs/verification_report.json",
             "outputs/payload_filtered_playbooks_results.json",
             "outputs/policy_retrieval_10_queries_benchmark.md",
+        ],
+    },
+    {
+        "id": "6",
+        "dir": "sentinel-vector-search-engine",
+        "name": "3072-d Vector Retrieval Engine",
+        "entrypoint": "vector_search_engine.py",
+        "args": ["--offline-mock", "--verify"],
+        "sla": "Unit-norm cosine == dot, 100% Qdrant parity, HNSW O(log N)",
+        "artifacts": [
+            "outputs/2d_vector_geometry.png",
+            "outputs/vector_search_benchmarks.png",
+            "outputs/vector_internals_verification_report.json",
         ],
     },
     {

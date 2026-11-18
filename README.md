@@ -68,14 +68,14 @@ Project SENTINEL is architected into 8 modular, independently testable engineeri
 
 | # | Subsystem & Directory | Primary Stack | Core Technical Capability | Production Target & Benchmark | Verification Artifact | Visual Artifact |
 | :-: | :--- | :--- | :--- | :--- | :--- | :--- |
-| **1** | [**`sentinel-polyglot-data-architecture`**](./sentinel-polyglot-data-architecture/) | PostgreSQL, Supabase, Python | 18-table relational & unstructured schema specification, 60-day chargeback maturation guardrails, zero look-ahead leakage | 18 tables verified, 100% PK uniqueness, 0 PK nulls | [`schema_reference.md`](./sentinel-polyglot-data-architecture/outputs/polyglot_18_table_schema_reference.md) | [ER Diagram (4K)](./sentinel-polyglot-data-architecture/outputs/sentinel_er_diagram_18_tables.png) |
-| **2** | [**`sentinel-feature-pipeline`**](./sentinel-feature-pipeline/) | Pandas, NumPy, Scipy | Point-in-time offline/online feature store, IST (`UTC+05:30`) diurnal cycle alignment, `FE-01` to `FE-10` & `R01` to `R08` derivation | 100.00% parity vs client store, 0 look-ahead leakage | [`feature_parity.md`](./sentinel-feature-pipeline/outputs/feature_parity_report.md) | [Feature Diagnostics](./sentinel-feature-pipeline/outputs/feature_pipeline_diagnostics.png) |
-| **3** | [**`sentinel-nosql-telemetry`**](./sentinel-nosql-telemetry/) | MongoDB 7.0, WiredTiger, BSON | High-throughput behavioral biometric & hardware telemetry ingestion, Equality-Sort-Range (ESR) compound B-Tree indexing | O(1) customer device lookup, 0 `COLLSCAN`, sub-5ms aggregations | [`explain_audit.json`](./sentinel-nosql-telemetry/outputs/explain_before_after.json) | [Sample BSON](./sentinel-nosql-telemetry/outputs/sample_bson_documents.json) |
-| **4** | [**`sentinel-fraud-graph`**](./sentinel-fraud-graph/) | Neo4j 5.20, Cypher, APOC | Property-graph fraud ring detection, 2-hop shared-device contagion traversal, mule merchant cashout terminal identification | 24-node mule ring detected, 77.05% cashout fraud rate | [`execution_audit.json`](./sentinel-fraud-graph/outputs/graph_execution_audit.json) | [Cluster Graph](./sentinel-fraud-graph/outputs/suspicious_cluster_graph.png) |
-| **5** | [**`sentinel-vector-search-engine`**](./sentinel-vector-search-engine/) | NumPy, BLAS, Qdrant | Mathematical first-principles 3072-d vector search, unit-sphere L2 norm proof (`cos(u,v) == u . v`), HNSW scaling benchmarks | 100% Qdrant parity (`|Δ| = 0.00e+00`), 14.26x BLAS speedup | [`internals_audit.json`](./sentinel-vector-search-engine/outputs/vector_internals_verification_report.json) | [HNSW Benchmarks](./sentinel-vector-search-engine/outputs/vector_search_benchmarks.png) |
-| **6** | [**`sentinel-policy-retrieval`**](./sentinel-policy-retrieval/) | Qdrant, Gemini Embeddings | Dense vector retrieval over 225 regulatory circulars, master directions, and fraud SOP playbooks with sliding-window chunking | **Hit@1 = 100%**, **Hit@3 = 100%**, **MRR@3 = 1.0000** | [`10_queries_benchmark.md`](./sentinel-policy-retrieval/outputs/policy_retrieval_10_queries_benchmark.md) | [Filtered Playbooks](./sentinel-policy-retrieval/outputs/payload_filtered_playbooks_results.json) |
+| **1** | [**`sentinel-polyglot-data-architecture`**](./sentinel-polyglot-data-architecture/) | PostgreSQL, Supabase, Python | 18-table relational & unstructured schema specification, 60-day chargeback maturation guardrails, zero look-ahead leakage | 18 tables verified, 100% PK uniqueness, 0 PK nulls | [`schema_reference.md`](./sentinel-polyglot-data-architecture/outputs/polyglot_18_table_schema_reference.md) | [18-Table Routing](./sentinel-polyglot-data-architecture/outputs/polyglot_18_table_er_and_routing.png) • [60d Timeline](./sentinel-polyglot-data-architecture/outputs/temporal_60d_maturation_timeline.png) |
+| **2** | [**`sentinel-nosql-telemetry`**](./sentinel-nosql-telemetry/) | MongoDB 7.0, WiredTiger, BSON | High-throughput behavioral biometric & hardware telemetry ingestion, Equality-Sort-Range (ESR) compound B-Tree indexing | O(1) customer device lookup, 0 `COLLSCAN`, sub-5ms aggregations | [`explain_audit.json`](./sentinel-nosql-telemetry/outputs/explain_before_after.json) | [Sample BSON](./sentinel-nosql-telemetry/outputs/sample_bson_documents.json) |
+| **3** | [**`sentinel-fraud-graph`**](./sentinel-fraud-graph/) | Neo4j 5.20, Cypher, APOC | Property-graph fraud ring detection, 2-hop shared-device contagion traversal, mule merchant cashout terminal identification | 24-node mule ring detected, 77.05% cashout fraud rate | [`execution_audit.json`](./sentinel-fraud-graph/outputs/graph_execution_audit.json) | [Cluster Graph](./sentinel-fraud-graph/outputs/suspicious_cluster_graph.png) |
+| **4** | [**`sentinel-feature-pipeline`**](./sentinel-feature-pipeline/) | Pandas, NumPy, Scipy | Point-in-time offline/online feature store, IST (`UTC+05:30`) diurnal cycle alignment, `FE-01` to `FE-10` & `R01` to `R08` derivation | 100.00% parity vs client store, 0 look-ahead leakage | [`feature_parity.md`](./sentinel-feature-pipeline/outputs/feature_parity_report.md) | [Feature Diagnostics](./sentinel-feature-pipeline/outputs/feature_pipeline_diagnostics.png) |
+| **5** | [**`sentinel-policy-retrieval`**](./sentinel-policy-retrieval/) | Qdrant, Gemini Embeddings | Dense vector retrieval over 225 regulatory circulars, master directions, and fraud SOP playbooks with sliding-window chunking | **Hit@1 = 100%**, **Hit@3 = 100%**, **MRR@3 = 1.0000** | [`10_queries_benchmark.md`](./sentinel-policy-retrieval/outputs/policy_retrieval_10_queries_benchmark.md) | [Filtered Playbooks](./sentinel-policy-retrieval/outputs/payload_filtered_playbooks_results.json) |
+| **6** | [**`sentinel-vector-search-engine`**](./sentinel-vector-search-engine/) | NumPy, BLAS, Qdrant | Mathematical first-principles 3072-d vector search, unit-sphere L2 norm proof (`cos(u,v) == u . v`), HNSW scaling benchmarks | 100% Qdrant parity (`|Δ| = 0.00e+00`), 14.26x BLAS speedup | [`internals_audit.json`](./sentinel-vector-search-engine/outputs/vector_internals_verification_report.json) | [HNSW Benchmarks](./sentinel-vector-search-engine/outputs/vector_search_benchmarks.png) |
 | **7** | [**`sentinel-rag-investigator`**](./sentinel-rag-investigator/) | FastAPI, Pydantic, Uvicorn | Real-time Polyglot RAG Assistant (`POST /explain`) orchestrating Postgres, Mongo, Neo4j, and Qdrant into grounded JSON cases | **p50 = 2.44 ms**, **p99 = 4.78 ms** (SLA <= 250 ms), 100% Grounding | [`hit_at_5_benchmark.md`](./sentinel-rag-investigator/outputs/hit_at_5_retrieval_benchmark.md) | [Polyglot Diagram](./sentinel-rag-investigator/architecture/polyglot_architecture_diagram.png) |
-| **8** | [**`sentinel-gpu-compute-sizing`**](./sentinel-gpu-compute-sizing/) | PyTorch 2.2, CUDA, LoRA | Analytical FLOPs compute sizing (6ND vs 4ND), Tensor Core FP16/BF16 profiling, 2,800 TPS peak hardware allocation | **Cost <= Rs. 4.00 / 1k txns**, 2,800 TPS cluster sized | [`compute_sizing.json`](./sentinel-gpu-compute-sizing/outputs/compute_sizing_report.json) | [GPU Telemetry](./sentinel-gpu-compute-sizing/outputs/gpu_utilization_chart.png) |
+| **8** | [**`sentinel_gpu_compute_sizing_and_granularity`** (`sentinel-gpu-compute-sizing`)](./sentinel-gpu-compute-sizing/) | PyTorch 2.2, CUDA, LoRA | Analytical FLOPs compute sizing (6ND vs 4ND), Tensor Core FP16/BF16 profiling, 2,800 TPS peak hardware allocation | **Cost <= Rs. 4.00 / 1k txns**, 2,800 TPS cluster sized | [`compute_sizing.json`](./sentinel-gpu-compute-sizing/outputs/compute_sizing_report.json) | [GPU Telemetry](./sentinel-gpu-compute-sizing/outputs/gpu_utilization_chart.png) |
 
 ---
 
@@ -109,11 +109,11 @@ Every subsystem is validated against strict service-level agreements (SLAs) and 
       <p align="center"><em>End-to-end 4-store hydration, sub-5ms scoring, and DPDP Act 2023 / PCI-DSS v4.0 privacy gates.</em></p>
     </td>
     <td width="50%">
-      <h3 align="center">18-Table Polyglot Schema Topology</h3>
-      <a href="./sentinel-polyglot-data-architecture/outputs/sentinel_er_diagram_18_tables.png">
-        <img src="./sentinel-polyglot-data-architecture/outputs/sentinel_er_diagram_18_tables.png" alt="18-Table Relational Schema" />
+      <h3 align="center">18-Table Polyglot Schema & 5-Engine Routing</h3>
+      <a href="./sentinel-polyglot-data-architecture/outputs/polyglot_18_table_er_and_routing.png">
+        <img src="./sentinel-polyglot-data-architecture/outputs/polyglot_18_table_er_and_routing.png" alt="18-Table Polyglot Schema & 5-Engine Storage Routing" />
       </a>
-      <p align="center"><em>4K UHD relational & unstructured entity topology with 60-day maturation guardrails.</em></p>
+      <p align="center"><em>18-table relational & unstructured entity topology with 5-engine routing & 60-day maturation guardrails.</em></p>
     </td>
   </tr>
   <tr>
@@ -280,27 +280,17 @@ sentinel-fraud-intelligence/
 │   ├── sentinel_architecture_verifier.py        # Automated 6-gate architecture & numerical parity verifier
 │   ├── scripts/
 │   │   ├── sentinel_data_loader.py              # Canonical 3-tier telemetry loader & privacy gate
-│   │   └── generate_er_diagram.py               # Reproducible generator for 4K 18-table ER diagram
+│   │   ├── generate_er_diagram.py               # Reproducible generator for 4K 18-table ER diagram
+│   │   └── generate_architecture_visuals.py     # Reproducible generator for 300-DPI publication visuals
 │   └── outputs/
+│       ├── polyglot_18_table_er_and_routing.png # 300-DPI 18-table schema & 5-engine storage routing diagram
+│       ├── temporal_60d_maturation_timeline.png # 300-DPI 60-day maturation timeline & zero-leakage splits
+│       ├── linkedin_post1_architecture_showcase.png # High-resolution 2-panel composite executive hero card
 │       ├── sentinel_er_diagram_18_tables.png    # 4K UHD 18-table relational ER diagram
 │       ├── polyglot_18_table_schema_reference.md# Complete 18-table schema, maturation window & worked trace
 │       ├── architecture_audit_summary.json      # Machine-readable audit summary
 │       └── verification_report.txt              # Captured CLI verification log
-│
-├── sentinel-feature-pipeline/                   # Subsystem 2: Point-in-time feature store & parity engine
-│   ├── feature_pipeline.py                      # Point-in-time FE-01..FE-10 & R01..R08 derivation engine
-│   ├── scripts/
-│   │   ├── sentinel_data_loader.py              # Canonical 3-tier telemetry loader
-│   │   └── generate_diagnostics_plot.py         # Reproducible feature diagnostic visualizer
-│   └── outputs/
-│       ├── feature_pipeline_diagnostics.png     # Multi-panel feature parity & IST ablation plot
-│       ├── feature_parity_report.md             # Reconciled client parity report (100.00% match)
-│       ├── feature_parity_summary.csv           # Feature-by-feature parity statistics
-│       ├── data_quality_report.md               # 4-split data quality & null telemetry audit
-│       ├── data_quality_report.json             # Machine-readable data quality report
-│       └── pipeline_verification_report.json    # 6-gate verification report
-│
-├── sentinel-nosql-telemetry/                    # Subsystem 3: MongoDB BSON telemetry & ESR index benchmarks
+├── sentinel-nosql-telemetry/                    # Subsystem 2: MongoDB BSON telemetry & ESR index benchmarks
 │   ├── sentinel_nosql_telemetry.py              # High-throughput BSON ingestion, ESR indexing & aggregations
 │   ├── verify_sync_counts.py                    # Cross-database count & sync validation
 │   ├── scripts/
@@ -311,7 +301,8 @@ sentinel-fraud-intelligence/
 │       ├── sample_bson_documents.json           # Sample customer, device & transaction BSON structures
 │       └── verification_report.json             # 6-gate NoSQL audit report
 │
-├── sentinel-fraud-graph/                        # Subsystem 4: Neo4j property-graph mule-ring detector
+│
+├── sentinel-fraud-graph/                        # Subsystem 3: Neo4j property-graph mule-ring detector
 │   ├── sentinel_fraud_graph.py                  # Graph builder, 2-hop contagion traversal & ring analyzer
 │   ├── queries.cypher                           # Standalone production Cypher queries (Q1, Q2, Q3)
 │   ├── scripts/
@@ -324,7 +315,32 @@ sentinel-fraud-intelligence/
 │       ├── query_2_two_hop_fraud_customers.csv  # Accounts within 2 hops of confirmed fraud
 │       └── query_3_merchants_shared_devices.csv # Collusive merchant cashout terminals
 │
-├── sentinel-vector-search-engine/               # Subsystem 5: 3072-d vector math, L2 proofs & HNSW benchmarks
+│
+├── sentinel-feature-pipeline/                   # Subsystem 4: Point-in-time feature store & parity engine
+│   ├── feature_pipeline.py                      # Point-in-time FE-01..FE-10 & R01..R08 derivation engine
+│   ├── scripts/
+│   │   ├── sentinel_data_loader.py              # Canonical 3-tier telemetry loader
+│   │   └── generate_diagnostics_plot.py         # Reproducible feature diagnostic visualizer
+│   └── outputs/
+│       ├── feature_pipeline_diagnostics.png     # Multi-panel feature parity & IST ablation plot
+│       ├── feature_parity_report.md             # Reconciled client parity report (100.00% match)
+│       ├── feature_parity_summary.csv           # Feature-by-feature parity statistics
+│       ├── data_quality_report.md               # 4-split data quality & null telemetry audit
+│       ├── data_quality_report.json             # Machine-readable data quality report
+│       └── pipeline_verification_report.json    # 6-gate verification report
+│
+│
+├── sentinel-policy-retrieval/                   # Subsystem 5: Qdrant 3072-d dense policy retrieval (Hit@5 100%)
+│   ├── qdrant_embeddings_pipeline.py            # 225-doc sliding-window chunker, 3072-d embedder & Qdrant indexer
+│   ├── scripts/
+│   │   └── sentinel_data_loader.py              # Canonical telemetry & policy corpus loader
+│   └── outputs/
+│       ├── policy_retrieval_10_queries_benchmark.md # 10-query precision breakdown, top-3 hits & filter proof
+│       ├── payload_filtered_playbooks_results.json  # Pre-filtered vs unfiltered payload query verification
+│       └── verification_report.json             # 6-gate vector retrieval SLA verification report
+│
+│
+├── sentinel-vector-search-engine/               # Subsystem 6: 3072-d vector math, L2 proofs & HNSW benchmarks
 │   ├── vector_search_engine.py                  # Unit-norm geometry proof, BLAS matrix engine & HNSW benchmarks
 │   ├── scripts/
 │   │   └── sentinel_data_loader.py              # Canonical telemetry loader
@@ -333,14 +349,6 @@ sentinel-fraud-intelligence/
 │       ├── 2d_vector_geometry.png               # 2D unit-circle geometric cosine equivalence proof
 │       └── vector_internals_verification_report.json # Exact cosine parity & BLAS speedup report
 │
-├── sentinel-policy-retrieval/                   # Subsystem 6: Qdrant 3072-d dense policy retrieval (Hit@5 100%)
-│   ├── qdrant_embeddings_pipeline.py            # 225-doc sliding-window chunker, 3072-d embedder & Qdrant indexer
-│   ├── scripts/
-│   │   └── sentinel_data_loader.py              # Canonical telemetry & policy corpus loader
-│   └── outputs/
-│       ├── policy_retrieval_10_queries_benchmark.md # 10-query precision breakdown, top-3 hits & filter proof
-│       ├── payload_filtered_playbooks_results.json  # Pre-filtered vs unfiltered payload query verification
-│       └── verification_report.json             # 6-gate vector retrieval SLA verification report
 │
 ├── sentinel-rag-investigator/                   # Subsystem 7: Real-time FastAPI RAG Assistant (POST /explain)
 │   ├── app/
@@ -359,7 +367,8 @@ sentinel-fraud-intelligence/
 │       ├── hit_at_5_retrieval_benchmark.json    # Machine-readable retrieval benchmarks
 │       └── privacy_and_grounding_audit.json     # 6-gate RAG audit & latency SLA report
 │
-└── sentinel-gpu-compute-sizing/                 # Subsystem 8: GPU compute sizing (6ND vs 4ND) & PyTorch telemetry
+│
+└── sentinel-gpu-compute-sizing/                 # Subsystem 8: `sentinel_gpu_compute_sizing_and_granularity` (GPU Compute Sizing & Granularity)
     ├── compute_sizing_calculator.py             # 6ND vs 4ND FLOPs calculator, VRAM sizing & 2,800 TPS cluster
     ├── gpu_benchmark.py                         # Direct entrypoint for GEMM FLOPs, Mini-LoRA & telemetry benchmark
     ├── gpu_demo_and_server.py                   # Live GPU telemetry, GEMM TFLOPS benchmark & HTTP telemetry server

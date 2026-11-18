@@ -35,7 +35,9 @@
 
 In UPI and Card networks, fraud dispute resolution requires up to 60 days for bank chargeback notification cycles:
 
-$$\text{label\_available\_at} = \text{transaction\_time} + 60\text{ days}$$
+```text
+label_available_at = transaction_time + 60 days
+```
 
 ```text
 Timeline & The 60-Day Chargeback Maturation Window (Validation Split Cutoff T_val = 2025-11-01 UTC)

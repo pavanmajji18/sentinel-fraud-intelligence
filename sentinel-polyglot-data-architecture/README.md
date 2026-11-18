@@ -67,7 +67,15 @@ The `sentinel_demo` schema partitions structured telemetry, unstructured RAG doc
 
 ---
 
-## 3. Entity-Relationship (ER) Topology & Join Architecture
+## 3. Entity-Relationship (ER) Topology & Polyglot Routing Architecture
+
+### 3.1 18-Table Polyglot Storage Routing Architecture
+
+The 300-DPI publication visual mapping all 18 tables to their 5 storage engines is generated at `outputs/polyglot_18_table_er_and_routing.png` via `scripts/generate_architecture_visuals.py`:
+
+![Sentinel 18-Table Polyglot Storage Routing Architecture](outputs/polyglot_18_table_er_and_routing.png)
+
+### 3.2 18-Table Entity-Relationship Topology
 
 The high-resolution 4K diagram is generated at `outputs/sentinel_er_diagram_18_tables.png` via `scripts/generate_er_diagram.py`:
 
@@ -123,6 +131,8 @@ In UPI and Card dispute workflows, ground-truth fraud labels (`fraud_label = 0` 
 ```text
 label_available_at = transaction_time + 60 days
 ```
+
+![Sentinel 60-Day Chargeback Maturation & Zero-Leakage Temporal Splits](outputs/temporal_60d_maturation_timeline.png)
 
 ```text
 Timeline & The 60-Day Chargeback Maturation Trap (Validation Split Boundary T_val = 2025-11-01 UTC)
@@ -228,9 +238,14 @@ sentinel-polyglot-data-architecture/
 ├── sentinel_architecture_verifier.py        # Automated 6-gate SLA, privacy, leakage & math verification engine
 ├── scripts/
 │   ├── sentinel_data_loader.py              # 3-tier telemetry loader & pre-ingestion privacy gate
-│   └── generate_er_diagram.py               # Reproducible generator for the 4K 18-table ER diagram
+│   ├── generate_er_diagram.py               # Reproducible generator for the 4K 18-table ER diagram
+│   └── generate_architecture_visuals.py     # Deterministic generator for publication-ready 300-DPI visuals
 └── outputs/
+    ├── polyglot_18_table_er_and_routing.png # 300-DPI 18-table schema & 5-engine storage routing diagram
+    ├── temporal_60d_maturation_timeline.png # 300-DPI 60-day maturation timeline & zero-leakage splits
+    ├── linkedin_post1_architecture_showcase.png # High-resolution 2-panel composite executive hero card
     ├── sentinel_er_diagram_18_tables.png    # 4K UHD (3840x2160) 18-table Entity-Relationship diagram
+    ├── polyglot_18_table_schema_reference.md# Complete 18-table schema catalog & worked numerical trace
     ├── architecture_audit_summary.json      # Machine-readable verification metrics & worked example parity
     └── verification_report.txt              # Captured CLI execution log of all 6 verification gates
 ```
@@ -244,7 +259,10 @@ pip install -r requirements.txt
 # 2. Execute all 6 architecture, privacy, temporal maturation & numerical parity gates
 python3 sentinel_architecture_verifier.py --offline-mock --verify
 
-# 3. Regenerate the 4K 18-table ER architecture diagram
+# 3. Generate all 3 publication-ready 300-DPI LinkedIn visual assets
+python3 scripts/generate_architecture_visuals.py
+
+# 4. (Optional) Regenerate the standalone 4K 18-table ER architecture diagram
 python3 scripts/generate_er_diagram.py
 ```
 
