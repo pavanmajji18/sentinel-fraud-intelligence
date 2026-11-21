@@ -10,91 +10,98 @@ Domain: Tier-1 RBI-Regulated Digital Payment Aggregator (UPI / Card / Wallet / N
   -> Health Probe (`ping`) : {'ok': 1.0} [VERIFIED]
 
 [STAGE 2] Three-Way Telemetry Ingestion & DPDP Act 2023 / PCI-DSS v4.0 Privacy Gate
-  -> Active Telemetry Tier : Tier 2 (PostgreSQL / Supabase Telemetry Replica)
+  -> Active Telemetry Tier : Tier 3 (Deterministic Schema-Compliant Synthetic Telemetry: 5,500 txns, seed=42)
   -> Privacy Standard      : DPDP Act 2023 & PCI-DSS v4.0 Data Minimization
-  -> Tokenized Entities    : 2500 Customers (C_*), 200 Merchants (M_*), 10120 Devices (D_*)
+  -> Tokenized Entities    : 500 Customers (C_*), 120 Merchants (M_*), 900 Devices (D_*)
   -> PII Guardrail Check   : 12 forbidden PII column types blocked; is_synthetic=True
 
 [STAGE 3] Hybrid BSON Schema Construction (Embedded Devices vs. Referenced Transactions)
-  -> `customers` BSON      : 2,500 docs | Embedded `devices` array (avg 0.72 devices/customer, max 3) | Avg size: 340 bytes (99.99797% below 16 MB BSON limit)
-  -> `transactions` BSON   : 5,500 docs | Referenced `customer_id`, `merchant_id`, `device_id` + Merchant snapshot | Avg size: 1014 bytes
+  -> `customers` BSON      : 500 docs | Embedded `devices` array (avg 3.78 devices/customer, max 15) | Avg size: 911 bytes (99.99457% below 16 MB BSON limit)
+  -> `transactions` BSON   : 5,500 docs | Referenced `customer_id`, `merchant_id`, `device_id` + Merchant snapshot | Avg size: 1017 bytes
 
 [STAGE 4] Operational Write/Read Lifecycle (5 Core CRUD Operations)
   -> 1. insert_one         : Inserted Canary Customer `C_CANARY_9999999999` & Canary Gaming UPI Txn `TX_CANARY_9999999999` (Rs. 49,999.00)
-  -> 2. insert_many        : Unordered bulk load (`ordered=False`) of 2,500 customers and 5,500 transactions in 159.41 ms
-  -> 3. find (Projected)   : Filter `payment_channel='UPI' AND transaction_amount > 10000` matched 147 docs (projected without `_id`)
-  -> 4. update_many        : Escalated `merchant_category='gaming' AND transaction_amount > 25000` (17 docs modified via addToSet & set)
-  -> 5. delete_one         : Removed canary probe docs (`deleted_count=1`); active counts verified at 2,500 customers and 5,500 transactions
+  -> 2. insert_many        : Unordered bulk load (`ordered=False`) of 500 customers and 5,500 transactions in 77.3 ms
+  -> 3. find (Projected)   : Filter `payment_channel='UPI' AND transaction_amount > 10000` matched 168 docs (projected without `_id`)
+  -> 4. update_many        : Escalated `merchant_category='gaming' AND transaction_amount > 25000` (14 docs modified via addToSet & set)
+  -> 5. delete_one         : Removed canary probe docs (`deleted_count=1`); active counts verified at 500 customers and 5,500 transactions
 
 [STAGE 5] Compound ESR B-Tree Index Engineering & .explain('executionStats') Benchmark
-  -> Target Scoring Query  : db.transactions.find({"customer_id": "C_7ac08ed4d9feab3c"}).sort({"transaction_time": -1})
-  -> Before Index Creation : Stage = SORT <- COLLSCAN | totalDocsExamined = 5,500 | totalKeysExamined = 0 | nReturned = 26 | Latency = 3.5721 ms
+  -> Target Scoring Query  : db.transactions.find({"customer_id": "C_89aec26619606cb4"}).sort({"transaction_time": -1})
+  -> Before Index Creation : Stage = SORT <- COLLSCAN | totalDocsExamined = 5,500 | totalKeysExamined = 0 | nReturned = 24 | Latency = 3.0783 ms
   -> Indexes Built         : idx_customer_id_1, idx_transaction_time_-1, idx_customer_id_1_transaction_time_-1
-  -> After ESR Index       : Stage = FETCH <- IXSCAN (idx_customer_id_1_transaction_time_-1) | totalDocsExamined = 26 | totalKeysExamined = 26 | nReturned = 26 | Latency = 0.0526 ms
-  -> Efficiency Gain       : 99.53% reduction in scanned BSON documents; blocking in-memory SORT eliminated
+  -> After ESR Index       : Stage = FETCH <- IXSCAN (idx_customer_id_1_transaction_time_-1) | totalDocsExamined = 24 | totalKeysExamined = 24 | nReturned = 24 | Latency = 0.0229 ms
+  -> Efficiency Gain       : 99.56% reduction in scanned BSON documents; blocking in-memory SORT eliminated
 
 [STAGE 6] Multi-Stage Analytical Aggregation Pipelines (MCC Risk, 24h Velocity, R01-R08 Precision)
 
   [Pipeline 1] Fraud Rate & Financial Exposure by Merchant Category:
   Merchant Category  | Total Txns | Fraud Txns | Fraud Rate % | Total Volume (INR) | Avg Ticket (INR)
   ------------------------------------------------------------------------------------------------
-  gaming             |        554 |         10 |        1.81% |       2,323,841.89 |         4,194.66
-  gift_cards         |        396 |          7 |        1.77% |       2,013,016.43 |         5,083.37
-  electronics        |        798 |         10 |        1.25% |       8,788,891.92 |        11,013.65
-  quick_commerce     |        812 |          0 |        0.00% |       9,833,027.96 |        12,109.64
-  other              |        304 |          0 |        0.00% |       4,720,664.90 |        15,528.50
-  grocery            |      1,071 |          0 |        0.00% |       2,234,330.91 |         2,086.21
-  food               |        687 |          0 |        0.00% |       1,434,544.47 |         2,088.13
-  healthcare         |        381 |          0 |        0.00% |         964,276.02 |         2,530.91
-  education          |        223 |          0 |        0.00% |         644,040.47 |         2,888.07
-  travel             |        274 |          0 |        0.00% |         624,325.31 |         2,278.56
+  electronics        |        588 |        149 |       25.34% |       2,688,003.96 |         4,571.44
+  travel             |        852 |        191 |       22.42% |       4,765,545.71 |         5,593.36
+  gaming             |        267 |         52 |       19.48% |       1,316,428.76 |         4,930.44
+  education          |        478 |         44 |        9.21% |       2,106,345.93 |         4,406.58
+  quick_commerce     |      1,013 |         85 |        8.39% |       4,662,337.33 |         4,602.50
+  utilities          |        993 |         78 |        7.85% |       3,957,138.10 |         3,985.03
+  grocery            |        471 |         36 |        7.64% |       1,944,774.22 |         4,129.03
+  food               |        838 |         57 |        6.80% |       3,297,017.25 |         3,934.39
 
   [Pipeline 2A] Top 10 Customers by 24-Hour Spend Velocity (Per-Customer Rolling 24h Peak Window):
   Rank | Customer ID          | 24h Txns |  24h Spend (INR) |  24h Spend (Paise) | Fraud Txns
   ----------------------------------------------------------------------------------------
-  1    | C_9b3aee21759c3763   |        9 |     8,009,402.16 |        800,940,216 |          0
-  2    | C_ec0917ec69fef0e2   |        2 |     5,782,717.61 |        578,271,761 |          0
-  3    | C_d7627b94e4877d99   |        3 |     4,062,397.25 |        406,239,725 |          0
-  4    | C_1f99ce6bdd6ab058   |        8 |       313,802.74 |         31,380,274 |          0
-  5    | C_4c80552c1bd9fbca   |        9 |       241,900.80 |         24,190,080 |          0
-  6    | C_20d02d4ebc5df27b   |        8 |       230,277.45 |         23,027,745 |          1
-  7    | C_1aa451e90647f952   |        6 |       178,322.30 |         17,832,230 |          0
-  8    | C_10ac8ffb32236498   |        9 |       166,995.84 |         16,699,584 |          0
-  9    | C_4107507e8652aca9   |        7 |       152,574.71 |         15,257,471 |          0
-  10   | C_52094f023f449fb3   |        7 |       143,915.12 |         14,391,512 |          1
+  1    | C_6df74ad4ce74e2a8   |        6 |       367,006.21 |         36,700,621 |          6
+  2    | C_87ceee91fc100ef4   |        7 |       365,901.54 |         36,590,154 |          6
+  3    | C_32bcb7477087ff42   |        6 |       355,135.67 |         35,513,567 |          6
+  4    | C_32abf437241e8590   |        6 |       345,807.52 |         34,580,752 |          6
+  5    | C_719af91bdb71d86b   |        6 |       344,874.03 |         34,487,403 |          6
+  6    | C_7dcdd3e88195a3cf   |        6 |       344,486.43 |         34,448,643 |          6
+  7    | C_c25b1be6e0bc1f40   |        6 |       343,093.67 |         34,309,367 |          6
+  8    | C_093196fa0afaa586   |        6 |       336,695.76 |         33,669,576 |          6
+  9    | C_e631e641e9303987   |        6 |       329,548.32 |         32,954,832 |          6
+  10   | C_d0108337ae0591f1   |        6 |       327,064.60 |         32,706,460 |          6
 
-  [Pipeline 2B] Top 10 Customers by Global Dataset Trailing 24h Window (2026-01-30T04:36:47.526000+00:00 -> 2026-01-31 04:36:47.526000+00:00):
+  [Pipeline 2B] Top 10 Customers by Global Dataset Trailing 24h Window (2025-05-29T23:06:22+00:00 -> 2025-05-30T23:06:22+00:00):
   Rank | Customer ID          | 24h Txns |  24h Spend (INR) |  24h Spend (Paise) | Fraud Txns
   ----------------------------------------------------------------------------------------
-  1    | C_fc2e7b5b12031d4a   |        1 |         3,245.60 |            324,560 |          0
+  1    | C_6df74ad4ce74e2a8   |        6 |       367,006.21 |         36,700,621 |          6
+  2    | C_03887f236e21fa86   |        6 |       187,697.82 |         18,769,782 |          6
+  3    | C_f6c8f2c04c6ea9bf   |        2 |        39,558.84 |          3,955,884 |          1
+  4    | C_f0f800eb6c915623   |        3 |        30,270.57 |          3,027,057 |          1
+  5    | C_32bcb7477087ff42   |        1 |        25,910.74 |          2,591,074 |          1
+  6    | C_0cc9cb709b07eae1   |        2 |        12,505.04 |          1,250,504 |          1
+  7    | C_b2656c7900c5fb42   |        2 |        12,320.23 |          1,232,023 |          0
+  8    | C_c888fbd6264b01c6   |        1 |        11,197.51 |          1,119,751 |          1
+  9    | C_b10b0e178e895baf   |        2 |        11,167.89 |          1,116,789 |          0
+  10   | C_5fb60dc8d874ac78   |        2 |        11,141.16 |          1,114,116 |          1
 
   [Pipeline 3 — Signal Attribution] Risk Signal Precision Across R01-R08 via Unwind:
   Reason Code            |   Triggers | Fraud Hits | Genuine Hits | Precision % |  Exposed Vol (INR)
   ------------------------------------------------------------------------------------------------
-  R05_AMOUNT_SPIKE       |        184 |         19 |          165 |      10.33% |      21,501,923.74
-  R04_FAILED_ATTEMPTS    |        474 |         24 |          450 |       5.06% |       4,062,318.15
-  R07_VELOCITY           |        741 |         22 |          719 |       2.97% |       4,532,727.98
-  R03_ODD_HOUR           |        729 |         19 |          710 |       2.61% |       3,606,249.20
-  R08_HIGH_RISK_MCC      |      1,598 |         25 |        1,573 |       1.56% |      12,529,121.05
-  R02_GEO_MISMATCH       |      4,397 |         20 |        4,377 |       0.45% |      30,169,802.91
-  R01_NEW_DEVICE         |      1,717 |          0 |        1,717 |       0.00% |       4,031,571.50
-  R06_NEW_ACCOUNT        |         22 |          0 |           22 |       0.00% |          76,422.36
+  R07_VELOCITY           |         78 |         78 |            0 |     100.00% |       4,870,381.58
+  R04_FAILED_ATTEMPTS    |        353 |        352 |            1 |      99.72% |      13,371,445.00
+  R05_AMOUNT_SPIKE       |        211 |        207 |            4 |      98.10% |       5,271,408.28
+  R01_NEW_DEVICE         |      2,154 |        604 |        1,550 |      28.04% |      14,939,181.94
+  R03_ODD_HOUR           |      1,160 |        300 |          860 |      25.86% |       5,275,287.78
+  R08_HIGH_RISK_MCC      |      1,707 |        392 |        1,315 |      22.96% |       8,769,978.43
+  R06_NEW_ACCOUNT        |         10 |          2 |            8 |      20.00% |          17,061.77
+  R02_GEO_MISMATCH       |      4,294 |        647 |        3,647 |      15.07% |      20,408,664.98
 
 ========================================================================================
 AUTOMATED ENGINEERING SLA, DATA-GOVERNANCE & QUERY-PLAN VERIFICATION GATES
 ========================================================================================
   [PASS] Gate 1 — DPDP Act 2023 & PCI-DSS v4.0 Pre-Ingestion Privacy Gate
-         Metric: 2500 C_*, 200 M_*, 10120 D_* tokenized; 0 raw PII columns persisted
+         Metric: 500 C_*, 120 M_*, 900 D_* tokenized; 0 raw PII columns persisted
   [PASS] Gate 2 — Three-Way Telemetry Scale & Hybrid BSON Schema Gate (>= 5,000 Txns)
-         Metric: 2500 customer docs (avg 340 B, avg 0.72 embedded devices) & 5,500 referenced transaction docs
+         Metric: 500 customer docs (avg 911 B, avg 3.78 embedded devices) & 5,500 referenced transaction docs
   [PASS] Gate 3 — Operational CRUD Lifecycle & Canary Cleanup Invariant Gate
-         Metric: insert_one=OK, insert_many=5,500, find=147 UPI>10k, update_many=17 escalated, delete_one=1 canary removed
+         Metric: insert_one=OK, insert_many=5,500, find=168 UPI>10k, update_many=14 escalated, delete_one=1 canary removed
   [PASS] Gate 4 — Compound ESR B-Tree Index & .explain('executionStats') Gate
-         Metric: COLLSCAN (5,500 docs) -> IXSCAN (26 docs), 99.53% scan reduction
+         Metric: COLLSCAN (5,500 docs) -> IXSCAN (24 docs), 99.56% scan reduction
   [PASS] Gate 5 — Core Aggregation Pipelines Gate (MCC Fraud Exposure & 24h Spend Velocity)
-         Metric: 8 MCC categories analyzed; Top-10 24h velocity leader = C_9b3aee21759c3763 (Rs. 8,009,402.16)
+         Metric: 8 MCC categories analyzed; Top-10 24h velocity leader = C_6df74ad4ce74e2a8 (Rs. 367,006.21)
   [PASS] Gate 6 — Signal Attribution Unwind Pipeline Gate (R01-R08 Precision)
-         Metric: All 8 reason codes (R01-R08) unwound; top precision signal = R05_AMOUNT_SPIKE (10.33%)
+         Metric: All 8 reason codes (R01-R08) unwound; top precision signal = R07_VELOCITY (100.0%)
 ----------------------------------------------------------------------------------------
   OVERALL VERIFICATION STATUS: 6/6 Gates Passed (100% COMPLIANT)
 ========================================================================================

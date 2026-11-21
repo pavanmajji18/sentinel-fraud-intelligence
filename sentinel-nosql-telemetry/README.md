@@ -1,36 +1,57 @@
 # Project SENTINEL — High-Throughput NoSQL Fraud Telemetry & BSON Indexing Engine
 
+[← Back to Project SENTINEL Monorepo Root](../README.md)
+
+[![MongoDB 7.0](https://img.shields.io/badge/MongoDB-7.0%20WiredTiger-47A248?style=flat&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![SLA p99 <= 250ms](https://img.shields.io/badge/SLA-p99%20%3C%3D%20250ms-blue)](#1-system-architecture--engineering-context)
+[![Peak Throughput 2,800 TPS](https://img.shields.io/badge/Peak%20Throughput-2%2C800%20TPS-orange)](#1-system-architecture--engineering-context)
+[![Compliance DPDP Act 2023 & PCI-DSS v4.0](https://img.shields.io/badge/Compliance-DPDP%20Act%202023%20%7C%20PCI--DSS%20v4.0-emerald)](#3-data-governance--zero-breach-privacy-architecture-dpdp-act-2023--pci-dss-v40)
+[![LinkedIn Post 2/8](https://img.shields.io/badge/LinkedIn%20Series-Post%202%2F8-0A66C2?style=flat&logo=linkedin&logoColor=white)](#7-compound-esr-b-tree-index-benchmark-explainexecutionstats)
+
+---
+
+![Project SENTINEL LinkedIn Post 2/8 Visual Showcase](outputs/linkedin_post2_nosql_explain_showcase.png)
+
+---
+
 ## 1. System Architecture & Engineering Context
 
 Real-time payment authorization pipelines for a **Tier-1 RBI-Regulated Digital Payment Aggregator** (spanning **UPI, Cards, Wallets, and Net-Banking** across 1,80,000+ merchants and ~90M unique payers) must ingest and score payment attempts at **4.2 million daily authorizations** (**1,000 TPS sustained, 2,800 TPS festive peak**) while maintaining an online scoring latency SLA of **`p50 <= 80 ms` and `p99 <= 250 ms`** (with a fail-open/review circuit breaker at `300 ms`).
 
 Static rule engines suffer from **9.8 bps fraud loss** and a **2.3% false decline/review rate**, generating 22,000+ manual investigator reviews per day. To power real-time velocity checks, point-in-time feature hydration (`FE-01` through `FE-10`), and deterministic risk signal attribution (`R01` through `R08`), the operational document store (`sentinel_fraud_db` in MongoDB) solves three core distributed systems challenges:
 
-1. **Sub-Millisecond Profile & Device Fingerprinting Reads (`O(1)` Atomic Document Lookup)**: Online authorization scoring requires immediate access to a customer's known hardware fingerprints (`mobile_android`, `mobile_ios`, `desktop_web`) to evaluate `FE-02 (is_new_device)` and `R01_NEW_DEVICE` without cross-collection join (`lookup`) network overhead.
+1. **Sub-Millisecond Profile & Device Fingerprinting Reads (`O(1)` Atomic Document Lookup)**: Online authorization scoring requires immediate access to a customer's known hardware fingerprints (`mobile_android`, `mobile_ios`, `desktop_web`) to evaluate `FE-02 (is_new_device)` and `R01_NEW_DEVICE` without cross-collection join (`$lookup`) network overhead.
 2. **Unbounded High-Velocity Stream Ingestion Without 16 MB BSON Overflow or Write Amplification**: At 2,800 TPS peak, transaction streams grow unboundedly. Embedding transactions inside customer documents would breach MongoDB's 16 MB BSON limit and trigger severe WiredTiger page re-allocation contention.
 3. **Equality-Sort-Range (ESR) B-Tree Indexing for Point-in-Time Velocity Queries**: Fetching a customer's trailing 1-hour (`FE-07: txn_count_last_1h`) and 24-hour (`txn_amount_last_24h_paise`) authorization history requires an index that satisfies both the equality predicate (`customer_id`) and reverse chronological ordering (`transaction_time: -1`) without a blocking in-memory `SORT` stage.
+
+---
 
 ## 2. Repository Structure
 
 ```text
 sentinel-nosql-telemetry/
-├── sentinel_nosql_telemetry.py       # End-to-end MongoDB BSON ingestion, CRUD, ESR index benchmark & aggregations
-├── verify_sync_counts.py             # Supabase (PostgreSQL) <-> MongoDB Atlas cross-database count & sync audit
+├── sentinel_nosql_telemetry.py          # End-to-end MongoDB BSON ingestion, CRUD, ESR index benchmark & aggregations
+├── verify_sync_counts.py                # Supabase (PostgreSQL) <-> MongoDB Atlas cross-database count & sync audit
 ├── scripts/
 │   ├── __init__.py
-│   └── sentinel_data_loader.py       # 3-Way telemetry loader + DPDP Act 2023 & PCI-DSS v4.0 privacy gate
+│   ├── generate_linkedin_post2_visual.py # Publication-grade 16:9 visual generator (1600x900 @ 300 DPI)
+│   └── sentinel_data_loader.py          # 3-Way telemetry loader + DPDP Act 2023 & PCI-DSS v4.0 privacy gate
 ├── outputs/
-│   ├── verification_report.json      # Complete telemetry, CRUD, index explain(), aggregation & 6-gate audit
-│   ├── explain_before_after.json     # Raw WiredTiger queryPlanner & executionStats before/after ESR indexing
-│   ├── aggregation_results.json      # Full outputs of Pipelines 1, 2A, 2B, and 3 (R01-R08 precision)
-│   ├── sample_bson_documents.json    # Sample Customer (embedded devices) & Transaction (referenced) BSON docs
-│   └── verification_log.txt          # Full Stage 1-6 console execution transcript
-├── docker-compose.yml                # Local MongoDB 7.0 WiredTiger container specification (port 27017)
-├── requirements.txt                  # Python dependencies (pymongo, pandas, numpy, python-dotenv)
-├── .env.example                      # Sanitized environment configuration template
-├── .gitignore                        # Hardened secret & raw telemetry dump exclusion rules
-└── README.md                         # Production architecture, schema design & benchmark documentation
+│   ├── linkedin_post2_nosql_explain_showcase.png # LinkedIn Post 2/8 publication visual showcase
+│   ├── verification_report.json         # Complete telemetry, CRUD, index explain(), aggregation & 6-gate audit
+│   ├── explain_before_after.json        # Raw WiredTiger queryPlanner & executionStats before/after ESR indexing
+│   ├── aggregation_results.json         # Full outputs of Pipelines 1, 2A, 2B, and 3 (R01-R08 precision)
+│   ├── sample_bson_documents.json       # Sample Customer (embedded devices) & Transaction (referenced) BSON docs
+│   └── verification_log.txt             # Full Stage 1-6 console execution transcript
+├── docker-compose.yml                   # Local MongoDB 7.0 WiredTiger container specification (port 27017)
+├── requirements.txt                     # Python dependencies (pymongo, pandas, numpy, python-dotenv, matplotlib, pillow)
+├── .env.example                         # Sanitized environment configuration template
+├── .gitignore                           # Hardened secret & raw telemetry dump exclusion rules
+└── README.md                            # Production architecture, schema design & benchmark documentation
 ```
+
+---
 
 ## 3. Data Governance & Zero-Breach Privacy Architecture (DPDP Act 2023 & PCI-DSS v4.0)
 
@@ -41,6 +62,8 @@ Every dataset loaded by `scripts/sentinel_data_loader.py` passes through `enforc
 * **Client Brand Anonymization**: Replaces any proprietary merchant branding with standardized domain tokens (`Merchant_<MCC>_<id>`, e.g., `Merchant_Gaming_014`).
 * **Synthetic Telemetry Verification & Integer Paise Invariant**: Asserts `is_synthetic == True` on 100% of ingested records and enforces exact integer paise representation (`amount_paise == round(transaction_amount * 100)`) to prevent IEEE-754 floating-point drift during financial aggregations.
 
+---
+
 ## 4. Three-Way Telemetry Data Flow
 
 To guarantee zero-downtime execution across local workstations, cloud staging replicas, and CI/CD pipelines, `load_sentinel_tables()` resolves telemetry across three automatic tiers:
@@ -50,6 +73,8 @@ To guarantee zero-downtime execution across local workstations, cloud staging re
 | **Tier 1: Local Sanitized Telemetry** | `SENTINEL_DATA_DIR` (`./sentinel_data/tables/*.csv` or `parquet/*.parquet`) | Directory exists on disk with all 7 core tables | Passes all 7 DataFrames through `enforce_data_privacy_guardrails()` |
 | **Tier 2: PostgreSQL / Supabase Replica** | `DATABASE_URL` (`public` or `sentinel_demo` schema) | Valid connection string configured and reachable within 10s timeout | Queries live tables (`customers`, `transactions`, `devices`, `merchants`, `payment_outcomes`, `labels`, `features`) and validates via `enforce_data_privacy_guardrails()` |
 | **Tier 3: Deterministic Synthetic Generator** | Built-in `generate_synthetic_sentinel_dataset(seed=42)` | Automatic fallback when Tiers 1 & 2 are absent | Generates **5,500 transactions**, **500 customers**, **120 merchants**, and **900 devices** (with 15 shared mule-ring devices and realistic 24h velocity bursts) |
+
+---
 
 ## 5. Hybrid BSON Schema Design: Embedded vs. Referenced Rationale
 
@@ -130,7 +155,9 @@ In `sentinel_fraud_db`, collection structure is governed by entity cardinality, 
 }
 ```
 
-## 6. Operational Write/Read Lifecycle (CRUD Verification)
+---
+
+## 6. Operational Write/Read Lifecycle (5 Core CRUD Operations)
 
 Stage 4 of `sentinel_nosql_telemetry.py` executes and validates all 5 core MongoDB operational write/read patterns:
 
@@ -139,8 +166,10 @@ Stage 4 of `sentinel_nosql_telemetry.py` executes and validates all 5 core Mongo
 | **`insert_one`** | `customers` & `transactions` | Inserts canary customer `C_CANARY_9999999999` and high-risk gaming UPI authorization `TX_CANARY_9999999999` (`Rs. 49,999.00` / `4,999,900 paise`) | `acknowledged = True` on both collections |
 | **`insert_many`** | `customers` & `transactions` | Unordered bulk ingestion (`ordered=False`) of **500 customers** and **5,500 transactions** | **500** customers + **5,500** transactions inserted (`5,501` total with canary) |
 | **`find` (Filtered & Projected)** | `transactions` | Filter: `payment_channel == "UPI"` and `transaction_amount > 10000.0` with projection excluding `_id` | **168 high-value UPI transactions** matched and sorted descending |
-| **`update_many`** | `transactions` | Filter: `merchant_category == "gaming"` and `transaction_amount > 25000.0`; appends `R08_HIGH_RISK_MCC` to `reason_codes` via `addToSet` and sets `review_required = True`, `escalation_tag = "HIGH_VALUE_GAMING_AUDIT"` | **14 high-value gaming transactions** matched and escalated |
+| **`update_many`** | `transactions` | Filter: `merchant_category == "gaming"` and `transaction_amount > 25000.0`; appends `R08_HIGH_RISK_MCC` to `reason_codes` via `$addToSet` and sets `review_required = True`, `escalation_tag = "HIGH_VALUE_GAMING_AUDIT"` | **14 high-value gaming transactions** matched and escalated |
 | **`delete_one`** | `transactions` & `customers` | Deletes canary probe documents `TX_CANARY_9999999999` and `C_CANARY_9999999999` | `deleted_count = 1` each; post-cleanup counts restored to exactly **500 customers** and **5,500 transactions** |
+
+---
 
 ## 7. Compound ESR B-Tree Index Benchmark (`.explain("executionStats")`)
 
@@ -158,14 +187,18 @@ We construct three B-Tree indexes on `db.transactions`:
 2. `idx_transaction_time_-1`: `[("transaction_time", -1)]`
 3. `idx_customer_id_1_transaction_time_-1`: `[("customer_id", 1), ("transaction_time", -1)]` (**ESR Compound Index**: **E**quality on `customer_id`, **S**ort/Range on `transaction_time: -1`)
 
+### Verified Query Plan & Execution Stats Comparison Table
+
 | Execution Metric | Before Indexing (Unindexed Baseline) | After Compound ESR Index (`idx_customer_id_1_transaction_time_-1`) | Engineering Improvement |
 | :--- | :--- | :--- | :--- |
 | **Winning Query Plan Stage** | `SORT <- COLLSCAN` | `FETCH <- IXSCAN (idx_customer_id_1_transaction_time_-1)` | Eliminates full collection scan and blocking in-memory sort |
 | **`nReturned` (Matching Docs)** | `24` | `24` | Identical deterministic result set |
 | **`totalDocsExamined`** | `5,500` | `24` | **99.56% reduction** in BSON documents scanned (`229.2x` fewer docs) |
 | **`totalKeysExamined`** | `0` | `24` | **1.000 selectivity ratio** (`nReturned == totalKeysExamined == totalDocsExamined`) |
-| **Execution Time (`ms`)** | `~4.62 ms` | `~0.03 ms` | **>100x speedup** (keeps scoring well within `p50 <= 80 ms` SLA) |
+| **Execution Time (`ms`)** | `3.157 ms` | `0.0197 ms` | **>150x latency reduction** (keeps scoring well within `p50 <= 80 ms` SLA) |
 | **In-Memory `SORT` Stage** | Required (`100 MB` RAM cap risk at scale) | **Eliminated (`False`)** | Index key order natively matches `.sort({"transaction_time": -1})` |
+
+---
 
 ## 8. Multi-Stage Aggregation Pipeline Benchmarks
 
@@ -237,15 +270,17 @@ Unwinds the `reason_codes` array across all transactions to quantify standalone 
 
 *Operational Takeaway*: High-precision behavioral signals (`R07_VELOCITY` at **100.00%**, `R04_FAILED_ATTEMPTS` at **99.72%**, and `R05_AMOUNT_SPIKE` at **98.10%**) serve as high-confidence autonomous `BLOCK` triggers (`OBJ-02 >= 70%` precision target), whereas broad contextual signals (`R01_NEW_DEVICE`, `R02_GEO_MISMATCH`, `R08_HIGH_RISK_MCC`) provide recall uplift when combined in multi-flag ensembles (`FE-10: combined_risk_flags >= 3`).
 
-## 9. Setup, Execution & Automated Verification Gates
+---
+
+## 9. Quick-Start, Execution & Automated Verification Gates
 
 ### Environment Setup
 
 ```bash
-# 1. Install dependencies
+# 1. Install dependencies (including pymongo, pandas, numpy, python-dotenv, matplotlib, pillow)
 pip install -r requirements.txt
 
-# 2. Configure environment variables
+# 2. Configure environment variables (copy safe template)
 cp .env.example .env
 
 # 3. (Optional) Start local MongoDB 7.0 container via Docker Compose
@@ -255,11 +290,14 @@ docker compose up -d
 ### Running the Telemetry & Indexing Pipeline
 
 ```bash
-# Run against live MongoDB / Atlas (with automatic fallback if daemon is offline)
-python3 sentinel_nosql_telemetry.py --verify
+# Option A: Run against live MongoDB Server / Atlas (with automatic in-memory fallback if daemon is offline)
+python sentinel_nosql_telemetry.py --verify
 
-# Run deterministic in-memory CI/CD verification suite (zero external daemon required)
-python3 sentinel_nosql_telemetry.py --offline-mock --verify
+# Option B: Run deterministic in-memory CI/CD verification suite (zero external daemon required)
+python sentinel_nosql_telemetry.py --offline-mock --verify
+
+# Option C: Generate publication-grade LinkedIn Post 2/8 visual asset
+python scripts/generate_linkedin_post2_visual.py
 ```
 
 ### Automated Verification Gates (`outputs/verification_report.json`)
@@ -290,7 +328,7 @@ python verify_sync_counts.py --samples
 | Entity / Data Stream | Supabase (PostgreSQL) | MongoDB (BSON) | Sync Architecture & Integrity |
 | :--- | :--- | :--- | :--- |
 | **`customers`** | `2,500 rows` | `2,500 docs` | **100% ID Parity Verified** (`[PASS] 100% SYNCED`) |
-| **`devices`** | `10,120 rows` | `1,804 embedded` | **Hybrid Embedded** inside `customers` for $O(1)$ scoring reads |
+| **`devices`** | `10,120 rows` | `1,804 embedded` | **Hybrid Embedded** inside `customers` for O(1) scoring reads |
 | **`transactions`** | `110,000 rows` | `5,500 docs` | **100% ID Parity Verified** on active scoring slice |
 | **`payment_outcomes`** | `110,000 rows` | *(Merged into Txn)* | Denormalized into transaction BSON (`status`, `failure_code`) |
 | **`labels`** | `110,000 rows` | *(Merged into Txn)* | Denormalized into transaction BSON (`fraud_label`) |

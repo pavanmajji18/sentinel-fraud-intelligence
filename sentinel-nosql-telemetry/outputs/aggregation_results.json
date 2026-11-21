@@ -4,104 +4,84 @@
     "stages_defined": 3,
     "results": [
       {
-        "merchant_category": "gaming",
-        "total_txns": 554,
-        "fraud_txns": 10,
-        "total_amount_paise": 232384189,
-        "total_amount_inr": 2323841.89,
-        "avg_amount_inr": 4194.66,
-        "fraud_amount_inr": 468415.33,
-        "fraud_rate_pct": 1.81
-      },
-      {
-        "merchant_category": "gift_cards",
-        "total_txns": 396,
-        "fraud_txns": 7,
-        "total_amount_paise": 201301643,
-        "total_amount_inr": 2013016.43,
-        "avg_amount_inr": 5083.37,
-        "fraud_amount_inr": 180574.51,
-        "fraud_rate_pct": 1.77
-      },
-      {
         "merchant_category": "electronics",
-        "total_txns": 798,
-        "fraud_txns": 10,
-        "total_amount_paise": 878889192,
-        "total_amount_inr": 8788891.92,
-        "avg_amount_inr": 11013.65,
-        "fraud_amount_inr": 162583.09,
-        "fraud_rate_pct": 1.25
-      },
-      {
-        "merchant_category": "quick_commerce",
-        "total_txns": 812,
-        "fraud_txns": 0,
-        "total_amount_paise": 983302796,
-        "total_amount_inr": 9833027.96,
-        "avg_amount_inr": 12109.64,
-        "fraud_amount_inr": 0.0,
-        "fraud_rate_pct": 0.0
-      },
-      {
-        "merchant_category": "other",
-        "total_txns": 304,
-        "fraud_txns": 0,
-        "total_amount_paise": 472066490,
-        "total_amount_inr": 4720664.9,
-        "avg_amount_inr": 15528.5,
-        "fraud_amount_inr": 0.0,
-        "fraud_rate_pct": 0.0
-      },
-      {
-        "merchant_category": "grocery",
-        "total_txns": 1071,
-        "fraud_txns": 0,
-        "total_amount_paise": 223433091,
-        "total_amount_inr": 2234330.91,
-        "avg_amount_inr": 2086.21,
-        "fraud_amount_inr": 0.0,
-        "fraud_rate_pct": 0.0
-      },
-      {
-        "merchant_category": "food",
-        "total_txns": 687,
-        "fraud_txns": 0,
-        "total_amount_paise": 143454447,
-        "total_amount_inr": 1434544.47,
-        "avg_amount_inr": 2088.13,
-        "fraud_amount_inr": 0.0,
-        "fraud_rate_pct": 0.0
-      },
-      {
-        "merchant_category": "healthcare",
-        "total_txns": 381,
-        "fraud_txns": 0,
-        "total_amount_paise": 96427602,
-        "total_amount_inr": 964276.02,
-        "avg_amount_inr": 2530.91,
-        "fraud_amount_inr": 0.0,
-        "fraud_rate_pct": 0.0
-      },
-      {
-        "merchant_category": "education",
-        "total_txns": 223,
-        "fraud_txns": 0,
-        "total_amount_paise": 64404047,
-        "total_amount_inr": 644040.47,
-        "avg_amount_inr": 2888.07,
-        "fraud_amount_inr": 0.0,
-        "fraud_rate_pct": 0.0
+        "total_txns": 588,
+        "fraud_txns": 149,
+        "total_amount_paise": 268800396,
+        "total_amount_inr": 2688003.96,
+        "avg_amount_inr": 4571.44,
+        "fraud_amount_inr": 1766472.15,
+        "fraud_rate_pct": 25.34
       },
       {
         "merchant_category": "travel",
-        "total_txns": 274,
-        "fraud_txns": 0,
-        "total_amount_paise": 62432531,
-        "total_amount_inr": 624325.31,
-        "avg_amount_inr": 2278.56,
-        "fraud_amount_inr": 0.0,
-        "fraud_rate_pct": 0.0
+        "total_txns": 852,
+        "fraud_txns": 191,
+        "total_amount_paise": 476554571,
+        "total_amount_inr": 4765545.71,
+        "avg_amount_inr": 5593.36,
+        "fraud_amount_inr": 3246879.51,
+        "fraud_rate_pct": 22.42
+      },
+      {
+        "merchant_category": "gaming",
+        "total_txns": 267,
+        "fraud_txns": 52,
+        "total_amount_paise": 131642876,
+        "total_amount_inr": 1316428.76,
+        "avg_amount_inr": 4930.44,
+        "fraud_amount_inr": 835337.29,
+        "fraud_rate_pct": 19.48
+      },
+      {
+        "merchant_category": "education",
+        "total_txns": 478,
+        "fraud_txns": 44,
+        "total_amount_paise": 210634593,
+        "total_amount_inr": 2106345.93,
+        "avg_amount_inr": 4406.58,
+        "fraud_amount_inr": 1149022.44,
+        "fraud_rate_pct": 9.21
+      },
+      {
+        "merchant_category": "quick_commerce",
+        "total_txns": 1013,
+        "fraud_txns": 85,
+        "total_amount_paise": 466233733,
+        "total_amount_inr": 4662337.33,
+        "avg_amount_inr": 4602.5,
+        "fraud_amount_inr": 2586435.27,
+        "fraud_rate_pct": 8.39
+      },
+      {
+        "merchant_category": "utilities",
+        "total_txns": 993,
+        "fraud_txns": 78,
+        "total_amount_paise": 395713810,
+        "total_amount_inr": 3957138.1,
+        "avg_amount_inr": 3985.03,
+        "fraud_amount_inr": 1955741.63,
+        "fraud_rate_pct": 7.85
+      },
+      {
+        "merchant_category": "grocery",
+        "total_txns": 471,
+        "fraud_txns": 36,
+        "total_amount_paise": 194477422,
+        "total_amount_inr": 1944774.22,
+        "avg_amount_inr": 4129.03,
+        "fraud_amount_inr": 1016672.24,
+        "fraud_rate_pct": 7.64
+      },
+      {
+        "merchant_category": "food",
+        "total_txns": 838,
+        "fraud_txns": 57,
+        "total_amount_paise": 329701725,
+        "total_amount_inr": 3297017.25,
+        "avg_amount_inr": 3934.39,
+        "fraud_amount_inr": 1530834.54,
+        "fraud_rate_pct": 6.8
       }
     ]
   },
@@ -110,150 +90,236 @@
     "window_definition": "[customer_peak_window_end - 24h, customer_peak_window_end]",
     "results": [
       {
-        "customer_id": "C_9b3aee21759c3763",
-        "txns_in_24h": 9,
-        "total_spend_24h_paise": 800940216,
-        "total_spend_24h_inr": 8009402.16,
-        "fraud_txns_in_24h": 0,
-        "max_single_txn_inr": 7995933.05,
-        "window_start_utc": "2024-10-20 11:33:57.458000+00:00",
-        "window_end_utc": "2024-10-20 11:42:39.591000+00:00",
+        "customer_id": "C_6df74ad4ce74e2a8",
+        "txns_in_24h": 6,
+        "total_spend_24h_paise": 36700621,
+        "total_spend_24h_inr": 367006.21,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 74842.16,
+        "window_start_utc": "2025-05-30T21:15:31+00:00",
+        "window_end_utc": "2025-05-30T21:26:22+00:00",
         "channels_used": [
-          "UPI"
-        ]
-      },
-      {
-        "customer_id": "C_ec0917ec69fef0e2",
-        "txns_in_24h": 2,
-        "total_spend_24h_paise": 578271761,
-        "total_spend_24h_inr": 5782717.61,
-        "fraud_txns_in_24h": 0,
-        "max_single_txn_inr": 5780139.65,
-        "window_start_utc": "2024-11-05 17:32:19.313000+00:00",
-        "window_end_utc": "2024-11-05 17:33:54.900000+00:00",
-        "channels_used": [
+          "UPI",
+          "wallet",
           "card"
         ]
       },
       {
-        "customer_id": "C_d7627b94e4877d99",
-        "txns_in_24h": 3,
-        "total_spend_24h_paise": 406239725,
-        "total_spend_24h_inr": 4062397.25,
-        "fraud_txns_in_24h": 0,
-        "max_single_txn_inr": 4060489.61,
-        "window_start_utc": "2024-10-05 05:55:22.055000+00:00",
-        "window_end_utc": "2024-10-05 05:57:28.721000+00:00",
-        "channels_used": [
-          "UPI"
-        ]
-      },
-      {
-        "customer_id": "C_1f99ce6bdd6ab058",
-        "txns_in_24h": 8,
-        "total_spend_24h_paise": 31380274,
-        "total_spend_24h_inr": 313802.74,
-        "fraud_txns_in_24h": 0,
-        "max_single_txn_inr": 274058.54,
-        "window_start_utc": "2024-10-16 03:32:24.762000+00:00",
-        "window_end_utc": "2024-10-17 00:40:04.376000+00:00",
+        "customer_id": "C_87ceee91fc100ef4",
+        "txns_in_24h": 7,
+        "total_spend_24h_paise": 36590154,
+        "total_spend_24h_inr": 365901.54,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 79759.76,
+        "window_start_utc": "2024-12-10T13:03:14+00:00",
+        "window_end_utc": "2024-12-11T08:26:36+00:00",
         "channels_used": [
           "UPI",
           "card"
         ]
       },
       {
-        "customer_id": "C_4c80552c1bd9fbca",
-        "txns_in_24h": 9,
-        "total_spend_24h_paise": 24190080,
-        "total_spend_24h_inr": 241900.8,
-        "fraud_txns_in_24h": 0,
-        "max_single_txn_inr": 178538.14,
-        "window_start_utc": "2024-10-22 12:47:26.198000+00:00",
-        "window_end_utc": "2024-10-22 12:56:38.370000+00:00",
-        "channels_used": [
-          "UPI"
-        ]
-      },
-      {
-        "customer_id": "C_20d02d4ebc5df27b",
-        "txns_in_24h": 8,
-        "total_spend_24h_paise": 23027745,
-        "total_spend_24h_inr": 230277.45,
-        "fraud_txns_in_24h": 1,
-        "max_single_txn_inr": 174209.21,
-        "window_start_utc": "2024-10-21 00:59:54.342000+00:00",
-        "window_end_utc": "2024-10-21 01:05:59.019000+00:00",
-        "channels_used": [
-          "UPI"
-        ]
-      },
-      {
-        "customer_id": "C_1aa451e90647f952",
+        "customer_id": "C_32bcb7477087ff42",
         "txns_in_24h": 6,
-        "total_spend_24h_paise": 17832230,
-        "total_spend_24h_inr": 178322.3,
-        "fraud_txns_in_24h": 0,
-        "max_single_txn_inr": 138850.61,
-        "window_start_utc": "2024-10-25 23:05:32.631000+00:00",
-        "window_end_utc": "2024-10-25 23:12:37.994000+00:00",
+        "total_spend_24h_paise": 35513567,
+        "total_spend_24h_inr": 355135.67,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 79227.85,
+        "window_start_utc": "2024-12-27T18:57:30+00:00",
+        "window_end_utc": "2024-12-27T19:07:24+00:00",
         "channels_used": [
+          "net_banking",
+          "UPI",
+          "wallet",
           "card"
         ]
       },
       {
-        "customer_id": "C_10ac8ffb32236498",
-        "txns_in_24h": 9,
-        "total_spend_24h_paise": 16699584,
-        "total_spend_24h_inr": 166995.84,
-        "fraud_txns_in_24h": 0,
-        "max_single_txn_inr": 81644.17,
-        "window_start_utc": "2024-10-04 06:44:02.591000+00:00",
-        "window_end_utc": "2024-10-04 06:55:30.491000+00:00",
+        "customer_id": "C_32abf437241e8590",
+        "txns_in_24h": 6,
+        "total_spend_24h_paise": 34580752,
+        "total_spend_24h_inr": 345807.52,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 74597.7,
+        "window_start_utc": "2024-12-04T16:45:56+00:00",
+        "window_end_utc": "2024-12-04T16:53:34+00:00",
         "channels_used": [
-          "UPI"
-        ]
-      },
-      {
-        "customer_id": "C_4107507e8652aca9",
-        "txns_in_24h": 7,
-        "total_spend_24h_paise": 15257471,
-        "total_spend_24h_inr": 152574.71,
-        "fraud_txns_in_24h": 0,
-        "max_single_txn_inr": 73326.17,
-        "window_start_utc": "2024-10-28 21:47:54.203000+00:00",
-        "window_end_utc": "2024-10-28 21:57:24.234000+00:00",
-        "channels_used": [
+          "UPI",
           "card"
         ]
       },
       {
-        "customer_id": "C_52094f023f449fb3",
-        "txns_in_24h": 7,
-        "total_spend_24h_paise": 14391512,
-        "total_spend_24h_inr": 143915.12,
-        "fraud_txns_in_24h": 1,
-        "max_single_txn_inr": 130570.45,
-        "window_start_utc": "2024-11-26 18:38:31.981000+00:00",
-        "window_end_utc": "2024-11-26 18:43:31.646000+00:00",
+        "customer_id": "C_719af91bdb71d86b",
+        "txns_in_24h": 6,
+        "total_spend_24h_paise": 34487403,
+        "total_spend_24h_inr": 344874.03,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 77957.47,
+        "window_start_utc": "2025-01-02T23:40:30+00:00",
+        "window_end_utc": "2025-01-02T23:47:42+00:00",
         "channels_used": [
+          "card",
           "UPI"
+        ]
+      },
+      {
+        "customer_id": "C_7dcdd3e88195a3cf",
+        "txns_in_24h": 6,
+        "total_spend_24h_paise": 34448643,
+        "total_spend_24h_inr": 344486.43,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 78237.85,
+        "window_start_utc": "2025-05-16T21:43:14+00:00",
+        "window_end_utc": "2025-05-16T21:49:59+00:00",
+        "channels_used": [
+          "UPI",
+          "card"
+        ]
+      },
+      {
+        "customer_id": "C_c25b1be6e0bc1f40",
+        "txns_in_24h": 6,
+        "total_spend_24h_paise": 34309367,
+        "total_spend_24h_inr": 343093.67,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 72223.89,
+        "window_start_utc": "2024-11-24T08:10:47+00:00",
+        "window_end_utc": "2024-11-24T08:18:13+00:00",
+        "channels_used": [
+          "UPI",
+          "wallet",
+          "card"
+        ]
+      },
+      {
+        "customer_id": "C_093196fa0afaa586",
+        "txns_in_24h": 6,
+        "total_spend_24h_paise": 33669576,
+        "total_spend_24h_inr": 336695.76,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 79944.1,
+        "window_start_utc": "2025-01-23T21:36:17+00:00",
+        "window_end_utc": "2025-01-23T21:45:17+00:00",
+        "channels_used": [
+          "card",
+          "UPI"
+        ]
+      },
+      {
+        "customer_id": "C_e631e641e9303987",
+        "txns_in_24h": 6,
+        "total_spend_24h_paise": 32954832,
+        "total_spend_24h_inr": 329548.32,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 71361.53,
+        "window_start_utc": "2025-03-27T14:26:09+00:00",
+        "window_end_utc": "2025-03-27T14:34:26+00:00",
+        "channels_used": [
+          "UPI",
+          "card"
+        ]
+      },
+      {
+        "customer_id": "C_d0108337ae0591f1",
+        "txns_in_24h": 6,
+        "total_spend_24h_paise": 32706460,
+        "total_spend_24h_inr": 327064.6,
+        "fraud_txns_in_24h": 6,
+        "max_single_txn_inr": 70424.92,
+        "window_start_utc": "2025-05-22T05:20:35+00:00",
+        "window_end_utc": "2025-05-22T05:28:33+00:00",
+        "channels_used": [
+          "wallet",
+          "UPI",
+          "card"
         ]
       }
     ]
   },
   "pipeline_2b_global_24h_velocity": {
     "description": "Top 10 accounts by 24-hour spend velocity (global dataset trailing 24h window)",
-    "global_window_start_utc": "2026-01-30T04:36:47.526000+00:00",
-    "global_window_end_utc": "2026-01-31 04:36:47.526000+00:00",
+    "global_window_start_utc": "2025-05-29T23:06:22+00:00",
+    "global_window_end_utc": "2025-05-30T23:06:22+00:00",
     "results": [
       {
-        "customer_id": "C_fc2e7b5b12031d4a",
+        "customer_id": "C_6df74ad4ce74e2a8",
+        "txns_in_global_24h": 6,
+        "total_spend_24h_paise": 36700621,
+        "total_spend_24h_inr": 367006.21,
+        "fraud_txns_in_24h": 6,
+        "latest_txn_utc": "2025-05-30T21:26:22+00:00"
+      },
+      {
+        "customer_id": "C_03887f236e21fa86",
+        "txns_in_global_24h": 6,
+        "total_spend_24h_paise": 18769782,
+        "total_spend_24h_inr": 187697.82,
+        "fraud_txns_in_24h": 6,
+        "latest_txn_utc": "2025-05-30T15:01:39+00:00"
+      },
+      {
+        "customer_id": "C_f6c8f2c04c6ea9bf",
+        "txns_in_global_24h": 2,
+        "total_spend_24h_paise": 3955884,
+        "total_spend_24h_inr": 39558.84,
+        "fraud_txns_in_24h": 1,
+        "latest_txn_utc": "2025-05-30T17:41:58+00:00"
+      },
+      {
+        "customer_id": "C_f0f800eb6c915623",
+        "txns_in_global_24h": 3,
+        "total_spend_24h_paise": 3027057,
+        "total_spend_24h_inr": 30270.57,
+        "fraud_txns_in_24h": 1,
+        "latest_txn_utc": "2025-05-30T17:50:37+00:00"
+      },
+      {
+        "customer_id": "C_32bcb7477087ff42",
         "txns_in_global_24h": 1,
-        "total_spend_24h_paise": 324560,
-        "total_spend_24h_inr": 3245.6,
+        "total_spend_24h_paise": 2591074,
+        "total_spend_24h_inr": 25910.74,
+        "fraud_txns_in_24h": 1,
+        "latest_txn_utc": "2025-05-30T11:21:01+00:00"
+      },
+      {
+        "customer_id": "C_0cc9cb709b07eae1",
+        "txns_in_global_24h": 2,
+        "total_spend_24h_paise": 1250504,
+        "total_spend_24h_inr": 12505.04,
+        "fraud_txns_in_24h": 1,
+        "latest_txn_utc": "2025-05-30T22:50:52+00:00"
+      },
+      {
+        "customer_id": "C_b2656c7900c5fb42",
+        "txns_in_global_24h": 2,
+        "total_spend_24h_paise": 1232023,
+        "total_spend_24h_inr": 12320.23,
         "fraud_txns_in_24h": 0,
-        "latest_txn_utc": "2026-01-31 04:36:47.526000+00:00"
+        "latest_txn_utc": "2025-05-30T17:09:16+00:00"
+      },
+      {
+        "customer_id": "C_c888fbd6264b01c6",
+        "txns_in_global_24h": 1,
+        "total_spend_24h_paise": 1119751,
+        "total_spend_24h_inr": 11197.51,
+        "fraud_txns_in_24h": 1,
+        "latest_txn_utc": "2025-05-30T19:44:39+00:00"
+      },
+      {
+        "customer_id": "C_b10b0e178e895baf",
+        "txns_in_global_24h": 2,
+        "total_spend_24h_paise": 1116789,
+        "total_spend_24h_inr": 11167.89,
+        "fraud_txns_in_24h": 0,
+        "latest_txn_utc": "2025-05-30T22:29:50+00:00"
+      },
+      {
+        "customer_id": "C_5fb60dc8d874ac78",
+        "txns_in_global_24h": 2,
+        "total_spend_24h_paise": 1114116,
+        "total_spend_24h_inr": 11141.16,
+        "fraud_txns_in_24h": 1,
+        "latest_txn_utc": "2025-05-30T20:00:17+00:00"
       }
     ]
   },
@@ -262,76 +328,76 @@
     "stages_defined": 5,
     "results": [
       {
-        "reason_code": "R05_AMOUNT_SPIKE",
-        "trigger_count": 184,
-        "fraud_hits": 19,
-        "genuine_hits": 165,
-        "exposed_volume_inr": 21501923.74,
-        "fraud_volume_inr": 586915.79,
-        "precision_pct": 10.33
+        "reason_code": "R07_VELOCITY",
+        "trigger_count": 78,
+        "fraud_hits": 78,
+        "genuine_hits": 0,
+        "exposed_volume_inr": 4870381.58,
+        "fraud_volume_inr": 4870381.58,
+        "precision_pct": 100.0
       },
       {
         "reason_code": "R04_FAILED_ATTEMPTS",
-        "trigger_count": 474,
-        "fraud_hits": 24,
-        "genuine_hits": 450,
-        "exposed_volume_inr": 4062318.15,
-        "fraud_volume_inr": 635317.09,
-        "precision_pct": 5.06
+        "trigger_count": 353,
+        "fraud_hits": 352,
+        "genuine_hits": 1,
+        "exposed_volume_inr": 13371445.0,
+        "fraud_volume_inr": 13366787.56,
+        "precision_pct": 99.72
       },
       {
-        "reason_code": "R07_VELOCITY",
-        "trigger_count": 741,
-        "fraud_hits": 22,
-        "genuine_hits": 719,
-        "exposed_volume_inr": 4532727.98,
-        "fraud_volume_inr": 624176.86,
-        "precision_pct": 2.97
-      },
-      {
-        "reason_code": "R03_ODD_HOUR",
-        "trigger_count": 729,
-        "fraud_hits": 19,
-        "genuine_hits": 710,
-        "exposed_volume_inr": 3606249.2,
-        "fraud_volume_inr": 405580.11,
-        "precision_pct": 2.61
-      },
-      {
-        "reason_code": "R08_HIGH_RISK_MCC",
-        "trigger_count": 1598,
-        "fraud_hits": 25,
-        "genuine_hits": 1573,
-        "exposed_volume_inr": 12529121.05,
-        "fraud_volume_inr": 661062.58,
-        "precision_pct": 1.56
-      },
-      {
-        "reason_code": "R02_GEO_MISMATCH",
-        "trigger_count": 4397,
-        "fraud_hits": 20,
-        "genuine_hits": 4377,
-        "exposed_volume_inr": 30169802.91,
-        "fraud_volume_inr": 437032.27,
-        "precision_pct": 0.45
+        "reason_code": "R05_AMOUNT_SPIKE",
+        "trigger_count": 211,
+        "fraud_hits": 207,
+        "genuine_hits": 4,
+        "exposed_volume_inr": 5271408.28,
+        "fraud_volume_inr": 5241980.96,
+        "precision_pct": 98.1
       },
       {
         "reason_code": "R01_NEW_DEVICE",
-        "trigger_count": 1717,
-        "fraud_hits": 0,
-        "genuine_hits": 1717,
-        "exposed_volume_inr": 4031571.5,
-        "fraud_volume_inr": 0.0,
-        "precision_pct": 0.0
+        "trigger_count": 2154,
+        "fraud_hits": 604,
+        "genuine_hits": 1550,
+        "exposed_volume_inr": 14939181.94,
+        "fraud_volume_inr": 11643387.18,
+        "precision_pct": 28.04
+      },
+      {
+        "reason_code": "R03_ODD_HOUR",
+        "trigger_count": 1160,
+        "fraud_hits": 300,
+        "genuine_hits": 860,
+        "exposed_volume_inr": 5275287.78,
+        "fraud_volume_inr": 3255385.79,
+        "precision_pct": 25.86
+      },
+      {
+        "reason_code": "R08_HIGH_RISK_MCC",
+        "trigger_count": 1707,
+        "fraud_hits": 392,
+        "genuine_hits": 1315,
+        "exposed_volume_inr": 8769978.43,
+        "fraud_volume_inr": 5848688.95,
+        "precision_pct": 22.96
       },
       {
         "reason_code": "R06_NEW_ACCOUNT",
-        "trigger_count": 22,
-        "fraud_hits": 0,
-        "genuine_hits": 22,
-        "exposed_volume_inr": 76422.36,
-        "fraud_volume_inr": 0.0,
-        "precision_pct": 0.0
+        "trigger_count": 10,
+        "fraud_hits": 2,
+        "genuine_hits": 8,
+        "exposed_volume_inr": 17061.77,
+        "fraud_volume_inr": 1830.34,
+        "precision_pct": 20.0
+      },
+      {
+        "reason_code": "R02_GEO_MISMATCH",
+        "trigger_count": 4294,
+        "fraud_hits": 647,
+        "genuine_hits": 3647,
+        "exposed_volume_inr": 20408664.98,
+        "fraud_volume_inr": 12331942.53,
+        "precision_pct": 15.07
       }
     ]
   }

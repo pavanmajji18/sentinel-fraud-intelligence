@@ -2,7 +2,7 @@
   "target_query": {
     "collection": "transactions",
     "filter": {
-      "customer_id": "C_7ac08ed4d9feab3c"
+      "customer_id": "C_89aec26619606cb4"
     },
     "sort": {
       "transaction_time": -1
@@ -68,14 +68,14 @@
   "comparison_summary": {
     "winning_plan_before": "SORT <- COLLSCAN",
     "winning_plan_after": "FETCH <- IXSCAN (idx_customer_id_1_transaction_time_-1)",
-    "nReturned": 26,
+    "nReturned": 24,
     "totalDocsExamined_before": 5500,
-    "totalDocsExamined_after": 26,
-    "docs_examined_reduction_pct": 99.53,
+    "totalDocsExamined_after": 24,
+    "docs_examined_reduction_pct": 99.56,
     "totalKeysExamined_before": 0,
-    "totalKeysExamined_after": 26,
-    "executionTimeMillisPrecise_before": 3.5721,
-    "executionTimeMillisPrecise_after": 0.0526,
+    "totalKeysExamined_after": 24,
+    "executionTimeMillisPrecise_before": 3.0783,
+    "executionTimeMillisPrecise_after": 0.0229,
     "in_memory_sort_eliminated": true
   },
   "explain_before_raw": {
@@ -84,7 +84,7 @@
       "namespace": "sentinel_fraud_db.transactions",
       "indexFilterSet": false,
       "parsedQuery": {
-        "customer_id": "C_7ac08ed4d9feab3c"
+        "customer_id": "C_89aec26619606cb4"
       },
       "winningPlan": {
         "stage": "SORT",
@@ -96,7 +96,7 @@
         "inputStage": {
           "stage": "COLLSCAN",
           "filter": {
-            "customer_id": "C_7ac08ed4d9feab3c"
+            "customer_id": "C_89aec26619606cb4"
           },
           "direction": "forward"
         }
@@ -105,13 +105,13 @@
     },
     "executionStats": {
       "executionSuccess": true,
-      "nReturned": 26,
-      "executionTimeMillis": 4,
-      "executionTimeMillisPrecise": 3.5721,
+      "nReturned": 24,
+      "executionTimeMillis": 3,
+      "executionTimeMillisPrecise": 3.0783,
       "totalKeysExamined": 0,
       "totalDocsExamined": 5500,
       "collectionTotalDocs": 5500,
-      "selectivityRatio": 0.004727,
+      "selectivityRatio": 0.004364,
       "executionStages": {
         "stage": "SORT",
         "sortPattern": {
@@ -122,12 +122,12 @@
         "inputStage": {
           "stage": "COLLSCAN",
           "filter": {
-            "customer_id": "C_7ac08ed4d9feab3c"
+            "customer_id": "C_89aec26619606cb4"
           },
           "direction": "forward"
         },
-        "nReturned": 26,
-        "executionTimeMillisEstimate": 4,
+        "nReturned": 24,
+        "executionTimeMillisEstimate": 3,
         "docsExamined": 5500,
         "keysExamined": 0
       }
@@ -140,7 +140,7 @@
       "namespace": "sentinel_fraud_db.transactions",
       "indexFilterSet": false,
       "parsedQuery": {
-        "customer_id": "C_7ac08ed4d9feab3c"
+        "customer_id": "C_89aec26619606cb4"
       },
       "winningPlan": {
         "stage": "FETCH",
@@ -155,7 +155,7 @@
           "direction": "forward",
           "indexBounds": {
             "customer_id": [
-              "[\"C_7ac08ed4d9feab3c\", \"C_7ac08ed4d9feab3c\"]"
+              "[\"C_89aec26619606cb4\", \"C_89aec26619606cb4\"]"
             ],
             "transaction_time": [
               "[MaxKey, MinKey]"
@@ -167,11 +167,11 @@
     },
     "executionStats": {
       "executionSuccess": true,
-      "nReturned": 26,
+      "nReturned": 24,
       "executionTimeMillis": 0,
-      "executionTimeMillisPrecise": 0.0526,
-      "totalKeysExamined": 26,
-      "totalDocsExamined": 26,
+      "executionTimeMillisPrecise": 0.0229,
+      "totalKeysExamined": 24,
+      "totalDocsExamined": 24,
       "collectionTotalDocs": 5500,
       "selectivityRatio": 1.0,
       "executionStages": {
@@ -187,17 +187,17 @@
           "direction": "forward",
           "indexBounds": {
             "customer_id": [
-              "[\"C_7ac08ed4d9feab3c\", \"C_7ac08ed4d9feab3c\"]"
+              "[\"C_89aec26619606cb4\", \"C_89aec26619606cb4\"]"
             ],
             "transaction_time": [
               "[MaxKey, MinKey]"
             ]
           }
         },
-        "nReturned": 26,
+        "nReturned": 24,
         "executionTimeMillisEstimate": 0,
-        "docsExamined": 26,
-        "keysExamined": 26
+        "docsExamined": 24,
+        "keysExamined": 24
       }
     },
     "ok": 1.0
