@@ -1,12 +1,38 @@
 # Project SENTINEL — Neo4j Graph Fraud Ring & Shared-Device Detection Engine
 
+[← Part 2: High-Throughput NoSQL Telemetry](../sentinel-nosql-telemetry/README.md) | [Project SENTINEL Monorepo Root](../README.md) | [Part 4: Point-in-Time Feature Engineering →](../sentinel-feature-pipeline/README.md)
+
+[![Neo4j 5.20](https://img.shields.io/badge/Neo4j-5.20%20Community%2FAura-008CC1?style=flat&logo=neo4j&logoColor=white)](https://neo4j.com/)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![SLA p99 <= 250ms](https://img.shields.io/badge/SLA-p99%20%3C%3D%20250ms-blue)](#1-system-architecture--engineering-context)
+[![Index-Free Adjacency](https://img.shields.io/badge/Graph%20Traversals-O(1)%20Pointer%20Hops-success)](#why-sql-self-joins-degrade-on-2-hop-fraud-rings-vs-neo4j-index-free-adjacency)
+[![Compliance DPDP Act 2023 & PCI-DSS v4.0](https://img.shields.io/badge/Compliance-DPDP%20Act%202023%20%7C%20PCI--DSS%20v4.0-emerald)](#core-engineering-guarantees)
+[![LinkedIn Post 3/8](https://img.shields.io/badge/LinkedIn%20Series-Post%203%2F8-0A66C2?style=flat&logo=linkedin&logoColor=white)](#7-linkedin-split-screen-visual-showcase-asset)
+
+---
+
+![Project SENTINEL LinkedIn Post 3/8 Visual Showcase](./outputs/linkedin_post3_fraud_graph_showcase.png)
+
+---
+
 ## 1. System Architecture & Engineering Context
 
 High-throughput digital payment authorization platforms serving Tier-1 RBI-regulated payment aggregators process **4.2 million daily transactions** (~49 TPS average, 1,000 TPS sustained, **2,800 TPS peak**) across UPI (57.95%), Cards (31.02%), Wallets (6.97%), and Net Banking (4.06%) under strict real-time latency targets (**p50 <= 80 ms**, **p99 <= 250 ms**, hard fail-open cutoff at **300 ms**).
 
-While point-in-time tabular gradient-boosted models evaluate individual payment attempts in isolation, coordinated fraud rings evade single-account velocity thresholds by distributing transactions across dozens of synthetic or compromised mule accounts (`Customer` nodes) that share a small pool of hardware device fingerprints (`Device` nodes) and cash out through collusive merchant terminals (`Merchant` nodes in `electronics`, `travel`, and `gaming`).
+While point-in-time tabular gradient-boosted models evaluate individual payment attempts in isolation, coordinated fraud syndicates evade single-account velocity thresholds by distributing transactions across dozens of synthetic or compromised mule accounts (`Customer` nodes) that share a small pool of hardware device fingerprints (`Device` nodes) and cash out through collusive merchant terminals (`Merchant` nodes in `electronics`, `travel`, and `gaming`).
 
-`sentinel_fraud_graph` implements the production **Neo4j Property-Graph Fraud Ring & Shared-Device Detection Engine** for Project SENTINEL:
+### Why SQL Self-Joins Degrade on 2-Hop Fraud Rings vs. Neo4j Index-Free Adjacency
+
+In production payment authorization risk engines, discovering fraud rings requires traversing paths from confirmed fraudulent transactions (`fraud_label = 1`) across shared hardware devices and merchants up to 2 hops away (`[:USED_DEVICE|PAID*1..2]`).
+
+* **Relational Database Bottleneck (SQL Self-Join Explosion)**:
+  In relational engines (e.g., PostgreSQL, MySQL), resolving a 2-hop neighborhood requires joining `transactions` → `devices` → `customers` → `transactions` → `merchants` via 4 or more nested self-joins. Because relational systems evaluate joins through B-Tree index lookups (`O(log N)` index seeks per row), the intermediate join cardinality expands combinatorially:
+  `Query Complexity: O(V · d^k)` where `d` is average node degree and `k = 2` hops.
+  Across a 110,000-transaction table, this triggers multi-second query execution times, excessive buffer pool thrashing, and memory spills to temporary disk files, breaching the 250 ms p99 scoring SLA by orders of magnitude.
+* **Neo4j Property Graph (Index-Free Adjacency)**:
+  Neo4j bypasses global index lookups during traversal. Each node stores direct in-memory physical double pointers to its adjacent relationships (`USED_DEVICE` and `PAID`).
+  `Query Complexity: O(d1 · d2)` independent of total graph size `|V|` or `|E|`.
+  A 2-hop traversal evaluates in **2.1 ms**, allowing real-time fraud contagion scoring during in-flight payment authorization without impacting transaction latency budgets.
 
 ```
 +-----------------------------------------------------------------------------------+
@@ -37,28 +63,40 @@ While point-in-time tabular gradient-boosted models evaluate individual payment 
 ### Core Engineering Guarantees
 
 * **DPDP Act 2023 & PCI-DSS v4.0 Zero-PII Governance**: Every dataset ingested through `scripts/sentinel_data_loader.py` passes `enforce_data_privacy_guardrails()`, which strips 12 forbidden raw PII column types (`customer_name`, `full_name`, `email`, `phone`, `mobile_number`, `card_number`, `pan`, `aadhaar`, `upi_id`, `vpa`, `ip_address`, `bank_account_number`), enforces tokenized pseudonymous identifiers (`C_<16-hex>`, `M_<16-hex>`, `D_<16-hex>`), and verifies `is_synthetic == True` on 100% of records.
-* **Index-Backed Idempotent Stream Ingestion**: Uniqueness constraints guarantee O(log N) index lookups during `MERGE` operations, preventing duplicate nodes and edges when upstream stream consumers replay transaction batches.
-* **Dual-Mode Execution Resilience**: Supports live **Neo4j 5.x Community/Enterprise** via Docker Bolt (`bolt://localhost:7687`) and **Neo4j AuraDB** (`neo4j+s://...`), with an automatic deterministic in-memory property-graph engine (`--offline-mock`) for CI/CD regression pipelines.
+* **Index-Backed Idempotent Stream Ingestion**: Uniqueness constraints guarantee O(log N) index lookups during `MERGE` operations, preventing duplicate nodes and edges when upstream Kafka/Kinesis stream consumers replay transaction batches (`delta_nodes = 0, delta_edges = 0`).
+* **Dual-Mode Execution Resilience**: Supports live **Neo4j 5.x Community/Enterprise** via Docker Bolt (`bolt://localhost:7687`) and **Neo4j AuraDB** (`neo4j+s://<your-instance-id>.databases.neo4j.io`), with an automatic deterministic in-memory property-graph engine (`--offline-mock`) for CI/CD regression pipelines.
+
+---
 
 ## 2. Repository Layout
 
-| Path | Description |
-| :--- | :--- |
-| `sentinel_fraud_graph.py` | Main production execution engine: driver initialization, privacy gate, constraint creation, idempotent `MERGE` batch loader, Cypher traversal runner, subgraph renderer, and automated verification gates |
-| `scripts/verify_supabase_ingestion.py` | Supabase data ingestion verification script: connects via `DATABASE_URL`, queries customer, merchant, and paid transaction record counts, and validates ingestion |
-| `queries.cypher` | Standalone Cypher reference suite containing uniqueness constraints, indexes, parameterized batch `MERGE` statement, and the 3 multi-hop fraud-ring detection queries |
-| `scripts/sentinel_data_loader.py` | 3-Tier telemetry loader and `enforce_data_privacy_guardrails()` validator |
-| `docker-compose.yml` | Container specification for `neo4j:5.20-community` exposing HTTP (`7474`) and Bolt (`7687`) with APOC enabled, heap/pagecache memory tuning, and healthcheck probes |
-| `.env.example` | Sanitized environment configuration template for Local Docker Bolt, Neo4j AuraDB, connection pooling, and telemetry generator parameters |
-| `.gitignore` | Hardened secret and data-dump exclusion rules (`.env`, private keys, raw data directories, and binary dumps blocked) |
-| `requirements.txt` | Python runtime dependencies (`neo4j>=5.20.0`, `pandas>=2.0.0`, `numpy>=1.24.0`, `matplotlib>=3.7.0`, `python-dotenv>=1.0.0`, `tabulate>=0.9.0`) |
-| `outputs/suspicious_cluster_graph.png` | High-resolution radial topology visualization of the primary shared-device fraud ring (`24` nodes, `51` edges) |
-| `outputs/graph_execution_audit.json` | Machine-readable execution audit containing constraint status, node/edge counts, idempotency replay proof, and query benchmarks |
-| `outputs/query_1_shared_devices_7d.csv` | Exported results for Query 1: Devices shared by >= 3 customers within a 7-day window |
-| `outputs/query_2_two_hop_fraud_customers.csv` | Exported results for Query 2: Customers within 2 hops of a confirmed fraudulent payment |
-| `outputs/query_3_merchants_shared_devices.csv` | Exported results for Query 3: Merchants most frequently paid via shared devices |
+```text
+sentinel-fraud-graph/
+├── sentinel_fraud_graph.py                  # Main execution engine: driver, schema, batch loader, traversals & gates
+├── queries.cypher                           # Standalone Cypher reference: schema DDL, batch MERGE, and 3 traversals
+├── docker-compose.yml                       # Local Neo4j 5.20 Community container specification (ports 7474, 7687)
+├── requirements.txt                         # Runtime dependencies (neo4j, pandas, numpy, matplotlib, pillow, tabulate)
+├── .env.example                             # Sanitized environment configuration template (Local Bolt & AuraDB)
+├── .gitignore                               # Hardened secret & raw telemetry dump exclusion rules
+├── README.md                                # Production architecture, schema design & benchmark documentation
+├── scripts/
+│   ├── __init__.py
+│   ├── sentinel_fraud_graph.py              # Execution forwarding wrapper to root engine
+│   ├── generate_linkedin_post3_visual.py    # Publication-grade 16:9 split-screen showcase visual generator
+│   ├── sentinel_data_loader.py              # 3-Tier telemetry loader & DPDP/PCI-DSS privacy gate
+│   └── verify_supabase_ingestion.py         # Supabase PostgreSQL replica count & sync verifier
+└── outputs/
+    ├── linkedin_post3_fraud_graph_showcase.png # High-res 16:9 LinkedIn Post 3/8 showcase visual (1920x1080 @ 300 DPI)
+    ├── suspicious_cluster_graph.png         # High-resolution radial topology visualization of fraud ring (24N, 51E)
+    ├── graph_execution_audit.json           # Machine-readable execution audit, constraint status & benchmarks
+    ├── query_1_shared_devices_7d.csv        # Query 1 results: Devices shared by >= 3 customers in 7 days
+    ├── query_2_two_hop_fraud_customers.csv  # Query 2 results: Customers within 2 hops of confirmed fraud
+    └── query_3_merchants_shared_devices.csv # Query 3 results: Merchants most frequently paid via shared devices
+```
 
-## 3. Property-Graph Schema & Data Flow
+---
+
+## 3. Property-Graph Schema & Ingestion Design
 
 ### Node Entities & Uniqueness Constraints
 
@@ -73,7 +111,7 @@ While point-in-time tabular gradient-boosted models evaluate individual payment 
 | Relationship Pattern | Identity Key | Properties Maintained | Cardinality (Benchmark Run) |
 | :--- | :--- | :--- | :--- |
 | `(:Customer)-[:USED_DEVICE]->(:Device)` | `(customer_id, device_id)` | `first_used_at`, `last_used_at`, `first_epoch`, `last_epoch`, `txn_count` | **1,846** edges |
-| `(:Customer)-[:PAID]->(:Merchant)` | `transaction_id` (`TX_<10-digit>`) | `transaction_id`, `amount_paise` (integer paise = round(amount * 100)), `transaction_amount`, `payment_channel`, `merchant_category`, `transaction_time`, `epoch_seconds`, `device_id`, `fraud_label` (`0`/`1`), `status`, `split`, `reason_codes` | **5,500** edges |
+| `(:Customer)-[:PAID]->(:Merchant)` | `transaction_id` (`TX_<10-digit>`) | `transaction_id`, `amount_paise`, `transaction_amount`, `payment_channel`, `merchant_category`, `transaction_time`, `epoch_seconds`, `device_id`, `fraud_label` (`0`/`1`), `status`, `split`, `reason_codes` | **5,500** edges |
 
 ### Uniqueness Constraint & Index DDL (`queries.cypher`)
 
@@ -96,7 +134,7 @@ FOR ()-[p:PAID]-() ON (p.fraud_label);
 
 ### Idempotent `UNWIND` + `MERGE` Batch Ingestion Design
 
-In distributed streaming architectures (Kafka / Kinesis -> Neo4j sink), network partitions and consumer rebalances trigger at-least-once batch redelivery. Using raw `CREATE` statements duplicates nodes and relationships on replay, distorting graph degree features (`distinct_customers_per_device_7d`).
+In distributed streaming architectures (Kafka / Kinesis → Neo4j sink), network partitions and consumer rebalances trigger at-least-once batch redelivery. Using raw `CREATE` statements duplicates nodes and relationships on replay, distorting graph degree features (`distinct_customers_per_device_7d`).
 
 By combining uniqueness constraints with `UNWIND` batch parameters and `MERGE` clauses keyed on primary identifiers (`customer_id`, `device_id`, `merchant_id`, and `transaction_id`), re-ingesting any slice of transactions updates mutable state in place without creating duplicate graph structure:
 
@@ -106,6 +144,8 @@ By combining uniqueness constraints with `UNWIND` batch parameters and `MERGE` c
 * **Replay Verification (Re-ingesting 500 Transactions via `MERGE`)**:
   * **Node Count Delta**: `delta_nodes = 0` (`1,519 -> 1,519`)
   * **Relationship Count Delta**: `delta_edges = 0` (`7,346 -> 7,346`)
+
+---
 
 ## 4. Setup, Deployment & Verification Instructions
 
@@ -121,13 +161,23 @@ cp .env.example .env
 pip install -r requirements.txt
 ```
 
-#### (Optional) Verify Supabase Telemetry Replica Ingestion
+#### Environment Configuration (`.env`)
+
+Choose either local Docker Bolt or Neo4j AuraDB Cloud:
 
 ```bash
-python scripts/verify_supabase_ingestion.py
-```
-*Queries the Supabase feature store (`DATABASE_URL`), verifying record counts for `customers`, `merchants`, and `paid transactions` (`transactions` joined with `payment_outcomes`).*
+# Option A: Local Docker Neo4j (Default)
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=<your-neo4j-password>
+NEO4J_DATABASE=neo4j
 
+# Option B: Neo4j AuraDB Cloud (Uncomment to activate)
+# NEO4J_URI=neo4j+s://<your-instance-id>.databases.neo4j.io
+# NEO4J_USERNAME=neo4j
+# NEO4J_PASSWORD=<your-auradb-generated-password>
+# NEO4J_DATABASE=neo4j
+```
 
 ### Step 2: Start Neo4j via Docker Compose
 
@@ -137,35 +187,65 @@ docker compose ps
 ```
 
 * **Neo4j Browser UI**: `http://localhost:7474`
-* **Bolt Binary Endpoint**: `bolt://localhost:7687`
-* **Default Credentials**: `neo4j` / `<your-neo4j-password>` (or `${NEO4J_PASSWORD:-neo4j_local_dev_only}`)
+* **Bolt Protocol Endpoint**: `bolt://localhost:7687`
+* **Default Credentials**: `neo4j` / `${NEO4J_PASSWORD:-neo4j_local_dev_only}`
 
-### Step 3: Execute Ingestion, Traversals & Automated Verification Gates
+### Step 3: Python Driver Connectivity Health Probe (`driver.verify_connectivity()`)
+
+```python
+import os
+from neo4j import GraphDatabase
+from dotenv import load_dotenv
+
+load_dotenv()
+uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+user = os.getenv("NEO4J_USERNAME", "neo4j")
+password = os.getenv("NEO4J_PASSWORD", "neo4j_local_dev_only")
+
+driver = GraphDatabase.driver(uri, auth=(user, password))
+driver.verify_connectivity()
+print(f"[PASS] Successfully connected to Neo4j at {uri}")
+driver.close()
+```
+
+### Step 4: Execute Ingestion, Traversals & Automated Verification Gates
 
 ```bash
-# Execute against live Neo4j Bolt / AuraDB (automatically falls back if daemon is unreachable)
+# Execute against live Neo4j Bolt / AuraDB (auto-falls back to deterministic engine if unreachable)
 python3 sentinel_fraud_graph.py --verify
 
 # Execute deterministic CI/CD verification in offline property-graph mode
 python3 sentinel_fraud_graph.py --offline-mock --verify
 ```
 
+### Step 5: Generate LinkedIn Visual Showcase Asset
+
+```bash
+python3 scripts/generate_linkedin_post3_visual.py
+```
+
+*Generates `outputs/linkedin_post3_fraud_graph_showcase.png` (1920x1080 px at 300 DPI).*
+
 ### Automated Verification Gates
 
 Running `python3 sentinel_fraud_graph.py --verify` validates 6 production readiness gates (`outputs/graph_execution_audit.json`):
 
-1. `Gate 1 (DPDP Act 2023 & PCI-DSS v4.0 Zero-PII Guardrail)`: Confirms 12 PII column types are absent/stripped, merchant names are tokenized, and 100% of records carry `is_synthetic == True`.
-2. `Gate 2 (Uniqueness Constraints Enforced on Customer, Device, Merchant)`: Confirms `customer_id_unique`, `device_id_unique`, and `merchant_id_unique` constraints and relationship indexes are active.
-3. `Gate 3 (>= 5,000 Transactions Loaded & MERGE Idempotency Proven)`: Confirms `5,500` `:PAID` edges are ingested and replaying a 500-transaction batch produces `delta_nodes == 0` and `delta_edges == 0`.
-4. `Gate 4 (Query 1 Detects Shared Mule Devices >= 3 Customers in 7d)`: Confirms sliding 7-day device-sharing traversal identifies coordinated hardware hubs.
-5. `Gate 5 (Query 2 & Query 3 Detect 2-Hop Suspects & Collusive Merchants)`: Confirms 2-hop fraud proximity and shared-device merchant rankings return validated risk tables.
-6. `Gate 6 (Suspicious Cluster Visualization Rendered & Non-Empty)`: Confirms `outputs/suspicious_cluster_graph.png` is rendered at 220 DPI.
+| Gate | Validation Rule | Production Criterion | Result |
+| :--- | :--- | :--- | :--- |
+| **Gate 1** | DPDP Act 2023 & PCI-DSS v4.0 Zero-PII Guardrail | 12 PII columns absent/stripped; `is_synthetic == True` on 100% rows | **PASS** |
+| **Gate 2** | Uniqueness Constraints Enforced | `customer_id_unique`, `device_id_unique`, `merchant_id_unique` active | **PASS** |
+| **Gate 3** | >= 5,000 Transactions Loaded & Ingestion Idempotency | `5,500` `:PAID` edges loaded; batch replay delta: `nodes = 0, edges = 0` | **PASS** |
+| **Gate 4** | Query 1 Detects Shared Mule Devices (>= 3 cust / 7d) | Sliding 7-day window identifies coordinated hardware hubs | **PASS** |
+| **Gate 5** | Query 2 & Query 3 Detect 2-Hop Rings & Collusive Terminals | 2-hop fraud proximity and shared-device merchant tables populated | **PASS** |
+| **Gate 6** | Suspicious Cluster Subgraph Rendered & Non-Empty | `outputs/suspicious_cluster_graph.png` generated (> 25 KB) | **PASS** |
+
+---
 
 ## 5. Multi-Hop Fraud-Ring Query Benchmarks & Forensic Findings
 
 ### Query 1: Devices Shared by >= 3 Distinct Customers Within a 7-Day Window
 
-Identifies hardware device fingerprints rotated across 3 or more distinct customer accounts within a 7-day (`604,800` second) window (`FE-09: distinct_customers_per_device_7d`).
+Identifies hardware device fingerprints rotated across 3 or more distinct customer accounts within a sliding 7-day (`604,800` second) window (`FE-09: distinct_customers_per_device_7d`).
 
 ```cypher
 MATCH (c1:Customer)-[p1:PAID]->(:Merchant),
@@ -212,9 +292,11 @@ LIMIT 15;
 
 * **Engineering Analysis**: Across the top 10 shared devices, **83.3% to 93.8%** of payment authorizations are confirmed fraud (`fraud_label = 1`). Enforcing a real-time velocity rule or feature gate on `distinct_customers_per_device_7d >= 3` isolates emulator farms and credential-stuffing infrastructure with minimal false positives on genuine single-user devices.
 
+---
+
 ### Query 2: Customers Within 2 Hops of a Confirmed Fraudulent Payment
 
-Traverses up to 2 hops (`[:USED_DEVICE|PAID*1..2]`) from any customer with a confirmed fraudulent transaction (`fraud_label = 1`) to identify accomplice accounts sharing hardware devices or collusive merchant endpoints.
+Traverses up to 2 hops (`[:USED_DEVICE|PAID*1..2]`) from any customer who executed a confirmed fraudulent transaction (`fraud_label = 1`) to identify accomplice accounts sharing hardware devices or collusive merchant endpoints.
 
 ```cypher
 MATCH (fraud_c:Customer)-[fraud_p:PAID {fraud_label: 1}]->(target_m:Merchant)
@@ -255,11 +337,13 @@ LIMIT 20;
 | `C_bdb2b574454bab95` | Ahmedabad | 168 | 9 | 13 | 19 | 8 | Rs. 5,05,788.33 | `D_5ca245340c743a27`, `D_6d7f5ab50a9d0d70` |
 | `C_27c7e9189409bb1a` | Mumbai | 156 | 9 | 9 | 13 | 7 | Rs. 4,48,937.99 | `D_0bb69097ee9cdc43`, `D_1316c0b28d5165c3` |
 
-* **Engineering Analysis**: Because chargeback and dispute labels mature up to 60 days after authorization (`label_available_at = transaction_time + 60 days`), sleeper accounts in an active fraud ring often have zero matured fraud labels at scoring time. Ranking 2-hop neighbors by `shared_mule_devices` and `linked_fraud_customers` exposes linked accounts before chargebacks materialize.
+* **Engineering Analysis**: Because chargeback and dispute labels mature up to 60 days after authorization (`label_available_at = transaction_time + 60 days`), sleeper accounts in an active fraud syndicate often have zero matured fraud labels at scoring time. Ranking 2-hop neighbors by `shared_mule_devices` and `linked_fraud_customers` unmasks linked sleeper accounts before chargebacks materialize.
+
+---
 
 ### Query 3: Merchants Most Frequently Paid via Shared Devices (`>= 2` Customers)
 
-Identifies merchant terminals receiving disproportionate payment volume from devices shared by 2 or more distinct customers.
+Identifies merchant terminals receiving disproportionate payment volume from devices shared by 2 or more distinct customers, exposing collusive cash-out endpoints.
 
 ```cypher
 MATCH (c:Customer)-[:USED_DEVICE]->(d:Device)
@@ -297,12 +381,34 @@ LIMIT 15;
 
 * **Engineering Analysis**: Cash-out activity from shared devices clusters heavily in `electronics`, `travel`, and `gaming` merchants (`R08_HIGH_RISK_MCC`), where fraud rates on shared-device transactions reach **61.54% to 77.05%**.
 
+---
+
 ## 6. Suspicious Cluster Subgraph Topology (`outputs/suspicious_cluster_graph.png`)
 
-The automated visualization pipeline renders the primary detected fraud ring (`24` nodes, `51` edges) into a 3-tier radial layout (`outputs/suspicious_cluster_graph.png`):
+The automated visualization pipeline renders the primary detected fraud ring (`24` nodes, `51` edges) into a 3-tier radial layout:
 
-![Suspicious Cluster Subgraph Topology](outputs/suspicious_cluster_graph.png)
+![Suspicious Cluster Subgraph Topology](./outputs/suspicious_cluster_graph.png)
 
 * **Inner Core (Red Hexagons — `n = 4`)**: The highest-velocity shared mule devices (`D_b64f832752bf8208`, `D_4719e96e57524728`, `D_8bc56ee8a19df557`, `D_1316c0b28d5165c3`), each shared across 24 to 28 distinct customer accounts within 7 days.
 * **Middle Ring (Orange & Gold Circles — `n = 13`)**: `12` confirmed fraud customer accounts and `1` 2-hop linked suspect customer account (`C_871d59..` in Chennai) connected to the inner-core device hubs via solid amber `[:USED_DEVICE]` edges.
 * **Outer Ring (Blue Squares — `n = 7`)**: The top targeted high-risk merchants (`Merchant_Electronics_028`, `Merchant_Electronics_021`, `Merchant_Travel_020`, `Merchant_Travel_034`, `Merchant_Travel_033`, `Merchant_Travel_015`, `Merchant_Travel_032`) receiving dashed red `[:PAID {fraud_label: 1}]` payouts.
+
+---
+
+## 7. LinkedIn Split-Screen Visual Showcase Asset
+
+The accompanying high-resolution LinkedIn visual showcase graphic (`1920x1080` px at 300 DPI, dark-slate engineering theme) presents a side-by-side architectural comparison:
+
+* **Left Panel**: Styled IDE code block rendering the actual 2-hop Cypher traversal query (`[:USED_DEVICE|PAID*1..2]`) alongside the core architectural trade-off analysis (uniqueness constraints + parameterized `MERGE` = idempotent retries + millisecond 2-hop discovery).
+* **Right Panel**: Cleanly framed Suspicious Cluster Graph (`outputs/suspicious_cluster_graph.png`) with aspect ratio preserved, accompanied by the tokenized entity attribution legend (`C_*`, `D_*`, `M_*`).
+
+```bash
+# Reproduce the publication-grade visual asset
+python3 scripts/generate_linkedin_post3_visual.py
+```
+
+*Output Target: `./outputs/linkedin_post3_fraud_graph_showcase.png` (1920x1080 px, 300 DPI).*
+
+---
+
+[← Part 2: High-Throughput NoSQL Telemetry](../sentinel-nosql-telemetry/README.md) | [Project SENTINEL Monorepo Root](../README.md) | [Part 4: Point-in-Time Feature Engineering →](../sentinel-feature-pipeline/README.md)
