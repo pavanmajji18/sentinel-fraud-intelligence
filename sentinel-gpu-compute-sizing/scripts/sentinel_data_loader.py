@@ -557,7 +557,8 @@ def load_sentinel_tables(
             privacy_audit = enforce_data_privacy_guardrails(loaded)
             return loaded, f"Tier 1 (Local Sanitized Parquet: {parquet_dir.name})", privacy_audit
 
-    db_url = os.getenv("DATABASE_URL", "")
+    offline_mode = os.getenv("SENTINEL_OFFLINE_MOCK", "").lower() in {"1", "true", "yes"}
+    db_url = "" if offline_mode else os.getenv("DATABASE_URL", "")
     if db_url and "<" not in db_url:
         try:
             import psycopg2  # type: ignore

@@ -1301,8 +1301,8 @@
     }
   },
   "visual_artifacts": {
-    "geometry_plot": "D:\\Euron\\Work and Learn Super 30\\Fast-Track\\sentinel-fraud-intelligence\\sentinel-vector-search-engine\\outputs\\2d_vector_geometry.png",
-    "benchmarks_plot": "D:\\Euron\\Work and Learn Super 30\\Fast-Track\\sentinel-fraud-intelligence\\sentinel-vector-search-engine\\outputs\\vector_search_benchmarks.png"
+    "geometry_plot": "outputs/2d_vector_geometry.png",
+    "benchmarks_plot": "outputs/vector_search_benchmarks.png"
   },
   "verification_gates": {
     "Gate 1: Strict Gemini Embedding 2 Vector Provenance Gate (Zero Mock Vectors)": true,

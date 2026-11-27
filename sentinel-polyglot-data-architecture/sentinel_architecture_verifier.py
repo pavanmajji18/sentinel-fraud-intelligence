@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -247,4 +248,6 @@ if __name__ == "__main__":
     parser.add_argument("--offline-mock", action="store_true", help="Run using deterministic telemetry")
     parser.add_argument("--verify", action="store_true", help="Execute all 6 verification gates")
     args = parser.parse_args()
+    if args.offline_mock:
+        os.environ["SENTINEL_OFFLINE_MOCK"] = "true"
     sys.exit(run_verification())

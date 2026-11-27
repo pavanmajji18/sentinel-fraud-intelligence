@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import tempfile
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -94,8 +95,14 @@ def main() -> None:
     if args.offline_mock:
         os.environ["SENTINEL_OFFLINE_MOCK"] = "true"
 
-    out_dir = Path(__file__).resolve().parent / "outputs"
-    out_dir.mkdir(parents=True, exist_ok=True)
+    temp_dir_ctx = None
+    default_out = Path(__file__).resolve().parent / "outputs"
+    if args.offline_mock and (default_out / "privacy_and_grounding_audit.json").exists():
+        temp_dir_ctx = tempfile.TemporaryDirectory(prefix="sentinel_rag_offline_")
+        out_dir = Path(temp_dir_ctx.name)
+    else:
+        out_dir = default_out
+        out_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 88)
     print("[STAGE 1] Multi-Tier Telemetry Ingestion & DPDP Act 2023 / PCI-DSS v4.0 Privacy Gate")
@@ -223,6 +230,8 @@ def main() -> None:
             indent=2,
         )
     )
+    if temp_dir_ctx is not None:
+        temp_dir_ctx.cleanup()
     print("=" * 88)
     print("ALL 6 PRODUCTION ENGINEERING GATES PASSED SUCCESSFULLY.")
     print("=" * 88)

@@ -28,6 +28,7 @@ import math
 import os
 import re
 import sys
+import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -699,7 +700,7 @@ class DualGatewayGeminiEmbedder:
         else:
             vecs = self._embed_deterministic_semantic_3072d(texts)
 
-        if self.cache_path:
+        if self.cache_path and not self.offline_mock:
             self.cache_path.parent.mkdir(parents=True, exist_ok=True)
             np.savez_compressed(
                 self.cache_path,
@@ -899,9 +900,17 @@ def run_policy_retrieval_pipeline(
     chunk_overlap_words: int = 40,
 ) -> Dict[str, Any]:
     """Execute all 6 production stages of the Dense Policy Retrieval Engine and export verification telemetry."""
+    if offline_mock:
+        os.environ["SENTINEL_OFFLINE_MOCK"] = "true"
     collection_name = os.getenv("QDRANT_COLLECTION_NAME", "sentinel_policy_corpus")
-    outputs_dir = REPO_ROOT / "outputs"
-    outputs_dir.mkdir(parents=True, exist_ok=True)
+    temp_dir_ctx = None
+    default_outputs = REPO_ROOT / "outputs"
+    if offline_mock and (default_outputs / "verification_report.json").exists():
+        temp_dir_ctx = tempfile.TemporaryDirectory(prefix="sentinel_policy_offline_")
+        outputs_dir = Path(temp_dir_ctx.name)
+    else:
+        outputs_dir = default_outputs
+        outputs_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 92)
     print("PROJECT SENTINEL — DENSE POLICY RETRIEVAL ENGINE (GEMINI EMBEDDING 2 & QDRANT)")
@@ -1371,6 +1380,8 @@ def run_policy_retrieval_pipeline(
     benchmark_md_path.write_text("\n".join(md_lines), encoding="utf-8")
     print(f"  -> Exported Markdown Bench : {benchmark_md_path}")
     print("=" * 92)
+    if temp_dir_ctx is not None:
+        temp_dir_ctx.cleanup()
     return report
 
 

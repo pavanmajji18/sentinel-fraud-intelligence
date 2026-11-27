@@ -23,6 +23,7 @@ import copy
 import json
 import os
 import sys
+import tempfile
 import time
 import uuid
 from dataclasses import dataclass
@@ -1667,9 +1668,21 @@ def run_telemetry_engine_pipeline(
     output_dir: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Execute the end-to-end SENTINEL MongoDB telemetry and indexing workflow."""
-    load_dotenv(REPO_ROOT / ".env")
-    out_dir = output_dir or (REPO_ROOT / "outputs")
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if force_offline_mock:
+        os.environ["SENTINEL_OFFLINE_MOCK"] = "true"
+    else:
+        load_dotenv(REPO_ROOT / ".env")
+    temp_dir_ctx = None
+    default_out = REPO_ROOT / "outputs"
+    if output_dir is not None:
+        out_dir = output_dir
+        out_dir.mkdir(parents=True, exist_ok=True)
+    elif force_offline_mock and (default_out / "verification_report.json").exists():
+        temp_dir_ctx = tempfile.TemporaryDirectory(prefix="sentinel_nosql_offline_")
+        out_dir = Path(temp_dir_ctx.name)
+    else:
+        out_dir = default_out
+        out_dir.mkdir(parents=True, exist_ok=True)
 
     log_lines: List[str] = []
 
@@ -1922,6 +1935,8 @@ def run_telemetry_engine_pipeline(
     )
 
     client.close()
+    if temp_dir_ctx is not None:
+        temp_dir_ctx.cleanup()
     return full_report
 
 

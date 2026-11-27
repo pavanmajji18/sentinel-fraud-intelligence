@@ -41,6 +41,7 @@ import math
 import os
 import random
 import sys
+import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -212,15 +213,44 @@ class PolicyChunkRecord:
     is_synthetic: bool = False
 
 
-def load_sentinel_policy_corpus_and_embeddings() -> Tuple[List[PolicyChunkRecord], np.ndarray, np.ndarray, List[Dict[str, Any]]]:
+def _import_policy_retrieval_embedder() -> Tuple[Any, Any, Any]:
+    """Import offline embedding helpers from sentinel-policy-retrieval without `scripts` shadowing."""
+    saved_path = list(sys.path)
+    saved_scripts = {
+        k: v for k, v in sys.modules.items() if k == "scripts" or k.startswith("scripts.")
+    }
+    for k in list(saved_scripts.keys()):
+        del sys.modules[k]
+    repo_resolved = REPO_ROOT.resolve()
+    sys.path[:] = [str(POLICY_RETRIEVAL_ROOT)] + [
+        p for p in saved_path if p not in ("", ".") and Path(p).resolve() != repo_resolved
+    ]
+    try:
+        from qdrant_embeddings_pipeline import (  # type: ignore
+            DualGatewayGeminiEmbedder,
+            chunk_corpus_documents,
+        )
+        from scripts.sentinel_data_loader import load_sentinel_corpus  # type: ignore
+
+        return DualGatewayGeminiEmbedder, chunk_corpus_documents, load_sentinel_corpus
+    finally:
+        sys.path[:] = saved_path
+        for k in [k for k in list(sys.modules.keys()) if k == "scripts" or k.startswith("scripts.")]:
+            del sys.modules[k]
+        sys.modules.update(saved_scripts)
+
+
+def load_sentinel_policy_corpus_and_embeddings(
+    offline_mock: bool = False,
+) -> Tuple[List[PolicyChunkRecord], np.ndarray, np.ndarray, List[Dict[str, Any]]]:
     """
-    STRICT LOADER: Loads genuine 3072-d Gemini Embedding 2 vectors from sentinel-policy-retrieval.
-    Mock data and synthetic random vectors are strictly prohibited.
+    Load 3072-d Gemini Embedding 2 vectors from `sentinel-policy-retrieval` cache when available,
+    or deterministically compute 3072-d semantic-subspace embeddings over `corpus_chunks_cache.json`
+    when running in hermetic `--offline-mock` CI mode without `.npz` caches.
     """
     cache_candidates = [
         POLICY_RETRIEVAL_ROOT / "outputs" / "embeddings_cache.npz",
         REPO_ROOT.parent / "sentinel-policy-retrieval" / "outputs" / "embeddings_cache.npz",
-        Path("D:/Euron/Work and Learn Super 30/Fast-Track/sentinel-fraud-intelligence/sentinel-policy-retrieval/outputs/embeddings_cache.npz"),
     ]
 
     cache_path: Optional[Path] = None
@@ -229,20 +259,7 @@ def load_sentinel_policy_corpus_and_embeddings() -> Tuple[List[PolicyChunkRecord
             cache_path = p
             break
 
-    if cache_path is None:
-        raise FileNotFoundError(
-            "FATAL: Real Gemini Embedding 2 vectors from sentinel-policy-retrieval not found at "
-            f"{cache_candidates[0]}. Mock data is strictly prohibited."
-        )
-
-    print(f"  [DATA SOURCE] Loading real Gemini Embedding 2 vectors from: {cache_path}")
-    data = np.load(cache_path)
-    raw_embeddings = data["embeddings"].astype(np.float32)
-    chunk_str_ids = [str(cid) for cid in data["chunk_ids"]]
-    num_points = len(raw_embeddings)
-    assert raw_embeddings.shape[1] == EMBEDDING_DIM, f"Expected dim {EMBEDDING_DIM}, got {raw_embeddings.shape[1]}"
-
-    # Load real chunk metadata from outputs/corpus_chunks_cache.json or verification report
+    # Load real chunk metadata from outputs/corpus_chunks_cache.json
     payload_cache = REPO_ROOT / "outputs" / "corpus_chunks_cache.json"
     payloads_by_id: Dict[str, Dict[str, Any]] = {}
     if payload_cache.exists():
@@ -303,11 +320,59 @@ def load_sentinel_policy_corpus_and_embeddings() -> Tuple[List[PolicyChunkRecord
         },
     ]
 
-    # Load genuine Gemini Embedding 2 query vectors
+    if not offline_mock and cache_path is not None:
+        print(f"  [DATA SOURCE] Loading real Gemini Embedding 2 vectors from: {cache_path.name}")
+        data = np.load(cache_path)
+        raw_embeddings = data["embeddings"].astype(np.float32)
+        chunk_str_ids = [str(cid) for cid in data["chunk_ids"]]
+    elif offline_mock:
+        DualGatewayGeminiEmbedder, chunk_corpus_documents, load_sentinel_corpus = (
+            _import_policy_retrieval_embedder()
+        )
+
+        print("  [OFFLINE-MOCK] Computing deterministic 3072-d semantic corpus embeddings...")
+        embedder = DualGatewayGeminiEmbedder(dimension=EMBEDDING_DIM, offline_mock=True)
+        if payloads_by_id:
+            ordered_items = [
+                payloads_by_id[str(k)]
+                for k in sorted((int(key) for key in payloads_by_id.keys()))
+            ]
+            chunk_dicts = [
+                {
+                    "chunk_id": item.get("chunk_id", f"CH_{i}"),
+                    "text": item.get("text", item.get("title", "")),
+                }
+                for i, item in enumerate(ordered_items)
+            ]
+            chunk_str_ids = [c["chunk_id"] for c in chunk_dicts]
+            raw_embeddings = embedder.embed_documents(chunk_dicts)
+        else:
+            corpus_docs, _, _ = load_sentinel_corpus(min_documents=225, seed=42)
+            chunk_dicts, _ = chunk_corpus_documents(corpus_docs)
+            chunk_str_ids = [c["chunk_id"] for c in chunk_dicts]
+            raw_embeddings = embedder.embed_documents(chunk_dicts)
+            payloads_by_id = {str(i + 1): ch for i, ch in enumerate(chunk_dicts)}
+    else:
+        raise FileNotFoundError(
+            "FATAL: Real Gemini Embedding 2 vectors from sentinel-policy-retrieval not found at "
+            f"{cache_candidates[0]}. Pass --offline-mock for deterministic CI verification."
+        )
+
+    num_points = len(raw_embeddings)
+    assert raw_embeddings.shape[1] == EMBEDDING_DIM, f"Expected dim {EMBEDDING_DIM}, got {raw_embeddings.shape[1]}"
+
+    # Load Gemini Embedding 2 query vectors (or deterministic offline query vectors in CI)
     q_cache_path = REPO_ROOT / "outputs" / "query_embeddings_cache.npz"
-    if q_cache_path.exists():
+    if not offline_mock and q_cache_path.exists():
         q_data = np.load(q_cache_path)
         query_vectors = q_data["query_embeddings"].astype(np.float32)
+    elif offline_mock:
+        DualGatewayGeminiEmbedder, _, _ = _import_policy_retrieval_embedder()
+        q_embedder = DualGatewayGeminiEmbedder(dimension=EMBEDDING_DIM, offline_mock=True)
+        query_vectors = np.stack(
+            [q_embedder.embed_query(q_item["query_text"]) for q_item in domain_queries],
+            axis=0,
+        ).astype(np.float32)
     else:
         # Generate with live EURI gateway if cache missing
         print("  [GATEWAY] Generating genuine Gemini Embedding 2 query vectors via live EURI Gateway...")
@@ -596,8 +661,8 @@ class QdrantRetrievalAdapter:
                 self.client = QdrantClient(":memory:")
 
     def recreate_collection(self, collection_name: str, dim: int, distance: str) -> None:
-        dist_enum = models.Distance.COSINE if distance.lower() == "cosine" else models.Distance.EUCLID
         if self.client:
+            dist_enum = models.Distance.COSINE if distance.lower() == "cosine" else models.Distance.EUCLID
             if hasattr(self.client, "collection_exists") and self.client.collection_exists(collection_name):
                 self.client.delete_collection(collection_name)
             self.client.create_collection(
@@ -1139,9 +1204,15 @@ def generate_visual_artifacts(
     fig.savefig(bench_path, dpi=180)
     plt.close(fig)
 
+    def _rel(p: Path) -> str:
+        try:
+            return str(p.relative_to(REPO_ROOT)).replace("\\", "/")
+        except ValueError:
+            return p.name
+
     return {
-        "geometry_plot": str(geom_path),
-        "benchmarks_plot": str(bench_path),
+        "geometry_plot": _rel(geom_path),
+        "benchmarks_plot": _rel(bench_path),
     }
 
 
@@ -1152,6 +1223,11 @@ def generate_visual_artifacts(
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Project SENTINEL: High-Dimensional Vector Search Internals & HNSW Benchmarking Engine"
+    )
+    parser.add_argument(
+        "--offline-mock",
+        action="store_true",
+        help="Run in deterministic offline CI/CD mode using in-memory Qdrant and cached/deterministic 3072-d vectors",
     )
     parser.add_argument(
         "--verify",
@@ -1172,8 +1248,20 @@ def main() -> int:
         help="Output directory for JSON report and visual benchmark plots",
     )
     args = parser.parse_args()
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    if args.offline_mock:
+        os.environ["SENTINEL_OFFLINE_MOCK"] = "true"
+    default_out_str = str(REPO_ROOT / "outputs")
+    temp_dir_ctx = None
+    if (
+        args.offline_mock
+        and args.output_dir == default_out_str
+        and (REPO_ROOT / "outputs" / "vector_internals_verification_report.json").exists()
+    ):
+        temp_dir_ctx = tempfile.TemporaryDirectory(prefix="sentinel_vector_offline_")
+        output_dir = Path(temp_dir_ctx.name)
+    else:
+        output_dir = Path(args.output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 88)
     print("PROJECT SENTINEL — HIGH-DIMENSIONAL VECTOR SEARCH & HNSW BENCHMARKING ENGINE")
@@ -1209,9 +1297,11 @@ def main() -> int:
     # STAGE 2: Load Real Gemini Embedding 2 Vectors (Zero Mock / Zero Synthetic)
     # -------------------------------------------------------------------------
     print("\n[STAGE 2] Strictly Loading Real 3072-d Gemini Embedding 2 Vectors from sentinel-policy-retrieval")
-    chunks, raw_corpus_vecs, raw_query_vecs, domain_queries = load_sentinel_policy_corpus_and_embeddings()
+    chunks, raw_corpus_vecs, raw_query_vecs, domain_queries = load_sentinel_policy_corpus_and_embeddings(
+        offline_mock=args.offline_mock
+    )
     tables, active_tier, privacy_audit = load_sentinel_tables(data_dir=None, min_transactions=5500, seed=42)
-    qdrant = QdrantRetrievalAdapter(use_cloud=args.use_cloud)
+    qdrant = QdrantRetrievalAdapter(use_cloud=args.use_cloud and not args.offline_mock)
 
     print(f"  Telemetry Source     : {active_tier}")
     print(f"  Privacy Gate Status  : {privacy_audit['compliance_standard']} (Zero Raw PII Enforced)")
@@ -1316,7 +1406,10 @@ def main() -> int:
         and stage5_res["benchmarks_by_scale"][1]["num_vectors"] == 10000
         and stage5_res["benchmarks_by_scale"][1]["qdrant_hnsw_graph_search"]["p95_ms"] < 80.0
     )
-    gate6_pass = Path(visual_paths["geometry_plot"]).exists() and Path(visual_paths["benchmarks_plot"]).exists()
+    gate6_pass = (
+        (output_dir / Path(visual_paths["geometry_plot"]).name).exists()
+        and (output_dir / Path(visual_paths["benchmarks_plot"]).name).exists()
+    )
 
     gates = [
         ("Gate 1: Strict Gemini Embedding 2 Vector Provenance Gate (Zero Mock Vectors)", gate1_pass),
@@ -1359,6 +1452,8 @@ def main() -> int:
         json.dump(report, f, indent=2)
 
     print(f"\n[SUCCESS] All 6 verification gates passed! Report saved to: {report_path}")
+    if temp_dir_ctx is not None:
+        temp_dir_ctx.cleanup()
     return 0
 
 

@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -571,6 +572,8 @@ def main() -> None:
     parser.add_argument("--verify", action="store_true", help="Execute all 6 automated engineering & SLA verification gates")
     parser.add_argument("--output-json", type=str, default="", help="Optional path to write full JSON sizing report")
     args = parser.parse_args()
+    if args.offline_mock:
+        os.environ["SENTINEL_OFFLINE_MOCK"] = "true"
 
     print("=" * 92)
     print("PROJECT SENTINEL — FLOPS/TFLOPS COMPUTE SIZING, VRAM & GRANULARITY CALCULATOR")

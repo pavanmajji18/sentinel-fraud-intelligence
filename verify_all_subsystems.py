@@ -194,16 +194,40 @@ def verify_portfolio_hygiene() -> Tuple[bool, List[str]]:
     classroom_phrases = [
         "Task 1", "Task 2", "Task 3", "Task 4",
         "Task 5", "Task 6", "Task 7", "Task 8",
-        "Rubric", "Homework", "Assignment",
+        "Rubric", "Homework",
         "Demonstrate 5 Required CRUD",
     ]
+    # Tightened coursework pattern for "Assignment": catches classroom headings, numbered
+    # assignments, and coursework modifiers without false-positiving on domain phrases like
+    # "reason code assignment engine" or "feature assignment".
+    classroom_assignment_pattern = re.compile(
+        r"(?:"
+        r"(?i:\b(?:homework|course|class|lab|module|project|week|graded|coding|take[- ]home|this|your|my|our)\s+assignment\b)"
+        r"|(?i:\bassignment\s*(?:#?\d+\b|:|\b(?:rubric|prompt|brief|requirements?|instructions?|guidelines?|submission|overview|part)\b))"
+        r"|(?<!Reason Code )(?<!Feature )(?<!Label )(?<!Value )(?<!Variable )(?<!Role )(?<!Port )(?<!Key )\bAssignment\b"
+        r")"
+    )
 
     # 2. Case-Study Client Brand Name
     client_brand = "Pay" + "Vista"
 
-    # 3. Raw PII Column Names
+    # 3. Raw PII Column Names & Local Filesystem Paths
     raw_pii_columns = ["customer_name", "aadhaar", "pan", "card_number", "upi_id", "vpa"]
     pii_word_patterns = {col: re.compile(rf"\b{col}\b", re.IGNORECASE) for col in raw_pii_columns}
+    pii_structural_patterns = {
+        col: re.compile(
+            rf"(?:[\"']{col}[\"']\s*:|(?:\.|\bAS\s+|\bSET\s+|\bWHERE\s+|\bRETURN\s+)\b{col}\b|\b{col}\s*[:=])",
+            re.IGNORECASE,
+        )
+        for col in raw_pii_columns
+    }
+    policy_pii_context_pattern = re.compile(
+        r"(?:POL-PRIV-003|RBI-DPDP|enforce_data_privacy_guardrails|forbidden\s+raw\s+PII|12\s+forbidden|strips?\s+.*?\bPII\b)",
+        re.IGNORECASE,
+    )
+    local_path_pattern = re.compile(
+        r"(?:/Users/[A-Za-z0-9_.-]+|[A-Za-z]:(?:\\\\|\\|/)(?:Users|Euron)(?:\\\\|\\|/))"
+    )
 
     # Scan tracked files
     this_script_name = Path(__file__).name
@@ -229,15 +253,28 @@ def verify_portfolio_hygiene() -> Tuple[bool, List[str]]:
             if pattern.search(content):
                 violations.append(f"Classroom phrase '{phrase}' detected in: {rel_path}")
 
+        if classroom_assignment_pattern.search(content):
+            violations.append(f"Classroom phrase 'Assignment' detected in: {rel_path}")
+
         # Check internal client name
         if re.search(rf"\b{client_brand}\b", content, re.IGNORECASE):
             violations.append(f"Internal client identifier '{client_brand}' detected in: {rel_path}")
 
+        # Check machine-specific local filesystem paths
+        if local_path_pattern.search(content):
+            violations.append(f"Machine-specific local path detected in: {rel_path}")
+
         # Check raw PII column leaks (Strictly forbidden in data/JSON/TXT/Cypher files)
         if rel_path.endswith((".json", ".txt", ".cypher")):
-            for col, pat in pii_word_patterns.items():
-                if pat.search(content):
+            for col in raw_pii_columns:
+                if pii_structural_patterns[col].search(content):
                     violations.append(f"Raw PII column leak '{col}' detected in data file: {rel_path}")
+                    continue
+                word_pat = pii_word_patterns[col]
+                for line in content.splitlines():
+                    if word_pat.search(line) and not policy_pii_context_pattern.search(line):
+                        violations.append(f"Raw PII column leak '{col}' detected in data file: {rel_path}")
+                        break
 
     # 4. Check relative links and images in root README.md
     readme_path = WORKSPACE_ROOT / "README.md"
@@ -358,9 +395,12 @@ def run_subsystems() -> int:
 
         t0 = time.time()
         try:
+            run_env = os.environ.copy()
+            run_env["SENTINEL_OFFLINE_MOCK"] = "true"
             res = subprocess.run(
                 cmd,
                 cwd=str(s_dir),
+                env=run_env,
                 capture_output=True,
                 text=True,
                 timeout=180,

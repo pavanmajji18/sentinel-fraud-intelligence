@@ -36,29 +36,29 @@ flowchart TD
         PRIV --> ORCH
     end
 
-    subgraph PolyglotStores["3. Polyglot Persistence Architecture (Task 1 to Task 5)"]
+    subgraph PolyglotStores["3. Polyglot Persistence Architecture (Stores 1 to 3)"]
         direction TB
 
-        subgraph Store1["Task 1 & Task 3: Telemetry & Feature Store"]
+        subgraph Store1["Store 1: Relational & NoSQL Telemetry / Feature Store"]
             S1_DB[("PostgreSQL / Supabase (sentinel_demo)\n& MongoDB (sentinel_fraud_db)\n• Transactions, Features (FE-01..FE-10), Outcomes, Labels\n• Exact Integer Paise Ledger (amount_paise)\n• Compound Index: (customer_id, transaction_time)")]
             S1_WHY["WHY THIS STORE:\n• ACID transactional safety for monetary state.\n• Sub-millisecond O(1) B-tree primary key lookups (<1.5ms).\n• Schema enforcement preventing financial rounding drift.\n• BSON flexibility for polymorphic payment channel payloads."]
             S1_DB --- S1_WHY
         end
 
-        subgraph Store2["Task 2: Graph Neighborhood & Mule Ring Engine"]
+        subgraph Store2["Store 2: Graph Neighborhood & Mule Ring Engine"]
             S2_DB[("Neo4j AuraDB / Bolt Engine (3106f5af)\n• Nodes: (:Customer), (:Device), (:Merchant)\n• Edges: [:USED_DEVICE], [:PAID]\n• 7-Day Shared Device Rings & 2-Hop Fraud Contagion")]
             S2_WHY["WHY THIS STORE:\n• Native index-free adjacency traversal (<2.0ms).\n• Eliminates catastrophic recursive relational self-joins.\n• Rapidly uncovers shared mule devices (>=3 custs in 7d).\n• Pinpoints 2-hop contagion from confirmed fraud payments."]
             S2_DB --- S2_WHY
         end
 
-        subgraph Store3["Task 4 & Task 5: Regulatory & SOP Vector Index"]
+        subgraph Store3["Store 3: Regulatory & SOP Vector Index"]
             S3_DB[("Qdrant Vector Store (sentinel_policy_corpus)\n• 3072-d Dense Embeddings (Gemini Embedding 2)\n• 220+ RBI Master Directions, NPCI Guidelines, SOPs\n• 180w chunks with 40w overlap, Distance.COSINE")]
             S3_WHY["WHY THIS STORE:\n• High-dimensional unit-sphere semantic search (<1.5ms).\n• Bridges vocabulary gap between feature anomalies and legal SOPs.\n• Payload metadata filtering on document_type & reason_code.\n• Exact cosine similarity recall (Hit@5 = 100.0%)."]
             S3_DB --- S3_WHY
         end
     end
 
-    subgraph Synthesis["4. Dual-Gateway LLM Synthesis & Verification (Task 6)"]
+    subgraph Synthesis["4. Dual-Gateway LLM Synthesis & Grounding Verification"]
         LLM["Dual-Gateway LLM Synthesizer\nEuron EURI (euri-chat-fast) / Google Gemini 2.5 Flash\n+ FR-API-06 Deterministic Template Fallback"]
         VERIF["Grounding & Schema Verifier\n• Validates Pydantic ExplainResponse Model\n• Enforces Exact Entity IDs & Integer Paise Grounding\n• Audits Zero-PII Leakage & Regulatory Citations"]
         LLM --> VERIF
@@ -77,12 +77,12 @@ flowchart TD
 
 ### Detailed Polyglot Database Storage & Architectural Justification Matrix
 
-| Database / Engine | Project Task | What It Stores | Architectural Justification (Why This Engine) |
+| Database / Engine | Architecture Layer | What It Stores | Architectural Justification (Why This Engine) |
 | :--- | :--- | :--- | :--- |
-| **PostgreSQL / Supabase** (`sentinel_demo`) | **Task 1 & Task 3** | • `transactions` (authorization events, amount, channel, timestamp)<br>• `features` (point-in-time `FE-01` to `FE-10`, reason codes)<br>• `payment_outcomes` (status, failure codes)<br>• `labels` (ground truth fraud labels with 60-day maturation)<br>• Integer paise financial accounting (`amount_paise = round(amount * 100)`) | **ACID guarantees & deterministic indexing**: Multi-hop graph joins and 3072-d cosine scans degrade relational buffer pools and lock tables at high write throughput (2,800 TPS peak). PostgreSQL provides strict typing, primary key B-trees for sub-millisecond retrieval, and zero financial rounding drift. |
-| **MongoDB** (`sentinel_fraud_db`) | **Task 1 (NoSQL)** | • Unstructured / polymorphic transaction documents<br>• Dynamic device hardware fingerprints and telemetry<br>• Nested Haversine geo-coordinates (`customer_location`, `merchant_location`)<br>• Rapid customer-device history arrays | **Schema-flexible document ingestion**: Handles variable payload structures across 4 payment channels (UPI, Cards, Wallets, Net Banking) without schema migrations, indexing via ESR compound keys `(customer_id, transaction_time)`. |
-| **Neo4j AuraDB / Bolt** (`3106f5af`) | **Task 2 (Graph)** | • Heterogeneous graph entities: `(:Customer)`, `(:Device)`, `(:Merchant)`<br>• Directed relationships: `[:USED_DEVICE]`, `[:PAID]` with timestamps and fraud labels<br>• 7-day shared hardware clusters (`distinct_customers_per_device_7d >= 3`)<br>• 2-hop confirmed fraud exposure paths | **Index-free adjacency traversal**: Relational self-joins over high-degree shared devices suffer catastrophic combinatorial explosion during mule-ring attacks. Neo4j navigates graph pointers in constant time per edge, computing 2-hop contagion in `< 2.0 ms`. |
-| **Qdrant Vector Store** (`sentinel_policy_corpus`) | **Task 4 & Task 5 (Vectors)** | • 3072-dimensional unit-sphere dense embeddings (`Distance.COSINE`)<br>• 220+ regulatory documents & 238+ policy chunks (`180w` size, `40w` overlap)<br>• RBI Master Directions on digital payment security & liability<br>• NPCI UPI risk monitoring circulars & investigator SOP playbooks | **Semantic bridging of domain vocabularies**: Keyword search fails when an authorization anomaly (e.g. nocturnal velocity spike) maps conceptually to regulatory mandates (RBI AFA step-up or NPCI cooling periods). Cosine similarity in 3072-d space guarantees top-5 authoritative citation in `< 1.5 ms`. |
+| **PostgreSQL / Supabase** (`sentinel_demo`) | **Store 1 (Relational)** | • `transactions` (authorization events, amount, channel, timestamp)<br>• `features` (point-in-time `FE-01` to `FE-10`, reason codes)<br>• `payment_outcomes` (status, failure codes)<br>• `labels` (ground truth fraud labels with 60-day maturation)<br>• Integer paise financial accounting (`amount_paise = round(amount * 100)`) | **ACID guarantees & deterministic indexing**: Multi-hop graph joins and 3072-d cosine scans degrade relational buffer pools and lock tables at high write throughput (2,800 TPS peak). PostgreSQL provides strict typing, primary key B-trees for sub-millisecond retrieval, and zero financial rounding drift. |
+| **MongoDB** (`sentinel_fraud_db`) | **Store 1 (NoSQL)** | • Unstructured / polymorphic transaction documents<br>• Dynamic device hardware fingerprints and telemetry<br>• Nested Haversine geo-coordinates (`customer_location`, `merchant_location`)<br>• Rapid customer-device history arrays | **Schema-flexible document ingestion**: Handles variable payload structures across 4 payment channels (UPI, Cards, Wallets, Net Banking) without schema migrations, indexing via ESR compound keys `(customer_id, transaction_time)`. |
+| **Neo4j AuraDB / Bolt** (`3106f5af`) | **Store 2 (Graph)** | • Heterogeneous graph entities: `(:Customer)`, `(:Device)`, `(:Merchant)`<br>• Directed relationships: `[:USED_DEVICE]`, `[:PAID]` with timestamps and fraud labels<br>• 7-day shared hardware clusters (`distinct_customers_per_device_7d >= 3`)<br>• 2-hop confirmed fraud exposure paths | **Index-free adjacency traversal**: Relational self-joins over high-degree shared devices suffer catastrophic combinatorial explosion during mule-ring attacks. Neo4j navigates graph pointers in constant time per edge, computing 2-hop contagion in `< 2.0 ms`. |
+| **Qdrant Vector Store** (`sentinel_policy_corpus`) | **Store 3 (Vectors)** | • 3072-dimensional unit-sphere dense embeddings (`Distance.COSINE`)<br>• 220+ regulatory documents & 238+ policy chunks (`180w` size, `40w` overlap)<br>• RBI Master Directions on digital payment security & liability<br>• NPCI UPI risk monitoring circulars & investigator SOP playbooks | **Semantic bridging of domain vocabularies**: Keyword search fails when an authorization anomaly (e.g. nocturnal velocity spike) maps conceptually to regulatory mandates (RBI AFA step-up or NPCI cooling periods). Cosine similarity in 3072-d space guarantees top-5 authoritative citation in `< 1.5 ms`. |
 
 ## 3. Data Governance, Schema & Point-in-Time Feature Specification
 

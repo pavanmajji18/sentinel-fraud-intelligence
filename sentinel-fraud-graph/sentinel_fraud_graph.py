@@ -22,6 +22,7 @@ import argparse
 import json
 import os
 import sys
+import tempfile
 import time
 from collections import defaultdict
 from datetime import datetime
@@ -859,7 +860,10 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    load_dotenv()
+    if args.offline_mock:
+        os.environ["SENTINEL_OFFLINE_MOCK"] = "true"
+    else:
+        load_dotenv()
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     user = os.getenv("NEO4J_USER") or os.getenv("NEO4J_USERNAME") or "neo4j"
     password = os.getenv("NEO4J_PASSWORD", "neo4j_local_dev_only")
@@ -956,9 +960,15 @@ def main() -> int:
         )
     )
 
-    # Save CSV & JSON outputs
-    outputs_dir = SCRIPT_DIR / "outputs"
-    outputs_dir.mkdir(parents=True, exist_ok=True)
+    # Save CSV & JSON outputs (preserve committed outputs during --offline-mock if already present)
+    temp_dir_ctx = None
+    default_outputs = SCRIPT_DIR / "outputs"
+    if args.offline_mock and (default_outputs / "graph_execution_audit.json").exists():
+        temp_dir_ctx = tempfile.TemporaryDirectory(prefix="sentinel_graph_offline_")
+        outputs_dir = Path(temp_dir_ctx.name)
+    else:
+        outputs_dir = default_outputs
+        outputs_dir.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(q1_rows).to_csv(outputs_dir / "query_1_shared_devices_7d.csv", index=False)
     pd.DataFrame(q2_rows).to_csv(outputs_dir / "query_2_two_hop_fraud_customers.csv", index=False)
     pd.DataFrame(q3_rows).to_csv(outputs_dir / "query_3_merchants_shared_devices.csv", index=False)
@@ -1025,6 +1035,8 @@ def main() -> int:
             all_passed = False
 
     store.close()
+    if temp_dir_ctx is not None:
+        temp_dir_ctx.cleanup()
     if args.verify and not all_passed:
         return 1
     return 0

@@ -330,9 +330,9 @@ def generate_synthetic_sentinel_dataset(
             did = rng.choice(cust_primary_devices[cid])
 
         prior = cust_history[cid]
-        prior_90d = [p for p in prior if (cur_time - p["dt"]).days < 90]
-        prior_24h = [p for p in prior if (cur_time - p["dt"]).total_seconds() < 86400]
-        prior_1h = [p for p in prior if (cur_time - p["dt"]).total_seconds() < 3600]
+        prior_90d = [p for p in prior if 0.0 < (cur_time - p["dt"]).total_seconds() <= 90.0 * 86400.0]
+        prior_24h = [p for p in prior if 0.0 < (cur_time - p["dt"]).total_seconds() <= 86400.0]
+        prior_1h = [p for p in prior if 0.0 < (cur_time - p["dt"]).total_seconds() <= 3600.0]
 
         avg_val = round(float(np.mean([p["amount"] for p in prior_90d])), 2) if prior_90d else None
         if is_ring_attack and avg_val:
@@ -536,9 +536,9 @@ def load_sentinel_tables(
     offline_mock: bool = False,
 ) -> Tuple[Dict[str, pd.DataFrame], str, Dict[str, Any]]:
     """
-    Strict Tier 2 Telemetry Loader & DPDP/PCI-DSS Privacy Gate:
-      Loads all 7 core tables strictly from PostgreSQL / Supabase feature store (`DATABASE_URL`).
-      Strictly avoids Tier 3 synthetic fallback; raises RuntimeError on connection failure.
+    Telemetry Loader & DPDP/PCI-DSS Privacy Gate:
+      - Default (`offline_mock=False`): Strict Tier 2 load from PostgreSQL / Supabase (`DATABASE_URL`).
+      - CI/CD Mode (`offline_mock=True`): Deterministic Tier 3 schema-exact synthetic telemetry.
     Returns (tables_dict, active_tier_description, privacy_audit_summary).
     """
     required_tables = [
@@ -550,6 +550,28 @@ def load_sentinel_tables(
         "labels",
         "features",
     ]
+
+    if offline_mock:
+        num_customers = int(os.getenv("SENTINEL_NUM_CUSTOMERS", "500"))
+        num_merchants = int(os.getenv("SENTINEL_NUM_MERCHANTS", "120"))
+        num_devices = int(os.getenv("SENTINEL_NUM_DEVICES", "900"))
+        num_txns = max(
+            min_transactions, int(os.getenv("SENTINEL_NUM_TRANSACTIONS", str(min_transactions)))
+        )
+        synth_seed = int(os.getenv("SENTINEL_SYNTHETIC_SEED", str(seed)))
+        tables = generate_synthetic_sentinel_dataset(
+            num_customers=num_customers,
+            num_merchants=num_merchants,
+            num_devices=num_devices,
+            num_transactions=num_txns,
+            seed=synth_seed,
+        )
+        privacy_audit = enforce_data_privacy_guardrails(tables)
+        return (
+            tables,
+            f"Tier 3 (Deterministic Schema-Compliant Synthetic Telemetry: {num_txns:,} txns, seed={synth_seed})",
+            privacy_audit,
+        )
 
     db_url = os.getenv("DATABASE_URL", "").strip().strip("'\"")
     if not db_url or "<" in db_url:

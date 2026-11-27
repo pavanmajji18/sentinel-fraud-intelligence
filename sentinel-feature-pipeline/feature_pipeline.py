@@ -24,6 +24,7 @@ import json
 import math
 import os
 import sys
+import tempfile
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -1845,12 +1846,23 @@ def main() -> int:
         description="Project SENTINEL — Point-in-Time Feature Engineering & Leakage-Free Pipeline"
     )
     parser.add_argument("--data-dir", type=str, default=None, help="Optional data directory override")
+    parser.add_argument(
+        "--offline-mock",
+        action="store_true",
+        help="Run using deterministic Tier 3 synthetic telemetry for offline CI verification",
+    )
     parser.add_argument("--verify", action="store_true", help="Execute all 6 automated SLA & parity gates")
     args = parser.parse_args()
 
     t0 = time.perf_counter()
-    outputs_dir = REPO_ROOT / "outputs"
-    outputs_dir.mkdir(parents=True, exist_ok=True)
+    temp_dir_ctx = None
+    if args.offline_mock and (REPO_ROOT / "outputs" / "pipeline_verification_report.json").exists():
+        # Preserve committed Tier 2 live-Supabase reports while exercising full artifact export in CI
+        temp_dir_ctx = tempfile.TemporaryDirectory(prefix="sentinel_feature_offline_")
+        outputs_dir = Path(temp_dir_ctx.name)
+    else:
+        outputs_dir = REPO_ROOT / "outputs"
+        outputs_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 92)
     print("PROJECT SENTINEL — POINT-IN-TIME FEATURE ENGINEERING & LEAKAGE-FREE PIPELINE")
@@ -1861,9 +1873,9 @@ def main() -> int:
     tables, tier_desc, privacy_audit = load_sentinel_tables(
         data_dir=args.data_dir,
         min_transactions=5500,
-        offline_mock=False,
+        offline_mock=args.offline_mock,
     )
-    if "Tier 2" not in tier_desc:
+    if not args.offline_mock and "Tier 2" not in tier_desc:
         raise RuntimeError(
             f"Active telemetry source '{tier_desc}' is not Tier 2. "
             f"Project SENTINEL enforces strict Tier 2 execution against PostgreSQL / Supabase."
@@ -1986,8 +1998,10 @@ def main() -> int:
         (
             "Gate 6 [Deliverable Reports, CSV & Diagnostic Plot Exported]",
             (outputs_dir / "data_quality_report.md").exists()
+            and (outputs_dir / "data_quality_report.json").exists()
             and (outputs_dir / "feature_parity_report.md").exists()
-            and (outputs_dir / "pipeline_verification_report.json").exists()
+            and (outputs_dir / "feature_parity_summary.csv").exists()
+            and (outputs_dir / "recomputed_features_sample.csv").exists()
             and chart_path.exists(),
         ),
     ]
@@ -2013,6 +2027,9 @@ def main() -> int:
     (outputs_dir / "pipeline_verification_report.json").write_text(
         json.dumps(verification_payload, indent=2), encoding="utf-8"
     )
+
+    if temp_dir_ctx is not None:
+        temp_dir_ctx.cleanup()
 
     print("=" * 92)
     print(

@@ -573,13 +573,14 @@ def load_sentinel_corpus(
       Tier 3: Deterministic 225-document regulatory, policy, playbook & case narrative generator
     Returns (documents_list, active_tier_description, corpus_privacy_audit).
     """
+    workspace_root = Path(__file__).resolve().parent.parent.parent
     corpus_env = os.getenv("SENTINEL_CORPUS_DIR") or os.getenv("SENTINEL_CORPUS_PATH", "")
     candidate_dirs = [
         corpus_env,
         data_dir,
         os.getenv("SENTINEL_DATA_DIR", "./sentinel_data"),
-        r"D:\Euron\Work and Learn Super 30\Fast-Track\sentinel-fraud-intelligence\sentinel_data\corpus",
-        r"D:\Euron\Work and Learn Super 30\Fast-Track\sentinel-fraud-intelligence\sentinel_data",
+        str(workspace_root / "sentinel_data" / "corpus"),
+        str(workspace_root / "sentinel_data"),
         "../sentinel_data",
         "./sentinel_data",
         "./data/sentinel_data",
@@ -593,9 +594,10 @@ def load_sentinel_corpus(
                 docs = json.loads(cand.read_text(encoding="utf-8"))
                 if len(docs) >= 200:
                     audit = enforce_corpus_privacy_guardrails(docs)
-                    return docs, f"Tier 1 (Local Sanitized Corpus JSON: {cand})", audit
+                    return docs, f"Tier 1 (Local Sanitized Corpus JSON: {cand.name})", audit
 
-    db_url = os.getenv("DATABASE_URL", "")
+    offline_mode = os.getenv("SENTINEL_OFFLINE_MOCK", "").lower() in {"1", "true", "yes"}
+    db_url = "" if offline_mode else os.getenv("DATABASE_URL", "")
     if db_url and "<" not in db_url:
         try:
             import psycopg2  # type: ignore
@@ -980,9 +982,10 @@ def load_sentinel_tables(
         "features",
     ]
 
+    workspace_root = Path(__file__).resolve().parent.parent.parent
     candidate_dirs = [
         data_dir or os.getenv("SENTINEL_DATA_DIR", "./sentinel_data"),
-        r"D:\Euron\Work and Learn Super 30\Fast-Track\sentinel-fraud-intelligence\sentinel_data",
+        str(workspace_root / "sentinel_data"),
         "../sentinel_data",
         "./data/sentinel_data",
     ]
@@ -1003,7 +1006,8 @@ def load_sentinel_tables(
             privacy_audit = enforce_data_privacy_guardrails(loaded)
             return loaded, f"Tier 1 (Local Sanitized Parquet: {parquet_dir.name})", privacy_audit
 
-    db_url = os.getenv("DATABASE_URL", "")
+    offline_mode = os.getenv("SENTINEL_OFFLINE_MOCK", "").lower() in {"1", "true", "yes"}
+    db_url = "" if offline_mode else os.getenv("DATABASE_URL", "")
     if db_url and "<" not in db_url:
         try:
             import psycopg2  # type: ignore
